@@ -3,6 +3,7 @@ package de.hpi.idd.dysni.avl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
@@ -53,7 +54,7 @@ public class AVTTreeTest {
 		tree.insert(Foo.E);
 		tree.insert(Foo.A);
 		tree.insert(Foo.B);
-		final AVLTree<String, Foo>.Node d = tree.getTop();
+		final AVLTree<String, Foo>.Node d = tree.getRoot();
 		assertEquals(d.getSKV(), "d");
 		final AVLTree<String, Foo>.Node c = d.getPrevious();
 		assertEquals(c.getSKV(), "c");
@@ -82,7 +83,7 @@ public class AVTTreeTest {
 		tree.insert(Foo.B);
 		tree.insert(Foo.F);
 		tree.insert(Foo.E);
-		final AVLTree<String, Foo>.Node c = tree.getTop();
+		final AVLTree<String, Foo>.Node c = tree.getRoot();
 		assertEquals(c.getSKV(), "c");
 		final AVLTree<String, Foo>.Node d = c.getNext();
 		assertEquals(d.getSKV(), "d");
@@ -101,5 +102,44 @@ public class AVTTreeTest {
 		assertEquals(a.getSKV(), "a");
 		assertEquals(a.getNext().getSKV(), "b");
 		assertNull(a.getPrevious());
+	}
+
+	@Test
+	public void testDeletion() {
+		tree.insert(Foo.C);
+		tree.insert(Foo.A);
+		tree.insert(Foo.D);
+		tree.insert(Foo.B);
+		tree.insert(Foo.F);
+		tree.insert(Foo.E);
+		tree.delete(Foo.A);
+		tree.delete(Foo.E);
+		final AVLTree<String, Foo>.Node c = tree.getRoot();
+		assertEquals(c.getSKV(), "c");
+		final AVLTree<String, Foo>.Node d = c.getNext();
+		assertEquals(d.getSKV(), "d");
+		assertEquals(d.getPrevious().getSKV(), "c");
+		final AVLTree<String, Foo>.Node f = d.getNext();
+		assertEquals(f.getSKV(), "f");
+		assertEquals(f.getPrevious().getSKV(), "d");
+		assertNull(f.getNext());
+		final AVLTree<String, Foo>.Node b = c.getPrevious();
+		assertEquals(b.getSKV(), "b");
+		assertEquals(b.getNext().getSKV(), "c");
+		assertNull(b.getPrevious());
+	}
+
+	@Test
+	public void testDeletionWihtMultipleElements() {
+		tree.insert(Foo.A);
+		tree.insert(Foo.A);
+		tree.delete(Foo.A);
+		assertFalse(tree.isEmpty());
+		final AVLTree<String, Foo>.Node a = tree.getRoot();
+		assertEquals(a.getSKV(), "a");
+		assertNull(a.getNext());
+		assertNull(a.getPrevious());
+		tree.delete(Foo.A);
+		assertTrue(tree.isEmpty());
 	}
 }

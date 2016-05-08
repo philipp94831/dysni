@@ -566,7 +566,7 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 		return false;
 	}
 
-	private Node find(final T element) {
+	public Node find(final T element) {
 		for (Node node = top; node != null;) {
 			if (node.skv.compareTo(element.getSKV()) < 0) {
 				if (node.right == null) {
@@ -615,7 +615,7 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 		return top == null ? null : top.getSmallest();
 	}
 
-	public Node getTop() {
+	public Node getRoot() {
 		return top;
 	}
 
