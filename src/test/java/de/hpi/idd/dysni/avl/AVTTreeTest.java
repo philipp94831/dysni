@@ -47,7 +47,7 @@ public class AVTTreeTest {
 	}
 
 	@Test
-	public void testLeftRotation() {
+	public void testRightRotation() {
 		tree.insert(Foo.G);
 		tree.insert(Foo.I);
 		tree.insert(Foo.E);
@@ -88,7 +88,7 @@ public class AVTTreeTest {
 	}
 
 	@Test
-	public void testRightRotation() {
+	public void testLeftRotation() {
 		tree.insert(Foo.C);
 		tree.insert(Foo.A);
 		tree.insert(Foo.E);
