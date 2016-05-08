@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.hpi.idd.dysni.avl;
+package de.hpi.idd.dysni;
 
 import java.util.Iterator;
 
