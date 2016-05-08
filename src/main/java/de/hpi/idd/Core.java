@@ -1,4 +1,4 @@
-package de.hpi.idd.dysni;
+package de.hpi.idd;
 
 import java.util.ArrayList;
 import java.util.HashMap;
