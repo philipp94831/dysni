@@ -148,7 +148,7 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 		return top == null ? null : top.getSmallest();
 	}
 
-	public Node<U, T> getRoot() {
+	Node<U, T> getRoot() {
 		return top;
 	}
 
