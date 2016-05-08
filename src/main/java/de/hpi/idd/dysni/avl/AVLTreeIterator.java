@@ -1,4 +1,4 @@
-package de.hpi.idd.dysni;
+package de.hpi.idd.dysni.avl;
 
 import java.util.Iterator;
 

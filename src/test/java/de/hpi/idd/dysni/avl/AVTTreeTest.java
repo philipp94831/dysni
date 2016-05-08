@@ -7,8 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
-import de.hpi.idd.dysni.AVLTree;
-import de.hpi.idd.dysni.Element;
 import org.junit.Test;
 
 public class AVTTreeTest {
