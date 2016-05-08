@@ -92,7 +92,7 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 	public boolean delete(final T element) {
 		if (element != null) {
 			final Node<U, T> node = find(element);
-			if (node.elements.contains(element)) {
+			if (node.getElements().contains(element)) {
 				if (node.delete(element)) {
 					top = null;
 				}
@@ -105,16 +105,16 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 
 	public Node<U, T> find(final T element) {
 		for (Node<U, T> node = top; node != null;) {
-			if (node.skv.compareTo(element.getSKV()) < 0) {
-				if (node.right == null) {
+			if (node.getSKV().compareTo(element.getSKV()) < 0) {
+				if (node.getRight() == null) {
 					return null;
 				}
-				node = node.right;
-			} else if (node.skv.compareTo(element.getSKV()) > 0) {
-				if (node.left == null) {
+				node = node.getRight();
+			} else if (node.getSKV().compareTo(element.getSKV()) > 0) {
+				if (node.getLeft() == null) {
 					return null;
 				}
-				node = node.left;
+				node = node.getLeft();
 			} else {
 				return node;
 			}
@@ -161,7 +161,7 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 	public void insert(final T element) {
 		if (element != null) {
 			if (top == null) {
-				top = new Node<U, T>(element, null);
+				top = new Node<U, T>(element);
 			} else {
 				top.insert(element);
 			}

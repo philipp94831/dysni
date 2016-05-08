@@ -13,10 +13,10 @@ import de.hpi.idd.dysni.avl.AVLTree.Skew;
  * </p>
  * <p>
  * The nodes are not independant from each other but must obey specific
- * balancing constraints and the tree structure is rearranged as elements
- * are inserted or deleted from the tree. The creation, modification and
- * tree-related navigation methods have therefore restricted access. Only
- * the order-related navigation, reading and delete methods are public.
+ * balancing constraints and the tree structure is rearranged as elements are
+ * inserted or deleted from the tree. The creation, modification and
+ * tree-related navigation methods have therefore restricted access. Only the
+ * order-related navigation, reading and delete methods are public.
  * </p>
  *
  * @see AVLTree
@@ -24,18 +24,18 @@ import de.hpi.idd.dysni.avl.AVLTree.Skew;
 public class Node<U extends Comparable<U>, T extends Element<U>> {
 
 	/** Elements contained in the current node. */
-	List<T> elements = new ArrayList<>();
+	private List<T> elements = new ArrayList<>();
 	/** Left sub-tree. */
-	Node<U, T> left;
+	private Node<U, T> left;
 	private Node<U, T> next;
 	/** Parent tree. */
 	private Node<U, T> parent;
 	private Node<U, T> prev;
 	/** Right sub-tree. */
-	Node<U, T> right;
+	private Node<U, T> right;
 	/** Skew factor. */
 	private AVLTree.Skew skew;
-	U skv;
+	private U skv;
 
 	/**
 	 * Build a node for a specified element.
@@ -45,23 +45,25 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 	 * @param parent
 	 *            parent node
 	 */
-	Node(final T element, final Node<U, T> parent) {
+	Node(final T element) {
 		elements.add(element);
 		skv = element.getSKV();
 		left = null;
 		right = null;
-		this.parent = parent;
+		parent = null;
 		skew = Skew.BALANCED;
 		prev = null;
 		next = null;
 	}
 
 	/**
-	 * Delete the element from the tree. If the node is empty afterwards, the node is deleted from the tree
+	 * Delete the element from the tree. If the node is empty afterwards, the
+	 * node is deleted from the tree
 	 *
 	 * @param element
 	 * 
-	 * @return true if the deleted element was the root of the tree, false otherwise 
+	 * @return true if the deleted element was the root of the tree, false
+	 *         otherwise
 	 */
 	public boolean delete(final T element) {
 		elements.remove(element);
@@ -81,7 +83,7 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 					leftShrunk = node == node.parent.left;
 					child = null;
 				} else {
-					node = left != null ? left.getLargest() : right.getSmallest();
+					node = left != null ? prev : next;
 					elements = node.elements;
 					skv = node.skv;
 					if (left != null) {
@@ -94,12 +96,9 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 				}
 				node = node.parent;
 				if (leftShrunk) {
-					node.left = child;
+					node.setLeft(child);
 				} else {
-					node.right = child;
-				}
-				if (child != null) {
-					child.parent = node;
+					node.setRight(child);
 				}
 				while (leftShrunk ? node.rebalanceLeftShrunk() : node.rebalanceRightShrunk()) {
 					if (node.parent == null) {
@@ -123,11 +122,11 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 	}
 
 	/**
-	 * Get the node whose element is the largest one in the tree rooted at
-	 * this node.
+	 * Get the node whose element is the largest one in the tree rooted at this
+	 * node.
 	 *
-	 * @return the tree node containing the largest element in the tree
-	 *         rooted at this node or null if the tree is empty
+	 * @return the tree node containing the largest element in the tree rooted
+	 *         at this node or null if the tree is empty
 	 * @see #getSmallest
 	 */
 	Node<U, T> getLargest() {
@@ -138,6 +137,10 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		return node;
 	}
 
+	public Node<U, T> getLeft() {
+		return left;
+	}
+
 	public Node<U, T> getNext() {
 		return next;
 	}
@@ -146,16 +149,20 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		return prev;
 	}
 
+	public Node<U, T> getRight() {
+		return right;
+	}
+
 	public U getSKV() {
 		return skv;
 	}
 
 	/**
-	 * Get the node whose element is the smallest one in the tree rooted at
-	 * this node.
+	 * Get the node whose element is the smallest one in the tree rooted at this
+	 * node.
 	 *
-	 * @return the tree node containing the smallest element in the tree
-	 *         rooted at this node or null if the tree is empty
+	 * @return the tree node containing the smallest element in the tree rooted
+	 *         at this node or null if the tree is empty
 	 * @see #getLargest
 	 */
 	Node<U, T> getSmallest() {
@@ -177,7 +184,7 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		if (newElement.getSKV().compareTo(this.skv) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				left = new Node<U, T>(newElement, this);
+				setLeft(new Node<U, T>(newElement));
 				left.setPrev(prev);
 				setPrev(left);
 				return rebalanceLeftGrown();
@@ -190,7 +197,7 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			right = new Node<U, T>(newElement, this);
+			setRight(new Node<U, T>(newElement));
 			right.setNext(next);
 			setNext(right);
 			return rebalanceRightGrown();
@@ -384,10 +391,10 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 	private void rotateCCW() {
 		final List<T> tmpElt = elements;
 		final U tmpSkv = skv;
-		final Node<U, T> tmpNext = next == right? this : next;
+		final Node<U, T> tmpNext = next == right ? this : next;
 		final Node<U, T> tmpPrev = prev;
 		final Node<U, T> tmpRightNext = right.next;
-		final Node<U, T> tmpRightPrev = right.prev == this? right : right.prev;
+		final Node<U, T> tmpRightPrev = right.prev == this ? right : right.prev;
 		elements = right.elements;
 		skv = right.skv;
 		setNext(tmpRightNext);
@@ -397,16 +404,10 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		right.setPrev(tmpPrev);
 		right.setNext(tmpNext);
 		final Node<U, T> tmpNode = right;
-		right = tmpNode.right;
-		tmpNode.right = tmpNode.left;
-		tmpNode.left = left;
-		left = tmpNode;
-		if (right != null) {
-			right.parent = this;
-		}
-		if (left.left != null) {
-			left.left.parent = left;
-		}
+		setRight(tmpNode.right);
+		tmpNode.setRight(tmpNode.left);
+		tmpNode.setLeft(left);
+		setLeft(tmpNode);
 	}
 
 	/**
@@ -420,8 +421,8 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		final List<T> tmpElt = elements;
 		final U tmpSkv = skv;
 		final Node<U, T> tmpNext = next;
-		final Node<U, T> tmpPrev = prev == left? this : prev;
-		final Node<U, T> tmpLeftNext = left.next == this? left : left.next;
+		final Node<U, T> tmpPrev = prev == left ? this : prev;
+		final Node<U, T> tmpLeftNext = left.next == this ? left : left.next;
 		final Node<U, T> tmpLeftPrev = left.prev;
 		elements = left.elements;
 		skv = left.skv;
@@ -432,15 +433,23 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		left.setNext(tmpNext);
 		left.setPrev(tmpPrev);
 		final Node<U, T> tmpNode = left;
-		left = tmpNode.left;
-		tmpNode.left = tmpNode.right;
-		tmpNode.right = right;
-		right = tmpNode;
-		if (left != null) {
-			left.parent = this;
+		setLeft(tmpNode.left);
+		tmpNode.setLeft(tmpNode.right);
+		tmpNode.setRight(right);
+		setRight(tmpNode);
+	}
+
+	private void setLeft(Node<U, T> child) {
+		left = child;
+		if (child != null) {
+			child.parent = this;
 		}
-		if (right.right != null) {
-			right.right.parent = right;
+	}
+
+	private void setNext(final Node<U, T> next) {
+		this.next = next;
+		if (this.next != null) {
+			this.next.prev = this;
 		}
 	}
 
@@ -451,10 +460,10 @@ public class Node<U extends Comparable<U>, T extends Element<U>> {
 		}
 	}
 
-	private void setNext(final Node<U, T> next) {
-		this.next = next;
-		if (this.next != null) {
-			this.next.prev = this;
+	private void setRight(Node<U, T> child) {
+		right = child;
+		if (child != null) {
+			child.parent = this;
 		}
 	}
 
