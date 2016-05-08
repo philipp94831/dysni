@@ -17,6 +17,7 @@
 package de.hpi.idd.dysni.avl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -53,140 +54,7 @@ import java.util.List;
  *
  * @since 3.0 to be out of scope of Apache Commons Math
  */
-public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
-
-	/** Top level node. */
-	private Node top;
-
-	/**
-	 * Build an empty tree.
-	 */
-	public AVLTree() {
-		top = null;
-	}
-	
-	public Node getTop() {
-		return top;
-	}
-
-	/**
-	 * Insert an element in the tree.
-	 * 
-	 * @param element
-	 *            element to insert (silently ignored if null)
-	 */
-	public void insert(final T element) {
-		if (element != null) {
-			if (top == null) {
-				top = new Node(element, null);
-			} else {
-				top.insert(element);
-			}
-		}
-	}
-
-	/**
-	 * Delete an element from the tree.
-	 * <p>
-	 * The element is deleted only if there is a node {@code n} containing
-	 * exactly the element instance specified, i.e. for which
-	 * {@code n.getElement() == element}. This is purposely <em>different</em>
-	 * from the specification of the {@code java.util.Set} {@code remove} method
-	 * (in fact, this is the reason why a specific class has been developed).
-	 * </p>
-	 * 
-	 * @param element
-	 *            element to delete (silently ignored if null)
-	 * @return true if the element was deleted from the tree
-	 */
-	public boolean delete(final T element) {
-		if (element != null) {
-			Node node = find(element);
-			if (node.elements.contains(element)) {
-				node.delete(element);
-				return true;
-			}
-			return false;
-		}
-		return false;
-	}
-
-	private Node find(final T element) {
-		for (Node node = top; node != null;) {
-			if (node.skv.compareTo(element.getSKV()) < 0) {
-				if (node.right == null) {
-					return null;
-				}
-				node = node.right;
-			} else if (node.skv.compareTo(element.getSKV()) > 0) {
-				if (node.left == null) {
-					return null;
-				}
-				node = node.left;
-			} else {
-				return node;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Check if the tree is empty.
-	 * 
-	 * @return true if the tree is empty
-	 */
-	public boolean isEmpty() {
-		return top == null;
-	}
-
-	/**
-	 * Get the number of elements of the tree.
-	 * 
-	 * @return number of elements contained in the tree
-	 */
-	public int size() {
-		return (top == null) ? 0 : top.size();
-	}
-
-	/**
-	 * Get the node whose element is the smallest one in the tree.
-	 * 
-	 * @return the tree node containing the smallest element in the tree or null
-	 *         if the tree is empty
-	 * @see #getLargest
-	 * @see #getNotSmaller
-	 * @see #getNotLarger
-	 * @see Node#getPrevious
-	 * @see Node#getNext
-	 */
-	public Node getSmallest() {
-		return (top == null) ? null : top.getSmallest();
-	}
-
-	/**
-	 * Get the node whose element is the largest one in the tree.
-	 * 
-	 * @return the tree node containing the largest element in the tree or null
-	 *         if the tree is empty
-	 * @see #getSmallest
-	 * @see #getNotSmaller
-	 * @see #getNotLarger
-	 * @see Node#getPrevious
-	 * @see Node#getNext
-	 */
-	public Node getLargest() {
-		return (top == null) ? null : top.getLargest();
-	}
-
-	/** Enum for tree skew factor. */
-	private enum Skew {
-		/** Code for left high trees. */
-		LEFT_HIGH,
-		/** Code for right high trees. */
-		RIGHT_HIGH,
-		/** Code for Skew.BALANCED trees. */
-		BALANCED;
-	}
+public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements Iterable<AVLTree<U, T>.Node> {
 
 	/**
 	 * This class implements AVL trees nodes.
@@ -201,28 +69,28 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 	 * tree-related navigation methods have therefore restricted access. Only
 	 * the order-related navigation, reading and delete methods are public.
 	 * </p>
-	 * 
+	 *
 	 * @see AVLTree
 	 */
 	public class Node {
 
 		/** Elements contained in the current node. */
 		private List<T> elements = new ArrayList<>();
-		private U skv;
 		/** Left sub-tree. */
 		private Node left;
-		/** Right sub-tree. */
-		private Node right;
+		private Node next;
 		/** Parent tree. */
 		private Node parent;
+		private Node prev;
+		/** Right sub-tree. */
+		private Node right;
 		/** Skew factor. */
 		private Skew skew;
-		private Node prev;
-		private Node next;
+		private U skv;
 
 		/**
 		 * Build a node for a specified element.
-		 * 
+		 *
 		 * @param element
 		 *            element
 		 * @param parent
@@ -238,19 +106,67 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 			prev = null;
 			next = null;
 		}
-		
-		public U getSKV() {
-			return skv;
-		}
 
-		@Override
-		public String toString() {
-			return skv.toString();
+		/**
+		 * Delete the node from the tree.
+		 *
+		 * @param element
+		 */
+		public void delete(final T element) {
+			elements.remove(element);
+			if (elements.isEmpty()) {
+				if (parent == null && left == null && right == null) {
+					// this was the last node, the tree is now empty
+					elements = null;
+					top = null;
+				} else {
+					Node node;
+					Node child;
+					boolean leftShrunk;
+					if (left == null && right == null) {
+						node = this;
+						elements = null;
+						prev.next = next;
+						next.prev = prev;
+						leftShrunk = node == node.parent.left;
+						child = null;
+					} else {
+						node = left != null ? left.getLargest() : right.getSmallest();
+						elements = node.elements;
+						skv = node.skv;
+						if (left != null) {
+							prev = node.prev;
+							prev.next = this;
+						} else {
+							next = node.next;
+							next.prev = this;
+						}
+						leftShrunk = node == node.parent.left;
+						child = node.left != null ? node.left : node.right;
+					}
+					node = node.parent;
+					if (leftShrunk) {
+						node.left = child;
+					} else {
+						node.right = child;
+					}
+					if (child != null) {
+						child.parent = node;
+					}
+					while (leftShrunk ? node.rebalanceLeftShrunk() : node.rebalanceRightShrunk()) {
+						if (node.parent == null) {
+							return;
+						}
+						leftShrunk = node == node.parent.left;
+						node = node.parent;
+					}
+				}
+			}
 		}
 
 		/**
 		 * Get the contained element.
-		 * 
+		 *
 		 * @return element contained in the node
 		 */
 		public List<T> getElements() {
@@ -258,18 +174,37 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 		}
 
 		/**
-		 * Get the number of elements of the tree rooted at this node.
-		 * 
-		 * @return number of elements contained in the tree rooted at this node
+		 * Get the node whose element is the largest one in the tree rooted at
+		 * this node.
+		 *
+		 * @return the tree node containing the largest element in the tree
+		 *         rooted at this node or null if the tree is empty
+		 * @see #getSmallest
 		 */
-		int size() {
-			return 1 + ((left == null) ? 0 : left.size()) + ((right == null) ? 0 : right.size());
+		Node getLargest() {
+			Node node = this;
+			while (node.right != null) {
+				node = node.right;
+			}
+			return node;
+		}
+
+		public Node getNext() {
+			return next;
+		}
+
+		public Node getPrevious() {
+			return prev;
+		}
+
+		public U getSKV() {
+			return skv;
 		}
 
 		/**
 		 * Get the node whose element is the smallest one in the tree rooted at
 		 * this node.
-		 * 
+		 *
 		 * @return the tree node containing the smallest element in the tree
 		 *         rooted at this node or null if the tree is empty
 		 * @see #getLargest
@@ -283,32 +218,8 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 		}
 
 		/**
-		 * Get the node whose element is the largest one in the tree rooted at
-		 * this node.
-		 * 
-		 * @return the tree node containing the largest element in the tree
-		 *         rooted at this node or null if the tree is empty
-		 * @see #getSmallest
-		 */
-		Node getLargest() {
-			Node node = this;
-			while (node.right != null) {
-				node = node.right;
-			}
-			return node;
-		}
-
-		public Node getPrevious() {
-			return prev;
-		}
-
-		public Node getNext() {
-			return next;
-		}
-
-		/**
 		 * Insert an element in a sub-tree.
-		 * 
+		 *
 		 * @param newElement
 		 *            element to insert
 		 * @return true if the parent tree should be re-Skew.BALANCED
@@ -347,65 +258,8 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 		}
 
 		/**
-		 * Delete the node from the tree.
-		 * 
-		 * @param element
-		 */
-		public void delete(T element) {
-			elements.remove(element);
-			if (elements.isEmpty()) {
-				if ((parent == null) && (left == null) && (right == null)) {
-					// this was the last node, the tree is now empty
-					elements = null;
-					top = null;
-				} else {
-					Node node;
-					Node child;
-					boolean leftShrunk;
-					if ((left == null) && (right == null)) {
-						node = this;
-						elements = null;
-						prev.next = next;
-						next.prev = prev;
-						leftShrunk = node == node.parent.left;
-						child = null;
-					} else {
-						node = (left != null) ? left.getLargest() : right.getSmallest();
-						elements = node.elements;
-						skv = node.skv;
-						if (left != null) {
-							prev = node.prev;
-							prev.next = this;
-						} else {
-							next = node.next;
-							next.prev = this;
-						}
-						leftShrunk = node == node.parent.left;
-						child = (node.left != null) ? node.left : node.right;
-					}
-					node = node.parent;
-					if (leftShrunk) {
-						node.left = child;
-					} else {
-						node.right = child;
-					}
-					if (child != null) {
-						child.parent = node;
-					}
-					while (leftShrunk ? node.rebalanceLeftShrunk() : node.rebalanceRightShrunk()) {
-						if (node.parent == null) {
-							return;
-						}
-						leftShrunk = node == node.parent.left;
-						node = node.parent;
-					}
-				}
-			}
-		}
-
-		/**
 		 * Re-balance the instance as left sub-tree has grown.
-		 * 
+		 *
 		 * @return true if the parent tree should be reSkew.BALANCED too
 		 */
 		private boolean rebalanceLeftGrown() {
@@ -445,49 +299,8 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 		}
 
 		/**
-		 * Re-balance the instance as right sub-tree has grown.
-		 * 
-		 * @return true if the parent tree should be reSkew.BALANCED too
-		 */
-		private boolean rebalanceRightGrown() {
-			switch (skew) {
-			case LEFT_HIGH:
-				skew = Skew.BALANCED;
-				return false;
-			case RIGHT_HIGH:
-				if (right.skew == Skew.RIGHT_HIGH) {
-					rotateCCW();
-					skew = Skew.BALANCED;
-					left.skew = Skew.BALANCED;
-				} else {
-					final Skew s = right.left.skew;
-					right.rotateCW();
-					rotateCCW();
-					switch (s) {
-					case LEFT_HIGH:
-						left.skew = Skew.BALANCED;
-						right.skew = Skew.RIGHT_HIGH;
-						break;
-					case RIGHT_HIGH:
-						left.skew = Skew.LEFT_HIGH;
-						right.skew = Skew.BALANCED;
-						break;
-					default:
-						left.skew = Skew.BALANCED;
-						right.skew = Skew.BALANCED;
-					}
-					skew = Skew.BALANCED;
-				}
-				return false;
-			default:
-				skew = Skew.RIGHT_HIGH;
-				return true;
-			}
-		}
-
-		/**
 		 * Re-balance the instance as left sub-tree has shrunk.
-		 * 
+		 *
 		 * @return true if the parent tree should be reSkew.BALANCED too
 		 */
 		private boolean rebalanceLeftShrunk() {
@@ -533,8 +346,49 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 		}
 
 		/**
+		 * Re-balance the instance as right sub-tree has grown.
+		 *
+		 * @return true if the parent tree should be reSkew.BALANCED too
+		 */
+		private boolean rebalanceRightGrown() {
+			switch (skew) {
+			case LEFT_HIGH:
+				skew = Skew.BALANCED;
+				return false;
+			case RIGHT_HIGH:
+				if (right.skew == Skew.RIGHT_HIGH) {
+					rotateCCW();
+					skew = Skew.BALANCED;
+					left.skew = Skew.BALANCED;
+				} else {
+					final Skew s = right.left.skew;
+					right.rotateCW();
+					rotateCCW();
+					switch (s) {
+					case LEFT_HIGH:
+						left.skew = Skew.BALANCED;
+						right.skew = Skew.RIGHT_HIGH;
+						break;
+					case RIGHT_HIGH:
+						left.skew = Skew.LEFT_HIGH;
+						right.skew = Skew.BALANCED;
+						break;
+					default:
+						left.skew = Skew.BALANCED;
+						right.skew = Skew.BALANCED;
+					}
+					skew = Skew.BALANCED;
+				}
+				return false;
+			default:
+				skew = Skew.RIGHT_HIGH;
+				return true;
+			}
+		}
+
+		/**
 		 * Re-balance the instance as right sub-tree has shrunk.
-		 * 
+		 *
 		 * @return true if the parent tree should be reSkew.BALANCED too
 		 */
 		private boolean rebalanceRightShrunk() {
@@ -580,6 +434,42 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 		}
 
 		/**
+		 * Perform a counter-clockwise rotation rooted at the instance.
+		 * <p>
+		 * The skew factor are not updated by this method, they <em>must</em> be
+		 * updated by the caller
+		 * </p>
+		 */
+		private void rotateCCW() {
+			final List<T> tmpElt = elements;
+			final U tmpSkv = skv;
+			final Node tmpPrev = prev;
+			elements = right.elements;
+			skv = right.skv;
+			next = right.next;
+			next.prev = this;
+			prev = right;
+			prev.next = this;
+			right.elements = tmpElt;
+			right.skv = tmpSkv;
+			right.prev = tmpPrev;
+			if (right.prev != null) {
+				right.prev.next = right;
+			}
+			final Node tmpNode = right;
+			right = tmpNode.right;
+			tmpNode.right = tmpNode.left;
+			tmpNode.left = left;
+			left = tmpNode;
+			if (right != null) {
+				right.parent = this;
+			}
+			if (left.left != null) {
+				left.left.parent = left;
+			}
+		}
+
+		/**
 		 * Perform a clockwise rotation rooted at the instance.
 		 * <p>
 		 * The skew factor are not updated by this method, they <em>must</em> be
@@ -616,39 +506,155 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> {
 		}
 
 		/**
-		 * Perform a counter-clockwise rotation rooted at the instance.
-		 * <p>
-		 * The skew factor are not updated by this method, they <em>must</em> be
-		 * updated by the caller
-		 * </p>
+		 * Get the number of elements of the tree rooted at this node.
+		 *
+		 * @return number of elements contained in the tree rooted at this node
 		 */
-		private void rotateCCW() {
-			final List<T> tmpElt = elements;
-			final U tmpSkv = skv;
-			final Node tmpPrev = prev;
-			elements = right.elements;
-			skv = right.skv;
-			next = right.next;
-			next.prev = this;
-			prev = right;
-			prev.next = this;
-			right.elements = tmpElt;
-			right.skv = tmpSkv;
-			right.prev = tmpPrev;
-			if (right.prev != null) {
-				right.prev.next = right;
+		int size() {
+			return 1 + (left == null ? 0 : left.size()) + (right == null ? 0 : right.size());
+		}
+
+		@Override
+		public String toString() {
+			return skv.toString();
+		}
+	}
+
+	/** Enum for tree skew factor. */
+	private enum Skew {
+		/** Code for Skew.BALANCED trees. */
+		BALANCED,
+		/** Code for left high trees. */
+		LEFT_HIGH,
+		/** Code for right high trees. */
+		RIGHT_HIGH;
+	}
+
+	/** Top level node. */
+	private Node top;
+
+	/**
+	 * Build an empty tree.
+	 */
+	public AVLTree() {
+		top = null;
+	}
+
+	/**
+	 * Delete an element from the tree.
+	 * <p>
+	 * The element is deleted only if there is a node {@code n} containing
+	 * exactly the element instance specified, i.e. for which
+	 * {@code n.getElement() == element}. This is purposely <em>different</em>
+	 * from the specification of the {@code java.util.Set} {@code remove} method
+	 * (in fact, this is the reason why a specific class has been developed).
+	 * </p>
+	 *
+	 * @param element
+	 *            element to delete (silently ignored if null)
+	 * @return true if the element was deleted from the tree
+	 */
+	public boolean delete(final T element) {
+		if (element != null) {
+			final Node node = find(element);
+			if (node.elements.contains(element)) {
+				node.delete(element);
+				return true;
 			}
-			final Node tmpNode = right;
-			right = tmpNode.right;
-			tmpNode.right = tmpNode.left;
-			tmpNode.left = left;
-			left = tmpNode;
-			if (right != null) {
-				right.parent = this;
-			}
-			if (left.left != null) {
-				left.left.parent = left;
+			return false;
+		}
+		return false;
+	}
+
+	private Node find(final T element) {
+		for (Node node = top; node != null;) {
+			if (node.skv.compareTo(element.getSKV()) < 0) {
+				if (node.right == null) {
+					return null;
+				}
+				node = node.right;
+			} else if (node.skv.compareTo(element.getSKV()) > 0) {
+				if (node.left == null) {
+					return null;
+				}
+				node = node.left;
+			} else {
+				return node;
 			}
 		}
+		return null;
+	}
+
+	/**
+	 * Get the node whose element is the largest one in the tree.
+	 *
+	 * @return the tree node containing the largest element in the tree or null
+	 *         if the tree is empty
+	 * @see #getSmallest
+	 * @see #getNotSmaller
+	 * @see #getNotLarger
+	 * @see Node#getPrevious
+	 * @see Node#getNext
+	 */
+	public Node getLargest() {
+		return top == null ? null : top.getLargest();
+	}
+
+	/**
+	 * Get the node whose element is the smallest one in the tree.
+	 *
+	 * @return the tree node containing the smallest element in the tree or null
+	 *         if the tree is empty
+	 * @see #getLargest
+	 * @see #getNotSmaller
+	 * @see #getNotLarger
+	 * @see Node#getPrevious
+	 * @see Node#getNext
+	 */
+	public Node getSmallest() {
+		return top == null ? null : top.getSmallest();
+	}
+
+	public Node getTop() {
+		return top;
+	}
+
+	/**
+	 * Insert an element in the tree.
+	 *
+	 * @param element
+	 *            element to insert (silently ignored if null)
+	 */
+	public void insert(final T element) {
+		if (element != null) {
+			if (top == null) {
+				top = new Node(element, null);
+			} else {
+				top.insert(element);
+			}
+		}
+	}
+
+	/**
+	 * Check if the tree is empty.
+	 *
+	 * @return true if the tree is empty
+	 */
+	public boolean isEmpty() {
+		return top == null;
+	}
+
+	@Override
+	public Iterator<AVLTree<U, T>.Node> iterator() {
+		return new AVLTreeIterator<U, T>(getSmallest());
+	}
+
+	/**
+	 * Get the number of elements of the tree.
+	 *
+	 * @return number of elements contained in the tree
+	 */
+	public int size() {
+		return top == null ? 0 : top.size();
 	}
 }

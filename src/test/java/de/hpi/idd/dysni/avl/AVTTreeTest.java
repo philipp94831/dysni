@@ -1,14 +1,78 @@
 package de.hpi.idd.dysni.avl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
+import java.util.Iterator;
 
 import org.junit.Test;
 
-import de.hpi.idd.dysni.avl.AVLTree.Node;
-
 public class AVTTreeTest {
-	
-	private AVLTree<String, Foo> tree = new AVLTree<>();
+
+	private static enum Foo implements Element<String> {
+		A("a"), B("b"), C("c"), D("d"), E("e"), F("f");
+
+		private final String skv;
+
+		private Foo(final String skv) {
+			this.skv = skv;
+		}
+
+		@Override
+		public String getSKV() {
+			return skv;
+		}
+	}
+
+	private final AVLTree<String, Foo> tree = new AVLTree<>();
+
+	@Test
+	public void testIterator() {
+		tree.insert(Foo.D);
+		tree.insert(Foo.F);
+		tree.insert(Foo.C);
+		tree.insert(Foo.E);
+		tree.insert(Foo.A);
+		tree.insert(Foo.B);
+		final Iterator<AVLTree<String, Foo>.Node> it = tree.iterator();
+		assertEquals(it.next().getSKV(), "a");
+		assertEquals(it.next().getSKV(), "b");
+		assertEquals(it.next().getSKV(), "c");
+		assertEquals(it.next().getSKV(), "d");
+		assertEquals(it.next().getSKV(), "e");
+		assertEquals(it.next().getSKV(), "f");
+		assertFalse(it.hasNext());
+	}
+
+	@Test
+	public void testLeftRotation() {
+		tree.insert(Foo.D);
+		tree.insert(Foo.F);
+		tree.insert(Foo.C);
+		tree.insert(Foo.E);
+		tree.insert(Foo.A);
+		tree.insert(Foo.B);
+		final AVLTree<String, Foo>.Node d = tree.getTop();
+		assertEquals(d.getSKV(), "d");
+		final AVLTree<String, Foo>.Node c = d.getPrevious();
+		assertEquals(c.getSKV(), "c");
+		assertEquals(c.getNext().getSKV(), "d");
+		final AVLTree<String, Foo>.Node b = c.getPrevious();
+		assertEquals(b.getSKV(), "b");
+		assertEquals(b.getNext().getSKV(), "c");
+		final AVLTree<String, Foo>.Node a = b.getPrevious();
+		assertEquals(a.getSKV(), "a");
+		assertEquals(a.getNext().getSKV(), "b");
+		assertNull(a.getPrevious());
+		final AVLTree<String, Foo>.Node e = d.getNext();
+		assertEquals(e.getSKV(), "e");
+		assertEquals(e.getPrevious().getSKV(), "d");
+		final AVLTree<String, Foo>.Node f = e.getNext();
+		assertEquals(f.getSKV(), "f");
+		assertEquals(f.getPrevious().getSKV(), "e");
+		assertNull(f.getNext());
+	}
 
 	@Test
 	public void testRightRotation() {
@@ -18,40 +82,24 @@ public class AVTTreeTest {
 		tree.insert(Foo.B);
 		tree.insert(Foo.F);
 		tree.insert(Foo.E);
-		Node c = tree.getTop();
+		final AVLTree<String, Foo>.Node c = tree.getTop();
 		assertEquals(c.getSKV(), "c");
-		Node d = c.getNext();
+		final AVLTree<String, Foo>.Node d = c.getNext();
 		assertEquals(d.getSKV(), "d");
 		assertEquals(d.getPrevious().getSKV(), "c");
-		Node e = d.getNext();
+		final AVLTree<String, Foo>.Node e = d.getNext();
 		assertEquals(e.getSKV(), "e");
 		assertEquals(e.getPrevious().getSKV(), "d");
-		Node f = e.getNext();
+		final AVLTree<String, Foo>.Node f = e.getNext();
 		assertEquals(f.getSKV(), "f");
 		assertEquals(f.getPrevious().getSKV(), "e");
 		assertNull(f.getNext());
-		Node b = c.getPrevious();
+		final AVLTree<String, Foo>.Node b = c.getPrevious();
 		assertEquals(b.getSKV(), "b");
 		assertEquals(b.getNext().getSKV(), "c");
-		Node a = b.getPrevious();
+		final AVLTree<String, Foo>.Node a = b.getPrevious();
 		assertEquals(a.getSKV(), "a");
 		assertEquals(a.getNext().getSKV(), "b");
 		assertNull(a.getPrevious());
-	}
-
-	private static enum Foo implements Element<String> {
-		
-		A("a"), B("b"), C("c"), D("d"), E("e"), F("f");
-
-		private final String skv;
-
-		private Foo(String skv) {
-			this.skv = skv;
-		}
-
-		@Override
-		public String getSKV() {
-			return skv;
-		}
 	}
 }
