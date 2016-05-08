@@ -443,18 +443,25 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 		private void rotateCCW() {
 			final List<T> tmpElt = elements;
 			final U tmpSkv = skv;
+			final Node tmpNext = next == right? this : next;
 			final Node tmpPrev = prev;
+			final Node tmpRightNext = right.next;
+			final Node tmpRightPrev = right.prev == this? right : right.prev;
 			elements = right.elements;
 			skv = right.skv;
-			next = right.next;
+			next = tmpRightNext;
 			next.prev = this;
-			prev = right;
+			prev = tmpRightPrev;
 			prev.next = this;
 			right.elements = tmpElt;
 			right.skv = tmpSkv;
 			right.prev = tmpPrev;
 			if (right.prev != null) {
 				right.prev.next = right;
+			}
+			right.next = tmpNext;
+			if (right.next != null) {
+				right.next.prev = right;
 			}
 			final Node tmpNode = right;
 			right = tmpNode.right;
@@ -480,17 +487,24 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 			final List<T> tmpElt = elements;
 			final U tmpSkv = skv;
 			final Node tmpNext = next;
+			final Node tmpPrev = prev == left? this : prev;
+			final Node tmpLeftNext = left.next == this? left : left.next;
+			final Node tmpLeftPrev = left.prev;
 			elements = left.elements;
 			skv = left.skv;
-			prev = left.prev;
+			prev = tmpLeftPrev;
 			prev.next = this;
-			next = left;
+			next = tmpLeftNext;
 			next.prev = this;
 			left.elements = tmpElt;
 			left.skv = tmpSkv;
 			left.next = tmpNext;
 			if (left.next != null) {
 				left.next.prev = left;
+			}
+			left.prev = tmpPrev;
+			if (left.prev != null) {
+				left.prev.next = left;
 			}
 			final Node tmpNode = left;
 			left = tmpNode.left;

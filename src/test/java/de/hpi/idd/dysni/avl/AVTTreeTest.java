@@ -12,7 +12,7 @@ import org.junit.Test;
 public class AVTTreeTest {
 
 	private static enum Foo implements Element<String> {
-		A("a"), B("b"), C("c"), D("d"), E("e"), F("f");
+		A("a"), B("b"), C("c"), D("d"), E("e"), F("f"), G("g"), H("h"), I("i");
 
 		private final String skv;
 
@@ -48,14 +48,26 @@ public class AVTTreeTest {
 
 	@Test
 	public void testLeftRotation() {
-		tree.insert(Foo.D);
+		tree.insert(Foo.G);
+		tree.insert(Foo.I);
+		tree.insert(Foo.E);
+		tree.insert(Foo.H);
 		tree.insert(Foo.F);
 		tree.insert(Foo.C);
-		tree.insert(Foo.E);
-		tree.insert(Foo.A);
+		tree.insert(Foo.D);
 		tree.insert(Foo.B);
-		final AVLTree<String, Foo>.Node d = tree.getRoot();
+		tree.insert(Foo.A);
+		final AVLTree<String, Foo>.Node g = tree.getRoot();
+		assertEquals(g.getSKV(), "g");
+		final AVLTree<String, Foo>.Node f = g.getPrevious();
+		assertEquals(f.getSKV(), "f");
+		assertEquals(f.getNext().getSKV(), "g");
+		final AVLTree<String, Foo>.Node e = f.getPrevious();
+		assertEquals(e.getSKV(), "e");
+		assertEquals(e.getNext().getSKV(), "f");
+		final AVLTree<String, Foo>.Node d = e.getPrevious();
 		assertEquals(d.getSKV(), "d");
+		assertEquals(d.getNext().getSKV(), "e");
 		final AVLTree<String, Foo>.Node c = d.getPrevious();
 		assertEquals(c.getSKV(), "c");
 		assertEquals(c.getNext().getSKV(), "d");
@@ -66,23 +78,26 @@ public class AVTTreeTest {
 		assertEquals(a.getSKV(), "a");
 		assertEquals(a.getNext().getSKV(), "b");
 		assertNull(a.getPrevious());
-		final AVLTree<String, Foo>.Node e = d.getNext();
-		assertEquals(e.getSKV(), "e");
-		assertEquals(e.getPrevious().getSKV(), "d");
-		final AVLTree<String, Foo>.Node f = e.getNext();
-		assertEquals(f.getSKV(), "f");
-		assertEquals(f.getPrevious().getSKV(), "e");
-		assertNull(f.getNext());
+		final AVLTree<String, Foo>.Node h = g.getNext();
+		assertEquals(h.getSKV(), "h");
+		assertEquals(h.getPrevious().getSKV(), "g");
+		final AVLTree<String, Foo>.Node i = h.getNext();
+		assertEquals(i.getSKV(), "i");
+		assertEquals(i.getPrevious().getSKV(), "h");
+		assertNull(i.getNext());
 	}
 
 	@Test
 	public void testRightRotation() {
 		tree.insert(Foo.C);
 		tree.insert(Foo.A);
-		tree.insert(Foo.D);
-		tree.insert(Foo.B);
-		tree.insert(Foo.F);
 		tree.insert(Foo.E);
+		tree.insert(Foo.B);
+		tree.insert(Foo.D);
+		tree.insert(Foo.G);
+		tree.insert(Foo.F);
+		tree.insert(Foo.H);
+		tree.insert(Foo.I);
 		final AVLTree<String, Foo>.Node c = tree.getRoot();
 		assertEquals(c.getSKV(), "c");
 		final AVLTree<String, Foo>.Node d = c.getNext();
@@ -94,7 +109,16 @@ public class AVTTreeTest {
 		final AVLTree<String, Foo>.Node f = e.getNext();
 		assertEquals(f.getSKV(), "f");
 		assertEquals(f.getPrevious().getSKV(), "e");
-		assertNull(f.getNext());
+		final AVLTree<String, Foo>.Node g = f.getNext();
+		assertEquals(g.getSKV(), "g");
+		assertEquals(g.getPrevious().getSKV(), "f");
+		final AVLTree<String, Foo>.Node h = g.getNext();
+		assertEquals(h.getSKV(), "h");
+		assertEquals(h.getPrevious().getSKV(), "g");
+		final AVLTree<String, Foo>.Node i = h.getNext();
+		assertEquals(i.getSKV(), "i");
+		assertEquals(i.getPrevious().getSKV(), "h");
+		assertNull(i.getNext());
 		final AVLTree<String, Foo>.Node b = c.getPrevious();
 		assertEquals(b.getSKV(), "b");
 		assertEquals(b.getNext().getSKV(), "c");
