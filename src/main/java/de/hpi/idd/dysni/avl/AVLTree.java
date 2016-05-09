@@ -47,25 +47,15 @@ import java.util.Iterator;
  * exist any more.
  * </p>
  *
- * @param <T>
+ * @param <V>
  *            the type of the elements
- * @param <U>
+ * @param <K>
  *            the type of the skv of the elements
  */
-public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements Iterable<Node<U, T>> {
-
-	/** Enum for tree skew factor. */
-	enum Skew {
-		/** Code for Skew.BALANCED trees. */
-		BALANCED,
-		/** Code for left high trees. */
-		LEFT_HIGH,
-		/** Code for right high trees. */
-		RIGHT_HIGH;
-	}
+public class AVLTree<K extends Comparable<K>, V extends Element<K>> implements Iterable<Node<K, V>> {
 
 	/** Top level node. */
-	private Node<U, T> top;
+	private Node<K, V> top;
 
 	/**
 	 * Build an empty tree.
@@ -89,10 +79,10 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 	 *            element to delete (silently ignored if null)
 	 * @return true if the element was deleted from the tree
 	 */
-	public boolean delete(final T element) {
+	public boolean delete(final V element) {
 		if (element != null) {
-			final Node<U, T> node = find(element);
-			if (node.getElements().contains(element)) {
+			final Node<K, V> node = find(element);
+			if (node.getContainer().contains(element)) {
 				if (node.delete(element)) {
 					top = null;
 				}
@@ -103,14 +93,14 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 		return false;
 	}
 
-	public Node<U, T> find(final T element) {
-		for (Node<U, T> node = top; node != null;) {
-			if (node.getSKV().compareTo(element.getSKV()) < 0) {
+	public Node<K, V> find(final V element) {
+		for (Node<K, V> node = top; node != null;) {
+			if (node.getKey().compareTo(element.getKey()) < 0) {
 				if (node.getRight() == null) {
 					return null;
 				}
 				node = node.getRight();
-			} else if (node.getSKV().compareTo(element.getSKV()) > 0) {
+			} else if (node.getKey().compareTo(element.getKey()) > 0) {
 				if (node.getLeft() == null) {
 					return null;
 				}
@@ -131,7 +121,7 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 	 * @see Node#getPrevious
 	 * @see Node#getNext
 	 */
-	public Node<U, T> getLargest() {
+	public Node<K, V> getLargest() {
 		return top == null ? null : top.getLargest();
 	}
 
@@ -144,11 +134,11 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 	 * @see Node#getPrevious
 	 * @see Node#getNext
 	 */
-	public Node<U, T> getSmallest() {
+	public Node<K, V> getSmallest() {
 		return top == null ? null : top.getSmallest();
 	}
 
-	Node<U, T> getRoot() {
+	Node<K, V> getRoot() {
 		return top;
 	}
 
@@ -157,15 +147,18 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 	 *
 	 * @param element
 	 *            element to insert (silently ignored if null)
+	 * @return 
 	 */
-	public void insert(final T element) {
+	public Node<K, V> insert(final V element) {
 		if (element != null) {
 			if (top == null) {
-				top = new Node<U, T>(element);
+				top = new Node<K, V>(element);
+				return top;
 			} else {
-				top.insert(element);
+				return top.insert(element);
 			}
 		}
+		return null;
 	}
 
 	/**
@@ -178,8 +171,8 @@ public class AVLTree<U extends Comparable<U>, T extends Element<U>> implements I
 	}
 
 	@Override
-	public Iterator<Node<U, T>> iterator() {
-		return new AVLTreeIterator<U, T>(getSmallest());
+	public Iterator<Node<K, V>> iterator() {
+		return new AVLTreeIterator<K, V>(getSmallest());
 	}
 
 	/**

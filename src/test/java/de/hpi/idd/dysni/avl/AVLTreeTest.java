@@ -9,22 +9,7 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-public class AVTTreeTest {
-
-	private static enum Foo implements Element<String> {
-		A("a"), B("b"), C("c"), D("d"), E("e"), F("f"), G("g"), H("h"), I("i");
-
-		private final String skv;
-
-		private Foo(final String skv) {
-			this.skv = skv;
-		}
-
-		@Override
-		public String getSKV() {
-			return skv;
-		}
-	}
+public class AVLTreeTest {
 
 	private final AVLTree<String, Foo> tree = new AVLTree<>();
 
@@ -39,23 +24,23 @@ public class AVTTreeTest {
 		tree.delete(Foo.A);
 		tree.delete(Foo.E);
 		final Node<String, Foo> c = tree.getRoot();
-		assertEquals(c.getSKV(), "c");
-		assertEquals(c.getPrevious().getSKV(), "b");
-		assertEquals(c.getNext().getSKV(), "d");
+		assertEquals(c.getKey(), "c");
+		assertEquals(c.getPrevious().getKey(), "b");
+		assertEquals(c.getNext().getKey(), "d");
 		final Node<String, Foo> d = c.getRight();
-		assertEquals(d.getSKV(), "d");
-		assertEquals(d.getPrevious().getSKV(), "c");
-		assertEquals(d.getNext().getSKV(), "f");
+		assertEquals(d.getKey(), "d");
+		assertEquals(d.getPrevious().getKey(), "c");
+		assertEquals(d.getNext().getKey(), "f");
 		assertNull(d.getLeft());
 		final Node<String, Foo> f = d.getRight();
-		assertEquals(f.getSKV(), "f");
-		assertEquals(f.getPrevious().getSKV(), "d");
+		assertEquals(f.getKey(), "f");
+		assertEquals(f.getPrevious().getKey(), "d");
 		assertNull(f.getNext());
 		assertNull(f.getLeft());
 		assertNull(f.getRight());
 		final Node<String, Foo> b = c.getLeft();
-		assertEquals(b.getSKV(), "b");
-		assertEquals(b.getNext().getSKV(), "c");
+		assertEquals(b.getKey(), "b");
+		assertEquals(b.getNext().getKey(), "c");
 		assertNull(b.getPrevious());
 		assertNull(b.getLeft());
 		assertNull(b.getRight());
@@ -68,7 +53,7 @@ public class AVTTreeTest {
 		tree.delete(Foo.A);
 		assertFalse(tree.isEmpty());
 		final Node<String, Foo> a = tree.getRoot();
-		assertEquals(a.getSKV(), "a");
+		assertEquals(a.getKey(), "a");
 		assertNull(a.getNext());
 		assertNull(a.getPrevious());
 		tree.delete(Foo.A);
@@ -84,12 +69,12 @@ public class AVTTreeTest {
 		tree.insert(Foo.A);
 		tree.insert(Foo.B);
 		final Iterator<Node<String, Foo>> it = tree.iterator();
-		assertEquals(it.next().getSKV(), "a");
-		assertEquals(it.next().getSKV(), "b");
-		assertEquals(it.next().getSKV(), "c");
-		assertEquals(it.next().getSKV(), "d");
-		assertEquals(it.next().getSKV(), "e");
-		assertEquals(it.next().getSKV(), "f");
+		assertEquals(it.next().getKey(), "a");
+		assertEquals(it.next().getKey(), "b");
+		assertEquals(it.next().getKey(), "c");
+		assertEquals(it.next().getKey(), "d");
+		assertEquals(it.next().getKey(), "e");
+		assertEquals(it.next().getKey(), "f");
 		assertFalse(it.hasNext());
 	}
 
@@ -105,48 +90,48 @@ public class AVTTreeTest {
 		tree.insert(Foo.H);
 		tree.insert(Foo.I);
 		final Node<String, Foo> c = tree.getRoot();
-		assertEquals(c.getSKV(), "c");
-		assertEquals(c.getPrevious().getSKV(), "b");
-		assertEquals(c.getNext().getSKV(), "d");
+		assertEquals(c.getKey(), "c");
+		assertEquals(c.getPrevious().getKey(), "b");
+		assertEquals(c.getNext().getKey(), "d");
 		final Node<String, Foo> a = c.getLeft();
-		assertEquals(a.getSKV(), "a");
-		assertEquals(a.getNext().getSKV(), "b");
+		assertEquals(a.getKey(), "a");
+		assertEquals(a.getNext().getKey(), "b");
 		assertNull(a.getPrevious());
 		assertNull(a.getLeft());
 		final Node<String, Foo> b = a.getRight();
-		assertEquals(b.getSKV(), "b");
-		assertEquals(b.getPrevious().getSKV(), "a");
-		assertEquals(b.getNext().getSKV(), "c");
+		assertEquals(b.getKey(), "b");
+		assertEquals(b.getPrevious().getKey(), "a");
+		assertEquals(b.getNext().getKey(), "c");
 		assertNull(b.getLeft());
 		assertNull(b.getRight());
 		final Node<String, Foo> g = c.getRight();
-		assertEquals(g.getSKV(), "g");
-		assertEquals(g.getPrevious().getSKV(), "f");
-		assertEquals(g.getNext().getSKV(), "h");
+		assertEquals(g.getKey(), "g");
+		assertEquals(g.getPrevious().getKey(), "f");
+		assertEquals(g.getNext().getKey(), "h");
 		final Node<String, Foo> e = g.getLeft();
-		assertEquals(e.getSKV(), "e");
-		assertEquals(e.getPrevious().getSKV(), "d");
-		assertEquals(e.getNext().getSKV(), "f");
+		assertEquals(e.getKey(), "e");
+		assertEquals(e.getPrevious().getKey(), "d");
+		assertEquals(e.getNext().getKey(), "f");
 		final Node<String, Foo> d = e.getLeft();
-		assertEquals(d.getSKV(), "d");
-		assertEquals(d.getPrevious().getSKV(), "c");
-		assertEquals(d.getNext().getSKV(), "e");
+		assertEquals(d.getKey(), "d");
+		assertEquals(d.getPrevious().getKey(), "c");
+		assertEquals(d.getNext().getKey(), "e");
 		assertNull(d.getLeft());
 		assertNull(d.getRight());
 		final Node<String, Foo> f = e.getRight();
-		assertEquals(f.getSKV(), "f");
-		assertEquals(f.getPrevious().getSKV(), "e");
-		assertEquals(f.getNext().getSKV(), "g");
+		assertEquals(f.getKey(), "f");
+		assertEquals(f.getPrevious().getKey(), "e");
+		assertEquals(f.getNext().getKey(), "g");
 		assertNull(f.getLeft());
 		assertNull(f.getRight());
 		final Node<String, Foo> h = g.getRight();
-		assertEquals(h.getSKV(), "h");
-		assertEquals(h.getPrevious().getSKV(), "g");
-		assertEquals(h.getNext().getSKV(), "i");
+		assertEquals(h.getKey(), "h");
+		assertEquals(h.getPrevious().getKey(), "g");
+		assertEquals(h.getNext().getKey(), "i");
 		assertNull(h.getLeft());
 		final Node<String, Foo> i = h.getRight();
-		assertEquals(i.getSKV(), "i");
-		assertEquals(i.getPrevious().getSKV(), "h");
+		assertEquals(i.getKey(), "i");
+		assertEquals(i.getPrevious().getKey(), "h");
 		assertNull(i.getNext());
 		assertNull(i.getLeft());
 		assertNull(i.getRight());
@@ -164,48 +149,48 @@ public class AVTTreeTest {
 		tree.insert(Foo.B);
 		tree.insert(Foo.A);
 		final Node<String, Foo> g = tree.getRoot();
-		assertEquals(g.getSKV(), "g");
-		assertEquals(g.getPrevious().getSKV(), "f");
-		assertEquals(g.getNext().getSKV(), "h");
+		assertEquals(g.getKey(), "g");
+		assertEquals(g.getPrevious().getKey(), "f");
+		assertEquals(g.getNext().getKey(), "h");
 		final Node<String, Foo> i = g.getRight();
-		assertEquals(i.getSKV(), "i");
-		assertEquals(i.getPrevious().getSKV(), "h");
+		assertEquals(i.getKey(), "i");
+		assertEquals(i.getPrevious().getKey(), "h");
 		assertNull(i.getNext());
 		assertNull(i.getRight());
 		final Node<String, Foo> h = i.getLeft();
-		assertEquals(h.getSKV(), "h");
-		assertEquals(h.getPrevious().getSKV(), "g");
-		assertEquals(h.getNext().getSKV(), "i");
+		assertEquals(h.getKey(), "h");
+		assertEquals(h.getPrevious().getKey(), "g");
+		assertEquals(h.getNext().getKey(), "i");
 		assertNull(h.getLeft());
 		assertNull(h.getRight());
 		final Node<String, Foo> c = g.getLeft();
-		assertEquals(c.getSKV(), "c");
-		assertEquals(c.getPrevious().getSKV(), "b");
-		assertEquals(c.getNext().getSKV(), "d");
+		assertEquals(c.getKey(), "c");
+		assertEquals(c.getPrevious().getKey(), "b");
+		assertEquals(c.getNext().getKey(), "d");
 		final Node<String, Foo> e = c.getRight();
-		assertEquals(e.getSKV(), "e");
-		assertEquals(e.getPrevious().getSKV(), "d");
-		assertEquals(e.getNext().getSKV(), "f");
+		assertEquals(e.getKey(), "e");
+		assertEquals(e.getPrevious().getKey(), "d");
+		assertEquals(e.getNext().getKey(), "f");
 		final Node<String, Foo> f = e.getRight();
-		assertEquals(f.getSKV(), "f");
-		assertEquals(f.getPrevious().getSKV(), "e");
-		assertEquals(f.getNext().getSKV(), "g");
+		assertEquals(f.getKey(), "f");
+		assertEquals(f.getPrevious().getKey(), "e");
+		assertEquals(f.getNext().getKey(), "g");
 		assertNull(f.getLeft());
 		assertNull(f.getRight());
 		final Node<String, Foo> d = e.getLeft();
-		assertEquals(d.getSKV(), "d");
-		assertEquals(d.getPrevious().getSKV(), "c");
-		assertEquals(d.getNext().getSKV(), "e");
+		assertEquals(d.getKey(), "d");
+		assertEquals(d.getPrevious().getKey(), "c");
+		assertEquals(d.getNext().getKey(), "e");
 		assertNull(d.getLeft());
 		assertNull(d.getRight());
 		final Node<String, Foo> b = c.getLeft();
-		assertEquals(b.getSKV(), "b");
-		assertEquals(b.getPrevious().getSKV(), "a");
-		assertEquals(b.getNext().getSKV(), "c");
+		assertEquals(b.getKey(), "b");
+		assertEquals(b.getPrevious().getKey(), "a");
+		assertEquals(b.getNext().getKey(), "c");
 		assertNull(b.getRight());
 		final Node<String, Foo> a = b.getLeft();
-		assertEquals(a.getSKV(), "a");
-		assertEquals(a.getNext().getSKV(), "b");
+		assertEquals(a.getKey(), "a");
+		assertEquals(a.getNext().getKey(), "b");
 		assertNull(a.getPrevious());
 		assertNull(a.getLeft());
 		assertNull(a.getRight());
