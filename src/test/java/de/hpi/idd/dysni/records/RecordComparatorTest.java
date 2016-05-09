@@ -24,15 +24,15 @@ public class RecordComparatorTest {
         CDRecord firstRecord = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None", (short) 2016, firstTracklist);
         CDRecord secondRecord = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None", (short) 2016, firstTracklist);
 
-        Map<String, Integer> similarityMap = RecordComparator.getSimilarityOfRecords(firstRecord, secondRecord);
+        Map<String, Float> similarityMap = RecordComparator.getSimilarityOfRecords(firstRecord, secondRecord);
 
-        assertEquals(similarityMap.get("artistSimilarity"), (Integer) 0);
-        assertEquals(similarityMap.get("dTitleSimilarity"), (Integer) 0);
-        assertEquals(similarityMap.get("categorySimilarity"), (Integer) 0);
-        assertEquals(similarityMap.get("genreSimilarity"), (Integer) 0);
-        assertEquals(similarityMap.get("cdExtraSimilarity"), (Integer) 0);
-        assertEquals(similarityMap.get("yearSimilarity"), (Integer) 0);
-        assertEquals(similarityMap.get("tracksSimilarity"), (Integer) firstRecord.getTracks().size());
+        assertEquals(similarityMap.get("artistSimilarity"), new Float(0.0));
+        assertEquals(similarityMap.get("dTitleSimilarity"), new Float(0.0));
+        assertEquals(similarityMap.get("categorySimilarity"), new Float(0.0));
+        assertEquals(similarityMap.get("genreSimilarity"), new Float(0.0));
+        assertEquals(similarityMap.get("cdExtraSimilarity"), new Float(0.0));
+        assertEquals(similarityMap.get("yearSimilarity"), new Float(0.0));
+        assertEquals(similarityMap.get("tracksSimilarity"), new Float(1.0));
 
         List<String> secondTracklist = new LinkedList<>();
         secondTracklist.add("Track 4");
@@ -42,13 +42,13 @@ public class RecordComparatorTest {
 
         similarityMap = RecordComparator.getSimilarityOfRecords(firstRecord, secondRecord);
 
-        assertEquals(similarityMap.get("artistSimilarity"), (Integer) 1);
-        assertEquals(similarityMap.get("dTitleSimilarity"), (Integer) 1);
-        assertEquals(similarityMap.get("categorySimilarity"), (Integer) 4);
-        assertEquals(similarityMap.get("genreSimilarity"), (Integer) 3);
-        assertEquals(similarityMap.get("cdExtraSimilarity"), (Integer) 0);
-        assertEquals(similarityMap.get("yearSimilarity"), (Integer) 1);
-        assertEquals(similarityMap.get("tracksSimilarity"), (Integer) 0);
+        assertEquals(similarityMap.get("artistSimilarity"), new Float(1.0));
+        assertEquals(similarityMap.get("dTitleSimilarity"), new Float(1.0));
+        assertEquals(similarityMap.get("categorySimilarity"), new Float(4.0));
+        assertEquals(similarityMap.get("genreSimilarity"), new Float(3.0));
+        assertEquals(similarityMap.get("cdExtraSimilarity"), new Float(0.0));
+        assertEquals(similarityMap.get("yearSimilarity"), new Float(1.0));
+        assertEquals(similarityMap.get("tracksSimilarity"), new Float(0.0));
     }
 
 }

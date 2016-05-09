@@ -1,41 +1,45 @@
 package de.hpi.idd.dysni.records;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by dennis on 08.05.16.
  */
 public class RecordComparator {
 
-    public static Map<String, Integer> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
-        Map<String, Integer> similarityMap = new HashMap<>();
+    public static Map<String, Float> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
+        Map<String, Float> similarityMap = new HashMap<>();
 
         similarityMap.put("artistSimilarity", levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
         similarityMap.put("dTitleSimilarity", levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
         similarityMap.put("categorySimilarity", levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
         similarityMap.put("genreSimilarity", levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
-        similarityMap.put("yearSimilarity", Math.abs(firstRecord.getYear() - secondRecord.getYear()));
+        similarityMap.put("yearSimilarity", new Float(Math.abs(firstRecord.getYear() - secondRecord.getYear())));
         similarityMap.put("cdExtraSimilarity", levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
         similarityMap.put("tracksSimilarity", getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
 
         return similarityMap;
     }
 
-    private static Integer getSimilarityOfTracks(List<String> firstTracklist, List<String> secondTracklist) {
-        int similarity = 0;
+    private static float getSimilarityOfTracks(List<String> firstTracklist, List<String> secondTracklist) {
+        int counter = 0;
 
         for(String track: firstTracklist) {
             if (secondTracklist.contains(track)) {
-                similarity++;
+                counter++;
             }
         }
 
+        List<String> mergedTracklist = new LinkedList<>();
+        mergedTracklist.addAll(firstTracklist);
+        mergedTracklist.addAll(secondTracklist);
+        HashSet mergedTrackset = new HashSet<>(firstTracklist);
+
+        float similarity = (float) counter/ (float) mergedTrackset.size();
         return similarity;
     }
 
-    public static int levenshteinDistance(String a, String b) {
+    public static Float levenshteinDistance(String a, String b) {
         a = a.toLowerCase();
         b = b.toLowerCase();
 
@@ -51,6 +55,6 @@ public class RecordComparator {
                 costs[j] = cj;
             }
         }
-        return costs[b.length()];
+        return new Float(costs[b.length()]);
     }
 }
