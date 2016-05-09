@@ -17,13 +17,10 @@ public class SimilarityTest {
 		tree.insert(Foo.A);
 		tree.insert(Foo.D);
 		tree.insert(Foo.B);
-		tree.insert(Foo.F);
 		tree.insert(Foo.E);
-		Node<String, Foo> node = tree.insert(Foo.CD);
-		List<Foo> candidates = node.getContainer().getSimilarCandidates();
-		assertTrue(candidates.contains(Foo.CD));
-		assertTrue(candidates.contains(Foo.C));
+		List<Foo> candidates = tree.insert(Foo.DE);
 		assertTrue(candidates.contains(Foo.D));
-		assertEquals(3, candidates.size());
+		assertTrue(candidates.contains(Foo.E));
+		assertEquals(2, candidates.size());
 	}
 }

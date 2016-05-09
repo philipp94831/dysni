@@ -26,8 +26,10 @@ public class Container<K extends Comparable<K>, V extends Element<K>> {
 		return elements.isEmpty();
 	}
 
-	public void add(V element) {
+	public List<V> add(V element) {
+		List<V> candidates = getSimilarCandidates();
 		elements.add(element);
+		return candidates;
 	}
 
 	public boolean contains(V element) {
@@ -38,27 +40,18 @@ public class Container<K extends Comparable<K>, V extends Element<K>> {
 		this.node = node;
 	}
 	
-	public List<V> getSimilarCandidates() {
+	private List<V> getSimilarCandidates() {
 		List<V> candidates = new ArrayList<>();
 		candidates.addAll(getAll());
-		Node<K, V> node = this.node;
-		while(true) {
-			node = node.getPrevious();
-			if(node == null) {
-				break;
-			}
+		
+		for(Node<K, V> node = this.node.getPrevious(); node != null; node = node.getPrevious()) {
 			if(getSimilarity(node) >= comp.getThreshold()) {
 				candidates.addAll(node.getContainer().getAll());
 			} else {
 				break;
 			}
 		}
-		node = this.node;
-		while(true) {
-			node = node.getNext();
-			if(node == null) {
-				break;
-			}
+		for(Node<K, V> node = this.node.getNext(); node != null; node = node.getNext()) {
 			if(getSimilarity(node) >= comp.getThreshold()) {
 				candidates.addAll(node.getContainer().getAll());
 			} else {

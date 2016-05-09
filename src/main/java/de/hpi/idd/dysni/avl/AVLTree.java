@@ -17,6 +17,7 @@
 package de.hpi.idd.dysni.avl;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class implements AVL trees.
@@ -147,13 +148,13 @@ public class AVLTree<K extends Comparable<K>, V extends Element<K>> implements I
 	 *
 	 * @param element
 	 *            element to insert (silently ignored if null)
-	 * @return 
+	 * @return candidates that are in the adaptive similarity window
 	 */
-	public Node<K, V> insert(final V element) {
+	public List<V> insert(final V element) {
 		if (element != null) {
 			if (top == null) {
-				top = new Node<K, V>(element);
-				return top;
+				top = new Node<K, V>(element.getKey(), element.getComparator());
+				return top.getContainer().add(element);
 			} else {
 				return top.insert(element);
 			}

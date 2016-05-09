@@ -1,5 +1,7 @@
 package de.hpi.idd.dysni.avl;
 
+import java.util.List;
+
 /**
  * This class implements AVL trees nodes.
  * <p>
@@ -41,10 +43,9 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 	 * @param parent
 	 *            parent node
 	 */
-	Node(final V element) {
-		setContainer(new Container<>(element.getComparator()));
-		container.add(element);
-		key = element.getKey();
+	Node(final K key, KeyComparator<K> comp) {
+		setContainer(new Container<>(comp));
+		this.key = key;
 		left = null;
 		right = null;
 		parent = null;
@@ -182,36 +183,36 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 	 *            element to insert
 	 * @return true if the parent tree should be re-Skew.BALANCED
 	 */
-	Node<K, V> insert(final V newElement) {
+	List<V> insert(final V newElement) {
 		if (newElement.getKey().compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				setLeft(new Node<K, V>(newElement));
+				setLeft(new Node<K, V>(newElement.getKey(), newElement.getComparator()));
 				left.setPrev(prev);
 				setPrev(left);
 				needsRebalance = rebalanceLeftGrown();
-				return left;
+				return left.getContainer().add(newElement);
 			}
-			Node<K, V> node = left.insert(newElement);
+			List<V> candidates = left.insert(newElement);
 			needsRebalance =  left.needsRebalance? rebalanceLeftGrown() : false;
-			return node;
+			return candidates;
 		}
 		if (newElement.getKey().compareTo(this.key) == 0) {
-			container.add(newElement);
+			List<V> candidates = container.add(newElement);
 			needsRebalance = false;
-			return this;
+			return candidates;
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			setRight(new Node<K, V>(newElement));
+			setRight(new Node<K, V>(newElement.getKey(), newElement.getComparator()));
 			right.setNext(next);
 			setNext(right);
 			needsRebalance = rebalanceRightGrown();
-			return right;
+			return right.container.add(newElement);
 		}
-		Node<K, V> node = right.insert(newElement);
+		List<V> candidates = right.insert(newElement);
 		needsRebalance = right.needsRebalance? rebalanceRightGrown() : false;
-		return node;
+		return candidates;
 	}
 
 	/**
