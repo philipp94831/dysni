@@ -17,7 +17,7 @@ public class AVLTreeIterator<K extends Comparable<K>, V extends Element<K>> impl
 
 	@Override
 	public Node<K, V> next() {
-		if(next== null) {
+		if (next == null) {
 			throw new IllegalStateException("There is no next element");
 		}
 		final Node<K, V> ret = next;

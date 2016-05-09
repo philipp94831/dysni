@@ -126,6 +126,10 @@ public class AVLTree<K extends Comparable<K>, V extends Element<K>> implements I
 		return top == null ? null : top.getLargest();
 	}
 
+	Node<K, V> getRoot() {
+		return top;
+	}
+
 	/**
 	 * Get the node whose element is the smallest one in the tree.
 	 *
@@ -139,10 +143,6 @@ public class AVLTree<K extends Comparable<K>, V extends Element<K>> implements I
 		return top == null ? null : top.getSmallest();
 	}
 
-	Node<K, V> getRoot() {
-		return top;
-	}
-
 	/**
 	 * Insert an element in the tree.
 	 *
@@ -154,7 +154,7 @@ public class AVLTree<K extends Comparable<K>, V extends Element<K>> implements I
 		if (element != null) {
 			if (top == null) {
 				top = new Node<K, V>(element.getKey(), element.getComparator());
-				return top.getContainer().add(element);
+				return top.add(element);
 			} else {
 				return top.insert(element);
 			}

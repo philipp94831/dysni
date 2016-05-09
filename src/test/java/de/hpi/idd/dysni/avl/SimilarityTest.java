@@ -6,9 +6,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-
 public class SimilarityTest {
-	
+
 	private final AVLTree<String, Foo> tree = new AVLTree<>();
 
 	@Test

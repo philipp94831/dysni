@@ -22,8 +22,10 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 
 	/** Elements contained in the current node. */
 	private Container<K, V> container;
+	private K key;
 	/** Left sub-tree. */
 	private Node<K, V> left;
+	private boolean needsRebalance;
 	private Node<K, V> next;
 	/** Parent tree. */
 	private Node<K, V> parent;
@@ -32,8 +34,6 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 	private Node<K, V> right;
 	/** Skew factor. */
 	private Skew skew;
-	private K key;
-	private boolean needsRebalance;
 
 	/**
 	 * Build a node for a specified element.
@@ -52,6 +52,10 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 		skew = Skew.BALANCED;
 		prev = null;
 		next = null;
+	}
+
+	List<V> add(final V newElement) {
+		return container.add(newElement);
 	}
 
 	/**
@@ -110,11 +114,6 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 		return false;
 	}
 
-	private void setContainer(Container<K, V> container) {
-		this.container = container;
-		container.setNode(this);
-	}
-
 	/**
 	 * Get the contained elements.
 	 *
@@ -122,6 +121,10 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 	 */
 	public Container<K, V> getContainer() {
 		return container;
+	}
+
+	public K getKey() {
+		return key;
 	}
 
 	/**
@@ -156,10 +159,6 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 		return right;
 	}
 
-	public K getKey() {
-		return key;
-	}
-
 	/**
 	 * Get the node whose element is the smallest one in the tree rooted at this
 	 * node.
@@ -191,14 +190,14 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 				left.setPrev(prev);
 				setPrev(left);
 				needsRebalance = rebalanceLeftGrown();
-				return left.getContainer().add(newElement);
+				return left.add(newElement);
 			}
 			List<V> candidates = left.insert(newElement);
-			needsRebalance =  left.needsRebalance? rebalanceLeftGrown() : false;
+			needsRebalance = left.needsRebalance ? rebalanceLeftGrown() : false;
 			return candidates;
 		}
 		if (newElement.getKey().compareTo(this.key) == 0) {
-			List<V> candidates = container.add(newElement);
+			List<V> candidates = add(newElement);
 			needsRebalance = false;
 			return candidates;
 		}
@@ -208,10 +207,10 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 			right.setNext(next);
 			setNext(right);
 			needsRebalance = rebalanceRightGrown();
-			return right.container.add(newElement);
+			return right.add(newElement);
 		}
 		List<V> candidates = right.insert(newElement);
-		needsRebalance = right.needsRebalance? rebalanceRightGrown() : false;
+		needsRebalance = right.needsRebalance ? rebalanceRightGrown() : false;
 		return candidates;
 	}
 
@@ -447,6 +446,11 @@ public class Node<K extends Comparable<K>, V extends Element<K>> {
 		tmpNode.setLeft(tmpNode.right);
 		tmpNode.setRight(right);
 		setRight(tmpNode);
+	}
+
+	private void setContainer(Container<K, V> container) {
+		this.container = container;
+		container.setNode(this);
 	}
 
 	private void setLeft(Node<K, V> child) {

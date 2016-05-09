@@ -8,8 +8,7 @@ import de.hpi.idd.dysni.avl.AVLTreeTest;
 import de.hpi.idd.dysni.avl.SimilarityTest;
 import de.hpi.idd.dysni.records.RecordComparatorTest;
 
-
 @RunWith(Suite.class)
-@SuiteClasses({AVLTreeTest.class, SimilarityTest.class, RecordComparatorTest.class})
+@SuiteClasses({ AVLTreeTest.class, SimilarityTest.class, RecordComparatorTest.class })
 public class AllTests {
 }
