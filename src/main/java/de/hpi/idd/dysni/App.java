@@ -42,7 +42,7 @@ public class App {
 			}
 
 			@Override
-			public String getKey() {
+			protected String computeKey() {
 				return object.getdTitle().substring(0, 3) + object.getArtist().substring(0, 3);
 			}
 

@@ -18,15 +18,16 @@ public class DynamicSortedNeighborhoodIndexer<T> {
 	public DynamicSortedNeighborhoodIndexer(RecordComparator<T> comp, List<WrapperFactory<T>> factories) {
 		this.comp = comp;
 		for (WrapperFactory<T> factory : factories) {
-			this.trees.add(new Tuple<>(factory, new AVLTree<>()));
+			trees.add(new Tuple<>(factory, new AVLTree<>()));
 		}
 	}
 
 	public void add(T rec) {
 		Set<T> candidates = new HashSet<>();
 		for (Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>> entry : trees) {
-			candidates.addAll(entry.getRight().insert(entry.getLeft().wrap(rec)).stream().map(ElementWrapper::getObject)
-					.collect(Collectors.toList()));
+			List<T> newCandidates = entry.getRight().insert(entry.getLeft().wrap(rec)).stream()
+					.map(ElementWrapper::getObject).collect(Collectors.toList());
+			candidates.addAll(newCandidates);
 		}
 		for (T candidate : candidates) {
 			if (comp.areSimilar(candidate, rec)) {
