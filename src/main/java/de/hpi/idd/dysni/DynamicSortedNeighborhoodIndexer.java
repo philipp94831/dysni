@@ -1,58 +1,56 @@
 package de.hpi.idd.dysni;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import de.hpi.idd.RecordComparator;
 import de.hpi.idd.dysni.avl.AVLTree;
-import de.hpi.idd.dysni.avl.Element;
-import de.hpi.idd.dysni.avl.KeyComparator;
-import de.hpi.idd.dysni.comp.LevenshteinComparator;
-import de.hpi.idd.dysni.records.CDRecord;
-import de.hpi.idd.dysni.records.CDRecordComparator;
 
-public class DynamicSortedNeighborhoodIndexer {
-	
-	private AVLTree<String, CDRecordElement> tree = new AVLTree<>();
-	private UnionFind<String> uf = new UnionFind<>();
-	
-	public static void main(String[] args) {
-		DynamicSortedNeighborhoodIndexer dysni = new DynamicSortedNeighborhoodIndexer();
-		CDRecord rec = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None", (short) 2016, Collections.emptyList());
-		CDRecord rec2 = new CDRecord("1", "The Rolling Tones", "Overpriced Best CD", "trash", "Pop", "None", (short) 2017, Collections.emptyList());
-		dysni.add(rec);
-		dysni.add(rec2);
+public class DynamicSortedNeighborhoodIndexer<T> {
+
+	private UnionFind<T> uf = new UnionFind<>();
+	private final RecordComparator<T> comp;
+	private final List<Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>>> trees = new ArrayList<>();
+
+	public DynamicSortedNeighborhoodIndexer(RecordComparator<T> comp, List<WrapperFactory<T>> factories) {
+		this.comp = comp;
+		for (WrapperFactory<T> factory : factories) {
+			this.trees.add(new Tuple<>(factory, new AVLTree<>()));
+		}
 	}
-	
 
-	private void add(CDRecord rec) {
-		List<CDRecordElement> candidates = tree.insert(new CDRecordElement(rec));
-		for(CDRecordElement candidate : candidates) {
-			if(CDRecordComparator.similar(candidate.record, rec)) {
-				uf.union(rec.getdId(), candidate.record.getdId());
+	public void add(T rec) {
+		Set<T> candidates = new HashSet<>();
+		for (Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>> entry : trees) {
+			candidates.addAll(entry.getRight().insert(entry.getLeft().wrap(rec)).stream().map(ElementWrapper::getObject)
+					.collect(Collectors.toList()));
+		}
+		for (T candidate : candidates) {
+			if (comp.areSimilar(candidate, rec)) {
+				uf.union(rec, candidate);
 			}
 		}
 	}
 
+	private static class Tuple<LEFT, RIGHT> {
 
-	private static class CDRecordElement implements Element<String> {
-		
-		private final CDRecord record;
-		private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
-		
-		
-		public CDRecordElement(CDRecord record) {
-			this.record = record;
+		private final LEFT left;
+		private final RIGHT right;
+
+		public Tuple(LEFT left, RIGHT right) {
+			this.left = left;
+			this.right = right;
 		}
 
-		@Override
-		public KeyComparator<String> getComparator() {
-			return COMPARATOR;
+		public LEFT getLeft() {
+			return left;
 		}
 
-		@Override
-		public String getKey() {
-			return record.getdTitle().substring(0, 3) + record.getArtist().substring(0, 3);
+		public RIGHT getRight() {
+			return right;
 		}
-		
 	}
 }

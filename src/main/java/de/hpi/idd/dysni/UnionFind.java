@@ -99,7 +99,7 @@ public class UnionFind<T> {
 
 	private int count = 0; // number of components
 	private Map<T, T> parent = new HashMap<>(); // parent[i] = parent of i
-	private Map<T, Integer> rank = new HashMap<>(); // rank[i] = rank of subtree rooted at i (never more than 31)
+	private Map<T, Byte> rank = new HashMap<>(); // rank[i] = rank of subtree rooted at i (never more than 31)
 
 	/**
 	 * Returns true if the the two sites are in the same component.
@@ -187,7 +187,7 @@ public class UnionFind<T> {
 	}
 
 	private void increaseRank(T rootP) {
-		rank.put(rootP, getRank(rootP) + 1);
+		rank.put(rootP, (byte) (getRank(rootP) + 1));
 	}
 
 	private void setParent(T rootP, T rootQ) {
@@ -195,6 +195,6 @@ public class UnionFind<T> {
 	}
 
 	private int getRank(T t) {
-		return rank.getOrDefault(t, 0);
+		return rank.getOrDefault(t, (byte) 0);
 	}
 }

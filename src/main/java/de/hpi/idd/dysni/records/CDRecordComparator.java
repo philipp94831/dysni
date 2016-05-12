@@ -10,28 +10,21 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class CDRecordComparator implements de.hpi.idd.RecordComparator<CDRecord> {
 
-	private static final CDRecordComparator instance = new CDRecordComparator();
 	private static final double THRESHOLD = 0.5;
 
 	public static Map<CDSimilarity, Double> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
 		Map<CDSimilarity, Double> similarityMap = new HashMap<>();
-		similarityMap.put(CDSimilarity.ARTIST,
-				levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
-		similarityMap.put(CDSimilarity.DTITLE,
-				levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
+		similarityMap.put(CDSimilarity.ARTIST, levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
+		similarityMap.put(CDSimilarity.DTITLE, levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
 		similarityMap.put(CDSimilarity.CATEGORY,
 				levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
 		similarityMap.put(CDSimilarity.GENRE, levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
-		similarityMap.put(CDSimilarity.YEAR, levenshteinDistance(firstRecord.getYear() + "", secondRecord.getYear() + ""));
+		similarityMap.put(CDSimilarity.YEAR,
+				levenshteinDistance(firstRecord.getYear() + "", secondRecord.getYear() + ""));
 		similarityMap.put(CDSimilarity.CDEXTRA,
 				levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
-		similarityMap.put(CDSimilarity.TRACK,
-				getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
+		similarityMap.put(CDSimilarity.TRACK, getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
 		return similarityMap;
-	}
-
-	public static boolean similar(CDRecord firstRecord, CDRecord secondRecord) {
-		return instance.areSimilar(firstRecord, secondRecord);
 	}
 
 	public boolean areSimilar(CDRecord firstRecord, CDRecord secondRecord) {
@@ -45,6 +38,9 @@ public class CDRecordComparator implements de.hpi.idd.RecordComparator<CDRecord>
 		Set<String> mergedTrackset = new HashSet<>();
 		mergedTrackset.addAll(firstTracklist);
 		mergedTrackset.addAll(secondTracklist);
+		if (mergedTrackset.size() == 0) {
+			return 1.0;
+		}
 		return (double) shared / mergedTrackset.size();
 	}
 
