@@ -1,4 +1,8 @@
 package de.hpi.idd.dysni;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /******************************************************************************
  *  Compilation:  javac UF.java
  *  Execution:    java UF < input.txt
@@ -91,35 +95,11 @@ package de.hpi.idd.dysni;
  * @author Robert Sedgewick
  * @author Kevin Wayne
  */
-public class UnionFind {
+public class UnionFind<T> {
 
-	// than 31)
-	private int count; // number of components
-	private int[] parent; // parent[i] = parent of i
-							private byte[] rank; // rank[i] = rank of subtree rooted at i (never more
-
-	/**
-	 * Initializes an empty union-find data structure with <tt>N</tt> sites
-	 * <tt>0</tt> through <tt>N-1</tt>. Each site is initially in its own
-	 * component.
-	 *
-	 * @param N
-	 *            the number of sites
-	 * @throws IllegalArgumentException
-	 *             if <tt>N &lt; 0</tt>
-	 */
-	public UnionFind(int N) {
-		if (N < 0) {
-			throw new IllegalArgumentException();
-		}
-		count = N;
-		parent = new int[N];
-		rank = new byte[N];
-		for (int i = 0; i < N; i++) {
-			parent[i] = i;
-			rank[i] = 0;
-		}
-	}
+	private int count = 0; // number of components
+	private Map<T, T> parent = new HashMap<>(); // parent[i] = parent of i
+	private Map<T, Integer> rank = new HashMap<>(); // rank[i] = rank of subtree rooted at i (never more than 31)
 
 	/**
 	 * Returns true if the the two sites are in the same component.
@@ -134,8 +114,8 @@ public class UnionFind {
 	 *             unless both <tt>0 &le; p &lt; N</tt> and
 	 *             <tt>0 &le; q &lt; N</tt>
 	 */
-	public boolean connected(int p, int q) {
-		return find(p) == find(q);
+	public boolean connected(T p, T q) {
+		return find(p).equals(find(q));
 	}
 
 	/**
@@ -158,13 +138,16 @@ public class UnionFind {
 	 * @throws IndexOutOfBoundsException
 	 *             unless <tt>0 &le; p &lt; N</tt>
 	 */
-	public int find(int p) {
-		validate(p);
-		while (p != parent[p]) {
-			parent[p] = parent[parent[p]]; // path compression by halving
-			p = parent[p];
+	public T find(T p) {
+		while (p != getParent(p)) {
+			setParent(p, getParent(getParent(p))); // path compression by halving
+			p = getParent(p);
 		}
 		return p;
+	}
+	
+	private T getParent(T t) {
+		return parent.getOrDefault(t, t);
 	}
 
 	/**
@@ -179,29 +162,39 @@ public class UnionFind {
 	 *             unless both <tt>0 &le; p &lt; N</tt> and
 	 *             <tt>0 &le; q &lt; N</tt>
 	 */
-	public void union(int p, int q) {
-		int rootP = find(p);
-		int rootQ = find(q);
+	public void union(T p, T q) {
+		if(!parent.containsKey(p)) {
+			count++;
+		}
+		if(!parent.containsKey(q)) {
+			count++;
+		}
+		T rootP = find(p);
+		T rootQ = find(q);
 		if (rootP == rootQ) {
 			return;
 		}
 		// make root of smaller rank point to root of larger rank
-		if (rank[rootP] < rank[rootQ]) {
-			parent[rootP] = rootQ;
-		} else if (rank[rootP] > rank[rootQ]) {
-			parent[rootQ] = rootP;
+		if (getRank(rootP) < getRank(rootQ)) {
+			setParent(rootP, rootQ);
+		} else if (getRank(rootP) > getRank(rootQ)) {
+			setParent(rootQ, rootP);
 		} else {
-			parent[rootQ] = rootP;
-			rank[rootP]++;
+			setParent(rootQ, rootP);
+			increaseRank(rootP);
 		}
 		count--;
 	}
 
-	// validate that p is a valid index
-	private void validate(int p) {
-		int N = parent.length;
-		if (p < 0 || p >= N) {
-			throw new IndexOutOfBoundsException("index " + p + " is not between 0 and " + (N - 1));
-		}
+	private void increaseRank(T rootP) {
+		rank.put(rootP, getRank(rootP) + 1);
+	}
+
+	private void setParent(T rootP, T rootQ) {
+		parent.put(rootP, rootQ);
+	}
+
+	private int getRank(T t) {
+		return rank.getOrDefault(t, 0);
 	}
 }
