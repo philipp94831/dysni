@@ -1,7 +1,10 @@
 package de.hpi.idd.dysni;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Stack;
 
 /******************************************************************************
  *  Compilation:  javac UF.java
@@ -100,6 +103,7 @@ public class UnionFind<T> {
 	private int count = 0; // number of components
 	private Map<T, T> parent = new HashMap<>(); // parent[i] = parent of i
 	private Map<T, Byte> rank = new HashMap<>(); // rank[i] = rank of subtree rooted at i (never more than 31)
+	private Map<T, Collection<T>> children = new HashMap<>();
 
 	/**
 	 * Returns true if the the two sites are in the same component.
@@ -191,7 +195,35 @@ public class UnionFind<T> {
 	}
 
 	private void setParent(T rootP, T rootQ) {
+		getChildren(getParent(rootP)).remove(rootP);
 		parent.put(rootP, rootQ);
+		addChild(rootQ, rootP);
+	}
+
+	private void addChild(T rootQ, T rootP) {
+		getChildren(rootQ).add(rootP);		
+	}
+	
+	public Collection<T> getComponent(T p) {
+		Collection<T> component = new HashSet<>();
+		Stack<T> todo = new Stack<>();
+		todo.add(find(p));
+		while(!todo.isEmpty()) {
+			T elem = todo.pop();
+			component.add(elem);
+			todo.addAll(getChildren(elem));
+		}
+		component.remove(p);
+		return component;
+	}
+
+	private Collection<T> getChildren(T parent) {
+		Collection<T> c = children.get(parent);
+		if(c == null) {
+			c = new HashSet<>();
+			children.put(parent, c);
+		}
+		return c;
 	}
 
 	private int getRank(T t) {

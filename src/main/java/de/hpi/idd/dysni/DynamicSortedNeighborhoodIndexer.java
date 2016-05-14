@@ -1,6 +1,7 @@
 package de.hpi.idd.dysni;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +23,7 @@ public class DynamicSortedNeighborhoodIndexer<T> {
 		}
 	}
 
-	public void add(T rec) {
+	public Collection<T> add(T rec) {
 		Set<T> candidates = new HashSet<>();
 		for (Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>> entry : trees) {
 			List<T> newCandidates = entry.getRight().insert(entry.getLeft().wrap(rec)).stream()
@@ -34,6 +35,7 @@ public class DynamicSortedNeighborhoodIndexer<T> {
 				uf.union(rec, candidate);
 			}
 		}
+		return uf.getComponent(rec);
 	}
 
 	private static class Tuple<LEFT, RIGHT> {
