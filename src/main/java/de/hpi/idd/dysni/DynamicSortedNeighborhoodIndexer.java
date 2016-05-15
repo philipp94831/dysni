@@ -25,9 +25,11 @@ public class DynamicSortedNeighborhoodIndexer<T> {
 
 	public Collection<T> add(T rec) {
 		Set<T> candidates = new HashSet<>();
-		for (Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>> entry : trees) {
-			List<T> newCandidates = entry.getRight().insert(entry.getLeft().wrap(rec)).stream()
-					.map(ElementWrapper::getObject).collect(Collectors.toList());
+		for (Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>> tuple : trees) {
+			WrapperFactory<T> factory = tuple.getLeft();
+			AVLTree<String, ElementWrapper<T>> tree = tuple.getRight();
+			List<T> newCandidates = tree.insert(factory.wrap(rec)).stream().map(ElementWrapper::getObject)
+					.collect(Collectors.toList());
 			candidates.addAll(newCandidates);
 		}
 		for (T candidate : candidates) {

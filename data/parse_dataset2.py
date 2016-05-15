@@ -29,7 +29,7 @@ for disc in root:
 		elif child.text is not None:
 			values[indexLookup[child.tag]] += child.text
 		
-	csvLine = ",".join(values)
+	csvLine = ",".join(map(lambda x: '"' + x + '"', values))
 	csvLines.append(csvLine)
 
 headline = "did,artist,dtitle,category,genre,year,cdextra,tracks"
