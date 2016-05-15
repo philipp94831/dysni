@@ -1,6 +1,8 @@
 package de.hpi.idd.dysni.avl;
 
-public interface Element<T extends Comparable<T>> {
+public interface Element<K extends Comparable<K>> {
 
-	public T getSKV();
+	public KeyComparator<K> getComparator();
+
+	public K getKey();
 }
