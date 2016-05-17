@@ -24,9 +24,9 @@ public class UnionFindTest {
 		assertTrue(uf.connected(2, 4));
 		assertTrue(uf.connected(1, 4));
 		assertEquals(1, uf.count());
-		assertEquals(4, uf.getComponent(1).size());
-		assertEquals(4, uf.getComponent(2).size());
-		assertEquals(4, uf.getComponent(3).size());
-		assertEquals(4, uf.getComponent(4).size());
+		assertEquals(3, uf.getComponent(1).size());
+		assertEquals(3, uf.getComponent(2).size());
+		assertEquals(3, uf.getComponent(3).size());
+		assertEquals(3, uf.getComponent(4).size());
 	}
 }

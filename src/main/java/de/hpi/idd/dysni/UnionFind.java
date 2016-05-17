@@ -195,7 +195,11 @@ public class UnionFind<T> {
 	}
 
 	private void setParent(T rootP, T rootQ) {
-		getChildren(getParent(rootP)).remove(rootP);
+		T oldParent = getParent(rootP);
+		if(oldParent == rootQ) {
+			return;
+		}
+		getChildren(oldParent).remove(rootP);
 		parent.put(rootP, rootQ);
 		addChild(rootQ, rootP);
 	}
