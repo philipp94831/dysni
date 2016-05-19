@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -19,14 +21,17 @@ public class App {
 	public static void main(String[] args) {
 		long start = System.nanoTime();
 		int i = 0;
+		int count = 0;
 		DynamicSortedNeighborhoodIndexer<CDRecord> dysni = new DynamicSortedNeighborhoodIndexer<>(
-				new CDRecordComparator(), Arrays.asList(new CDRecordFactory()));
+				new CDRecordComparator(), Arrays.asList(new CDRecordFactory(), new CDRecordFactory2()));
 		try {
 			CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new FileReader("data/cd_dataset.csv"));
 			CDRecordParser cdparser = new CDRecordParser();
 			for (CSVRecord record : parser) {
 				CDRecord rec = cdparser.parse(record);
-				System.out.println("Duplicates for " + rec.getdId() + ": " + dysni.add(rec));
+				Collection<CDRecord> duplicates = dysni.add(rec);
+				count += duplicates.isEmpty()? 0 : 1;
+				System.out.println("Duplicates for " + rec.getdId() + ": " + duplicates);
 				i++;
 			}
 		} catch (FileNotFoundException e) {
@@ -38,33 +43,40 @@ public class App {
 		}
 		long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
+		System.out.println("Found " + count + " duplicates");
 	}
 
 	private static class CDRecordFactory implements WrapperFactory<CDRecord> {
 
 		@Override
 		public ElementWrapper<CDRecord> wrap(CDRecord rec) {
-			return new CDRecordElement(rec);
+			String key = rec.getdTitle().substring(0, Math.min(3, rec.getdTitle().length()))
+					+ rec.getArtist().substring(0, Math.min(3, rec.getArtist().length()));
+			return new CDRecordElement(rec, key);
+		}
+	}
+
+	private static class CDRecordFactory2 implements WrapperFactory<CDRecord> {
+
+		@Override
+		public ElementWrapper<CDRecord> wrap(CDRecord rec) {
+			String key = rec.getArtist().substring(0, Math.min(3, rec.getArtist().length()))
+					+ rec.getdTitle().substring(0, Math.min(3, rec.getdTitle().length()));
+			return new CDRecordElement(rec, key);
+		}
+	}
+
+	private static class CDRecordElement extends ElementWrapper<CDRecord> {
+
+		private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
+
+		public CDRecordElement(CDRecord record, String key) {
+			super(record, key);
 		}
 
-		private static class CDRecordElement extends ElementWrapper<CDRecord> {
-
-			private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
-
-			public CDRecordElement(CDRecord record) {
-				super(record);
-			}
-
-			@Override
-			public KeyComparator<String> getComparator() {
-				return COMPARATOR;
-			}
-
-			@Override
-			protected String computeKey() {
-				return object.getdTitle().substring(0, Math.min(3, object.getdTitle().length()))
-						+ object.getArtist().substring(0, Math.min(3, object.getArtist().length()));
-			}
+		@Override
+		public KeyComparator<String> getComparator() {
+			return COMPARATOR;
 		}
 	}
 }

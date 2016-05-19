@@ -119,7 +119,11 @@ public class UnionFind<T> {
 	public Collection<T> getComponent(T t) {
 		Collection<T> component = new HashSet<>();
 		Stack<Node<T>> todo = new Stack<>();
-		todo.add(find(t));
+		Node<T> node = find(t);
+		if(node == null) {
+			return component;
+		}
+		todo.add(node);
 		while (!todo.isEmpty()) {
 			Node<T> elem = todo.pop();
 			component.add(elem.getElement());
