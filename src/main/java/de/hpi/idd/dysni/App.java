@@ -1,25 +1,43 @@
 package de.hpi.idd.dysni;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import de.hpi.idd.dysni.avl.KeyComparator;
 import de.hpi.idd.dysni.comp.LevenshteinComparator;
 import de.hpi.idd.dysni.records.CDRecord;
 import de.hpi.idd.dysni.records.CDRecordComparator;
+import de.hpi.idd.dysni.records.CDRecordParser;
 
 public class App {
 
 	public static void main(String[] args) {
+		long start = System.nanoTime();
+		int i = 0;
 		DynamicSortedNeighborhoodIndexer<CDRecord> dysni = new DynamicSortedNeighborhoodIndexer<>(
 				new CDRecordComparator(), Arrays.asList(new CDRecordFactory()));
-		CDRecord rec1 = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None",
-				(short) 2016, Collections.emptyList());
-		CDRecord rec2 = new CDRecord("1", "The Rolling Tones", "Overpriced Best CD", "trash", "Pop", "None",
-				(short) 2017, Collections.emptyList());
-		CDRecord[] recs = { rec1, rec2 };
-		for (CDRecord rec : recs) {
-			System.out.println("Duplicates: " + dysni.add(rec));
+		try {
+			CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new FileReader("data/cd_dataset.csv"));
+			CDRecordParser cdparser = new CDRecordParser();
+			for (CSVRecord record : parser) {
+				CDRecord rec = cdparser.parse(record);
+				System.out.println("Duplicates for " + rec.getdId() + ": " + dysni.add(rec));
+				i++;
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		long time = System.nanoTime() - start;
+		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
 	}
 
 	private static class CDRecordFactory implements WrapperFactory<CDRecord> {
@@ -44,7 +62,8 @@ public class App {
 
 			@Override
 			protected String computeKey() {
-				return object.getdTitle().substring(0, 3) + object.getArtist().substring(0, 3);
+				return object.getdTitle().substring(0, Math.min(3, object.getdTitle().length()))
+						+ object.getArtist().substring(0, Math.min(3, object.getArtist().length()));
 			}
 		}
 	}

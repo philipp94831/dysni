@@ -23,10 +23,13 @@ public class UnionFindTest {
 		uf.union(2, 4);
 		assertTrue(uf.connected(2, 4));
 		assertTrue(uf.connected(1, 4));
-		assertEquals(1, uf.count());
+		uf.union(5, 5);
+		uf.union(5, 5);
+		assertEquals(2, uf.count());
 		assertEquals(3, uf.getComponent(1).size());
 		assertEquals(3, uf.getComponent(2).size());
 		assertEquals(3, uf.getComponent(3).size());
 		assertEquals(3, uf.getComponent(4).size());
+		assertEquals(0, uf.getComponent(5).size());
 	}
 }

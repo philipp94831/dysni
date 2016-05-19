@@ -4,91 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
-/******************************************************************************
- *  Compilation:  javac UF.java
- *  Execution:    java UF < input.txt
- *  Dependencies: StdIn.java StdOut.java
- *  Data files:   http://algs4.cs.princeton.edu/15uf/tinyUF.txt
- *                http://algs4.cs.princeton.edu/15uf/mediumUF.txt
- *                http://algs4.cs.princeton.edu/15uf/largeUF.txt
- *
- *  Weighted quick-union by rank with path compression by halving.
- *
- *  % java UF < tinyUF.txt
- *  4 3
- *  3 8
- *  6 5
- *  9 4
- *  2 1
- *  5 0
- *  7 2
- *  6 1
- *  2 components
- *
- ******************************************************************************/
-
 /**
- * The <tt>UF</tt> class represents a <em>union-find data type</em> (also known
- * as the <em>disjoint-sets data type</em>). It supports the <em>union</em> and
- * <em>find</em> operations, along with a <em>connected</em> operation for
- * determining whether two sites are in the same component and a <em>count</em>
- * operation that returns the total number of components.
- * <p>
- * The union-find data type models connectivity among a set of <em>N</em> sites,
- * named 0 through <em>N</em> &ndash; 1. The <em>is-connected-to</em> relation
- * must be an <em>equivalence relation</em>:
- * <ul>
- * <p>
- * <li><em>Reflexive</em>: <em>p</em> is connected to <em>p</em>.
- * <p>
- * <li><em>Symmetric</em>: If <em>p</em> is connected to <em>q</em>, then
- * <em>q</em> is connected to <em>p</em>.
- * <p>
- * <li><em>Transitive</em>: If <em>p</em> is connected to <em>q</em> and
- * <em>q</em> is connected to <em>r</em>, then <em>p</em> is connected to
- * <em>r</em>.
- * </ul>
- * <p>
- * An equivalence relation partitions the sites into
- * <em>equivalence classes</em> (or <em>components</em>). In this case, two
- * sites are in the same component if and only if they are connected. Both sites
- * and components are identified with integers between 0 and <em>N</em> &ndash;
- * 1. Initially, there are <em>N</em> components, with each site in its own
- * component. The <em>component identifier</em> of a component (also known as
- * the <em>root</em>, <em>canonical element</em>, <em>leader</em>, or
- * <em>set representative</em>) is one of the sites in the component: two sites
- * have the same component identifier if and only if they are in the same
- * component.
- * <ul>
- * <p>
- * <li><em>union</em>(<em>p</em>, <em>q</em>) adds a connection between the two
- * sites <em>p</em> and <em>q</em>. If <em>p</em> and <em>q</em> are in
- * different components, then it replaces these two components with a new
- * component that is the union of the two.
- * <p>
- * <li><em>find</em>(<em>p</em>) returns the component identifier of the
- * component containing <em>p</em>.
- * <p>
- * <li><em>connected</em>(<em>p</em>, <em>q</em>) returns true if both
- * <em>p</em> and <em>q</em> are in the same component, and false otherwise.
- * <p>
- * <li><em>count</em>() returns the number of components.
- * </ul>
- * <p>
- * The component identifier of a component can change only when the component
- * itself changes during a call to <em>union</em>&mdash;it cannot change during
- * a call to <em>find</em>, <em>connected</em>, or <em>count</em>.
- * <p>
- * This implementation uses weighted quick union by rank with path compression
- * by halving. Initializing a data structure with <em>N</em> sites takes linear
- * time. Afterwards, the <em>union</em>, <em>find</em>, and <em>connected</em>
- * operations take logarithmic time (in the worst case) and the <em>count</em>
- * operation takes constant time. Moreover, the amortized time per
- * <em>union</em>, <em>find</em>, and <em>connected</em> operation has inverse
- * Ackermann complexity. For alternate implementations of the same API, see
- * {@link QuickUnionUF}, {@link QuickFindUF}, and {@link WeightedQuickUnionUF}.
+ * Based on the implementation by Robert Sedgewick and Kevin Wayne from
+ * Princeton University
  *
  * <p>
  * For additional documentation, see
@@ -99,138 +20,167 @@ import java.util.Stack;
  * @author Kevin Wayne
  */
 public class UnionFind<T> {
-
-	private int count = 0; // number of components
-	private Map<T, T> parent = new HashMap<>(); // parent[i] = parent of i
-	private Map<T, Byte> rank = new HashMap<>(); // rank[i] = rank of subtree rooted at i (never more than 31)
-	private Map<T, Collection<T>> children = new HashMap<>();
+	
+	private Map<T, Node<T>> nodes = new HashMap<>();
+	private Set<Node<T>> roots = new HashSet<>();
 
 	/**
 	 * Returns true if the the two sites are in the same component.
 	 *
-	 * @param p
-	 *            the integer representing one site
-	 * @param q
-	 *            the integer representing the other site
-	 * @return <tt>true</tt> if the two sites <tt>p</tt> and <tt>q</tt> are in
+	 * @param t
+	 *            the element representing one site
+	 * @param u
+	 *            the element representing the other site
+	 * @return <tt>true</tt> if the two sites <tt>t</tt> and <tt>u</tt> are in
 	 *         the same component; <tt>false</tt> otherwise
-	 * @throws IndexOutOfBoundsException
-	 *             unless both <tt>0 &le; p &lt; N</tt> and
-	 *             <tt>0 &le; q &lt; N</tt>
 	 */
-	public boolean connected(T p, T q) {
-		return find(p).equals(find(q));
+	public boolean connected(T t, T u) {
+		Node<T> nodeT = find(t);
+		Node<T> nodeU = find(u);
+		return nodeT == null || nodeU == null? false : nodeT.equals(nodeU);
 	}
 
 	/**
 	 * Returns the number of components.
 	 *
-	 * @return the number of components (between <tt>1</tt> and <tt>N</tt>)
+	 * @return the number of components
 	 */
 	public int count() {
-		return count;
+		return roots.size();
 	}
 
 	/**
 	 * Returns the component identifier for the component containing site
-	 * <tt>p</tt>.
+	 * <tt>t</tt>.
 	 *
-	 * @param p
+	 * @param t
 	 *            the integer representing one site
 	 * @return the component identifier for the component containing site
-	 *         <tt>p</tt>
-	 * @throws IndexOutOfBoundsException
-	 *             unless <tt>0 &le; p &lt; N</tt>
+	 *         <tt>t</tt>
 	 */
-	public T find(T p) {
-		while (p != getParent(p)) {
-			setParent(p, getParent(getParent(p))); // path compression by halving
-			p = getParent(p);
+	public Node<T> find(T t) {
+		Node<T> node = nodes.get(t);
+		if(node == null) {
+			return null;
 		}
-		return p;
-	}
-	
-	private T getParent(T t) {
-		return parent.getOrDefault(t, t);
+		while (node.getParent() != null) {
+			// path compression by halving
+			Node<T> pp = node.getParent().getParent();
+			if(pp != null) {
+				node.setParent(pp);
+			}
+			node = node.getParent();
+		}
+		return node;
 	}
 
 	/**
-	 * Merges the component containing site <tt>p</tt> with the the component
-	 * containing site <tt>q</tt>.
+	 * Merges the component containing site <tt>t</tt> with the the component
+	 * containing site <tt>u</tt>.
 	 *
-	 * @param p
-	 *            the integer representing one site
-	 * @param q
-	 *            the integer representing the other site
-	 * @throws IndexOutOfBoundsException
-	 *             unless both <tt>0 &le; p &lt; N</tt> and
-	 *             <tt>0 &le; q &lt; N</tt>
+	 * @param t
+	 *            the element representing one site
+	 * @param u
+	 *            the element representing the other site
 	 */
-	public void union(T p, T q) {
-		if(!parent.containsKey(p)) {
-			count++;
+	public void union(T t, T u) {
+		if (!nodes.containsKey(t)) {
+			insert(t);
 		}
-		if(!parent.containsKey(q)) {
-			count++;
+		if (!nodes.containsKey(u)) {
+			insert(u);
 		}
-		T rootP = find(p);
-		T rootQ = find(q);
-		if (rootP == rootQ) {
+		Node<T> rootT = find(t);
+		Node<T> rootU = find(u);
+		if (rootT.equals(rootU)) {
 			return;
 		}
 		// make root of smaller rank point to root of larger rank
-		if (getRank(rootP) < getRank(rootQ)) {
-			setParent(rootP, rootQ);
-		} else if (getRank(rootP) > getRank(rootQ)) {
-			setParent(rootQ, rootP);
+		if (rootT.getRank() < rootU.getRank()) {
+			rootT.setParent(rootU);
+		} else if (rootT.getRank() > rootU.getRank()) {
+			rootU.setParent(rootT);
 		} else {
-			setParent(rootQ, rootP);
-			increaseRank(rootP);
+			rootU.setParent(rootT);
+			rootT.increaseRank();
 		}
-		count--;
 	}
 
-	private void increaseRank(T rootP) {
-		rank.put(rootP, (byte) (getRank(rootP) + 1));
+	private void insert(T t) {
+		Node<T> node = new Node<>(t);
+		roots.add(node);
+		nodes.put(t, node);
 	}
 
-	private void setParent(T rootP, T rootQ) {
-		T oldParent = getParent(rootP);
-		if(oldParent == rootQ) {
-			return;
-		}
-		getChildren(oldParent).remove(rootP);
-		parent.put(rootP, rootQ);
-		addChild(rootQ, rootP);
+	public Set<Node<T>> getRoots() {
+		return roots;
 	}
 
-	private void addChild(T rootQ, T rootP) {
-		getChildren(rootQ).add(rootP);		
-	}
-	
-	public Collection<T> getComponent(T p) {
+	public Collection<T> getComponent(T t) {
 		Collection<T> component = new HashSet<>();
-		Stack<T> todo = new Stack<>();
-		todo.add(find(p));
-		while(!todo.isEmpty()) {
-			T elem = todo.pop();
-			component.add(elem);
-			todo.addAll(getChildren(elem));
+		Stack<Node<T>> todo = new Stack<>();
+		todo.add(find(t));
+		while (!todo.isEmpty()) {
+			Node<T> elem = todo.pop();
+			component.add(elem.getElement());
+			todo.addAll(elem.getChildren());
 		}
-		component.remove(p);
+		component.remove(t);
 		return component;
 	}
-
-	private Collection<T> getChildren(T parent) {
-		Collection<T> c = children.get(parent);
-		if(c == null) {
-			c = new HashSet<>();
-			children.put(parent, c);
+	
+	private class Node<U> {
+		private final U element;
+		private Node<U> parent;
+		private final Collection<Node<U>> children = new HashSet<>();
+		private byte rank;
+		
+		
+		public Node(U element) {
+			this.element = element;
 		}
-		return c;
-	}
+		
+		public void increaseRank() {
+			rank++;
+		}
+		
+		public byte getRank() {
+			return rank;
+		}
 
-	private int getRank(T t) {
-		return rank.getOrDefault(t, (byte) 0);
+
+		public U getElement() {
+			return element;
+		}
+
+
+		public Node<U> getParent() {
+			return parent;
+		}
+
+
+		public void setParent(Node<U> parent) {
+			if(this.parent != null) {
+				this.parent.removeChild(this);				
+			} else {
+				roots.remove(this);
+			}
+			this.parent = parent;
+			parent.addChild(this);
+		}
+
+
+		private void removeChild(Node<U> child) {
+			children.remove(child);
+		}
+
+
+		public Collection<Node<U>> getChildren() {
+			return children;
+		}
+		
+		private void addChild(Node<U> child) {
+			children.add(child);
+		}
 	}
 }
