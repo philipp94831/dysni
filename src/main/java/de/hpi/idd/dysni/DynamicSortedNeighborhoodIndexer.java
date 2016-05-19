@@ -39,6 +39,23 @@ public class DynamicSortedNeighborhoodIndexer<T> {
 		}
 		return uf.getComponent(rec);
 	}
+	
+	public Collection<T> findDuplicates(T rec) {
+		Set<T> candidates = new HashSet<>();
+		for (Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>> tuple : trees) {
+			WrapperFactory<T> factory = tuple.getLeft();
+			AVLTree<String, ElementWrapper<T>> tree = tuple.getRight();
+			List<T> newCandidates = tree.findCandidates(factory.wrap(rec)).stream().map(ElementWrapper::getObject)
+					.collect(Collectors.toList());
+			candidates.addAll(newCandidates);
+		}
+		for (T candidate : candidates) {
+			if (comp.areSimilar(candidate, rec)) {
+				uf.union(rec, candidate);
+			}
+		}
+		return uf.getComponent(rec);
+	}
 
 	private static class Tuple<LEFT, RIGHT> {
 
