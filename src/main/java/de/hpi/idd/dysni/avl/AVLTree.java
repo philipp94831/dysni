@@ -16,6 +16,7 @@
  */
 package de.hpi.idd.dysni.avl;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -183,5 +184,11 @@ public class AVLTree<K extends Comparable<K>, V extends Element<K>> implements I
 	 */
 	public int size() {
 		return top == null ? 0 : top.size();
+	}
+
+	public Collection<V> findCandidates(V elem) {
+		List<V> candidates = find(elem).getContainer().getSimilarCandidates();
+		candidates.remove(elem);
+		return candidates;
 	}
 }

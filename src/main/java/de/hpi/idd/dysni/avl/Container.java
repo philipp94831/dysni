@@ -35,7 +35,7 @@ public class Container<K extends Comparable<K>, V extends Element<K>> {
 		return elements;
 	}
 
-	private List<V> getSimilarCandidates() {
+	public List<V> getSimilarCandidates() {
 		List<V> candidates = new ArrayList<>();
 		candidates.addAll(getAll());
 		for (Node<K, V> node = this.node.getPrevious(); node != null; node = node.getPrevious()) {

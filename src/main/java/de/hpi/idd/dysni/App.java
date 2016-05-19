@@ -10,13 +10,14 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import de.hpi.idd.dysni.avl.KeyComparator;
 import de.hpi.idd.dysni.comp.LevenshteinComparator;
 import de.hpi.idd.dysni.records.CDRecord;
 import de.hpi.idd.dysni.records.CDRecordComparator;
 import de.hpi.idd.dysni.records.CDRecordParser;
 
 public class App {
+
+	private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
 
 	public static void main(String[] args) {
 		long start = System.nanoTime();
@@ -30,7 +31,7 @@ public class App {
 			for (CSVRecord record : parser) {
 				CDRecord rec = cdparser.parse(record);
 				Collection<CDRecord> duplicates = dysni.add(rec);
-				count += duplicates.isEmpty()? 0 : 1;
+				count += duplicates.isEmpty() ? 0 : 1;
 				System.out.println("Duplicates for " + rec.getdId() + ": " + duplicates);
 				i++;
 			}
@@ -52,7 +53,7 @@ public class App {
 		public ElementWrapper<CDRecord> wrap(CDRecord rec) {
 			String key = rec.getdTitle().substring(0, Math.min(3, rec.getdTitle().length()))
 					+ rec.getArtist().substring(0, Math.min(3, rec.getArtist().length()));
-			return new CDRecordElement(rec, key);
+			return new ElementWrapper<>(rec, key, COMPARATOR);
 		}
 	}
 
@@ -62,21 +63,7 @@ public class App {
 		public ElementWrapper<CDRecord> wrap(CDRecord rec) {
 			String key = rec.getArtist().substring(0, Math.min(3, rec.getArtist().length()))
 					+ rec.getdTitle().substring(0, Math.min(3, rec.getdTitle().length()));
-			return new CDRecordElement(rec, key);
-		}
-	}
-
-	private static class CDRecordElement extends ElementWrapper<CDRecord> {
-
-		private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
-
-		public CDRecordElement(CDRecord record, String key) {
-			super(record, key);
-		}
-
-		@Override
-		public KeyComparator<String> getComparator() {
-			return COMPARATOR;
+			return new ElementWrapper<>(rec, key, COMPARATOR);
 		}
 	}
 }
