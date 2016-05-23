@@ -1,15 +1,11 @@
 package de.hpi.idd.dysni.records;
 
 import java.util.Arrays;
+import java.util.Map;
 
-import org.apache.commons.csv.CSVRecord;
+public class CDRecordParser {
 
-import de.hpi.idd.RecordParser;
-
-public class CDRecordParser implements RecordParser<CDRecord> {
-
-	@Override
-	public CDRecord parse(CSVRecord record) {
+	public CDRecord parse(Map<String, String> record) {
 		CDRecord cd = new CDRecord();
 		cd.setdId(record.get("did"));
 		cd.setArtist(record.get("artist"));

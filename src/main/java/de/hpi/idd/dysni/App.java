@@ -5,15 +5,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import de.hpi.idd.dysni.comp.LevenshteinComparator;
-import de.hpi.idd.dysni.records.CDRecord;
 import de.hpi.idd.dysni.records.CDRecordComparator;
-import de.hpi.idd.dysni.records.CDRecordParser;
 
 public class App {
 
@@ -23,16 +23,16 @@ public class App {
 		long start = System.nanoTime();
 		int i = 0;
 		int count = 0;
-		DynamicSortedNeighborhoodIndexer<CDRecord> dysni = new DynamicSortedNeighborhoodIndexer<>(
+		DynamicSortedNeighborhoodIndexer<Map<String, String>> dysni = new DynamicSortedNeighborhoodIndexer<>(
 				new CDRecordComparator(), Arrays.asList(new CDRecordFactory(), new CDRecordFactory2()));
 		try {
 			CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new FileReader("data/cd_dataset.csv"));
-			CDRecordParser cdparser = new CDRecordParser();
 			for (CSVRecord record : parser) {
-				CDRecord rec = cdparser.parse(record);
-				Collection<CDRecord> duplicates = dysni.add(rec);
+				Map<String, String> rec = record.toMap();
+				Collection<Map<String, String>> duplicates = dysni.add(rec);
 				count += duplicates.isEmpty() ? 0 : 1;
-				System.out.println("Duplicates for " + rec.getdId() + ": " + duplicates);
+				System.out.println("Duplicates for " + rec.get("did") + ": "
+						+ duplicates.stream().map(d -> d.get("did")).collect(Collectors.toList()));
 				i++;
 			}
 		} catch (FileNotFoundException e) {
@@ -47,22 +47,26 @@ public class App {
 		System.out.println("Found " + count + " duplicates");
 	}
 
-	private static class CDRecordFactory implements WrapperFactory<CDRecord> {
+	private static class CDRecordFactory implements WrapperFactory<Map<String, String>> {
 
 		@Override
-		public ElementWrapper<CDRecord> wrap(CDRecord rec) {
-			String key = rec.getdTitle().substring(0, Math.min(3, rec.getdTitle().length()))
-					+ rec.getArtist().substring(0, Math.min(3, rec.getArtist().length()));
+		public ElementWrapper<Map<String, String>> wrap(Map<String, String> rec) {
+			String title = rec.get("dtitle");
+			String artist = rec.get("artist");
+			String key = title.substring(0, Math.min(3, title.length()))
+					+ artist.substring(0, Math.min(3, artist.length()));
 			return new ElementWrapper<>(rec, key, COMPARATOR);
 		}
 	}
 
-	private static class CDRecordFactory2 implements WrapperFactory<CDRecord> {
+	private static class CDRecordFactory2 implements WrapperFactory<Map<String, String>> {
 
 		@Override
-		public ElementWrapper<CDRecord> wrap(CDRecord rec) {
-			String key = rec.getArtist().substring(0, Math.min(3, rec.getArtist().length()))
-					+ rec.getdTitle().substring(0, Math.min(3, rec.getdTitle().length()));
+		public ElementWrapper<Map<String, String>> wrap(Map<String, String> rec) {
+			String title = rec.get("dtitle");
+			String artist = rec.get("artist");
+			String key = artist.substring(0, Math.min(3, artist.length()))
+					+ title.substring(0, Math.min(3, title.length()));
 			return new ElementWrapper<>(rec, key, COMPARATOR);
 		}
 	}

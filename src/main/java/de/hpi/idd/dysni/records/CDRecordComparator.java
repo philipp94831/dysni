@@ -5,10 +5,12 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.hpi.idd.RecordComparator;
+
 /**
  * Created by dennis on 08.05.16.
  */
-public class CDRecordComparator implements de.hpi.idd.RecordComparator<CDRecord> {
+public class CDRecordComparator implements RecordComparator<Map<String, String>> {
 
 	private static final double THRESHOLD = 0.5;
 
@@ -27,8 +29,10 @@ public class CDRecordComparator implements de.hpi.idd.RecordComparator<CDRecord>
 		return similarityMap;
 	}
 
-	public boolean areSimilar(CDRecord firstRecord, CDRecord secondRecord) {
-		return similarity(firstRecord, secondRecord) > THRESHOLD;
+	@Override
+	public boolean areSimilar(Map<String, String> firstRecord, Map<String, String> secondRecord) {
+		CDRecordParser p = new CDRecordParser();
+		return similarity(p.parse(firstRecord), p.parse(secondRecord)) > THRESHOLD;
 	}
 
 	private static double getSimilarityOfTracks(List<String> firstTracklist, List<String> secondTracklist) {
