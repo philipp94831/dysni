@@ -6,82 +6,84 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import de.hpi.idd.dysni.avl.KeyComparator;
 import de.hpi.idd.dysni.comp.LevenshteinComparator;
 import de.hpi.idd.dysni.records.CDRecordComparator;
+import de.hpi.idd.dysni.simavl.KeyComparator;
 import de.hpi.idd.dysni.store.MemoryStore;
 import de.hpi.idd.dysni.store.RecordStore;
 
 public class App {
 
-	private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
-
-	public static void main(String[] args) {
-		long start = System.nanoTime();
-		int i = 0;
-		int count = 0;
-		RecordStore<IdWrapper> store = new MemoryStore<>();
-		DynamicSortedNeighborhoodIndexer<IdWrapper> dysni = new DynamicSortedNeighborhoodIndexer<>(store,
-				new CDRecordComparator(store), Arrays.asList(new CDRecordFactory(), new CDRecordFactory2()));
-		try {
-			CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new FileReader("data/cd_dataset.csv"));
-			for (CSVRecord record : parser) {
-				IdWrapper rec = new IdWrapper(record.toMap());
-				dysni.add(rec);
-				Collection<String> duplicates = dysni.findDuplicates(rec);
-				count += duplicates.isEmpty() ? 0 : 1;
-				System.out.println("Duplicates for " + rec.getId() + ": " + duplicates);
-				i++;
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		long time = System.nanoTime() - start;
-		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
-		System.out.println("Found " + count + " duplicates");
-	}
-
 	private static class CDRecordFactory implements KeyWrapperFactory<IdWrapper, String> {
 
 		@Override
-		public KeyWrapper<String> wrap(IdWrapper rec) {
-			Map<String, String> obj = rec.getObject();
-			String title = obj.get("dtitle");
-			String artist = obj.get("artist");
-			String key = title.substring(0, Math.min(3, title.length()))
-					+ artist.substring(0, Math.min(3, artist.length()));
-			return new KeyWrapper<>(rec.getId(), key);
+		public KeyComparator<String> getComparator() {
+			return App.COMPARATOR;
 		}
 
 		@Override
-		public KeyComparator<String> getComparator() {
-			return COMPARATOR;
+		public KeyWrapper<String> wrap(final IdWrapper rec) {
+			final Map<String, String> obj = rec.getObject();
+			final String title = obj.get("dtitle");
+			final String artist = obj.get("artist");
+			final String key = title.substring(0, Math.min(3, title.length()))
+					+ artist.substring(0, Math.min(3, artist.length()));
+			return new KeyWrapper<>(rec.getId(), key);
 		}
 	}
 
 	private static class CDRecordFactory2 implements KeyWrapperFactory<IdWrapper, String> {
 
 		@Override
-		public KeyWrapper<String> wrap(IdWrapper rec) {
-			Map<String, String> obj = rec.getObject();
-			String title = obj.get("dtitle");
-			String artist = obj.get("artist");
-			String key = artist.substring(0, Math.min(3, artist.length()))
-					+ title.substring(0, Math.min(3, title.length()));
-			return new KeyWrapper<>(rec.getId(), key);
+		public KeyComparator<String> getComparator() {
+			return App.COMPARATOR;
 		}
 
 		@Override
-		public KeyComparator<String> getComparator() {
-			return COMPARATOR;
+		public KeyWrapper<String> wrap(final IdWrapper rec) {
+			final Map<String, String> obj = rec.getObject();
+			final String title = obj.get("dtitle");
+			final String artist = obj.get("artist");
+			final String key = artist.substring(0, Math.min(3, artist.length()))
+					+ title.substring(0, Math.min(3, title.length()));
+			return new KeyWrapper<>(rec.getId(), key);
 		}
+	}
+
+	private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
+
+	public static void main(final String[] args) {
+		final long start = System.nanoTime();
+		int i = 0;
+		int count = 0;
+		final RecordStore<IdWrapper> store = new MemoryStore<>();
+		final DynamicSortedNeighborhoodIndexer<IdWrapper> dysni = new DynamicSortedNeighborhoodIndexer<>(store,
+				new CDRecordComparator(store), Arrays.asList(new CDRecordFactory(), new CDRecordFactory2()));
+		try {
+			final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
+					.parse(new FileReader("data/cd_dataset.csv"));
+			for (final CSVRecord record : parser) {
+				final IdWrapper rec = new IdWrapper(record.toMap());
+				dysni.add(rec);
+				final Collection<String> duplicates = dysni.findDuplicates(rec);
+				count += duplicates.isEmpty() ? 0 : 1;
+				System.out.println("Duplicates for " + rec.getId() + ": " + duplicates);
+				i++;
+			}
+		} catch (final FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		final long time = System.nanoTime() - start;
+		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
+		System.out.println("Found " + count + " duplicates");
 	}
 }

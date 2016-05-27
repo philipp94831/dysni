@@ -8,12 +8,12 @@ public class MemoryStore<T> implements RecordStore<T> {
 	private final Map<String, T> store = new HashMap<>();
 
 	@Override
-	public T getRecord(String id) {
+	public T getRecord(final String id) {
 		return store.get(id);
 	}
 
 	@Override
-	public void storeRecord(String id, T record) {
+	public void storeRecord(final String id, final T record) {
 		store.put(id, record);
 	}
 

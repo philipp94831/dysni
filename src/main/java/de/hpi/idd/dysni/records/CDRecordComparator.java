@@ -1,7 +1,12 @@
 package de.hpi.idd.dysni.records;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,58 +19,18 @@ import de.hpi.idd.dysni.store.RecordStore;
  */
 public class CDRecordComparator implements SimilarityMeasure {
 
-	private static final double THRESHOLD = 0.5;
-	private final RecordStore<IdWrapper> store;
-	
-	
-	public CDRecordComparator(RecordStore<IdWrapper> store) {
-		this.store = store;
-	}
-
-	public static Map<CDSimilarity, Double> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
-		Map<CDSimilarity, Double> similarityMap = new HashMap<>();
-		similarityMap.put(CDSimilarity.ARTIST, levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
-		similarityMap.put(CDSimilarity.DTITLE, levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
-		similarityMap.put(CDSimilarity.CATEGORY,
-				levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
-		similarityMap.put(CDSimilarity.GENRE, levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
-		similarityMap.put(CDSimilarity.YEAR,
-				levenshteinDistance(firstRecord.getYear() + "", secondRecord.getYear() + ""));
-		similarityMap.put(CDSimilarity.CDEXTRA,
-				levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
-		similarityMap.put(CDSimilarity.TRACK, getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
-		return similarityMap;
-	}
-
-	private static double getSimilarityOfTracks(List<String> firstTracklist, List<String> secondTracklist) {
-		HashSet<String> set = new HashSet<>(firstTracklist);
-		set.retainAll(secondTracklist);
-		int shared = set.size();
-		Set<String> mergedTrackset = new HashSet<>();
-		mergedTrackset.addAll(firstTracklist);
-		mergedTrackset.addAll(secondTracklist);
-		if (mergedTrackset.size() == 0) {
-			return 1.0;
-		}
-		return (double) shared / mergedTrackset.size();
-	}
-
-	private static double levenshteinDistance(String a, String b) {
-		return 1.0 - (double) StringUtils.getLevenshteinDistance(a.toLowerCase(), b.toLowerCase())
-				/ Math.max(a.length(), b.length());
-	}
-
 	public enum CDSimilarity {
 		ARTIST, DTITLE, GENRE, YEAR, CDEXTRA, TRACK, CATEGORY;
 
+		private static final double TOTAL_WEIGHT = Arrays.stream(CDSimilarity.values())
+				.mapToDouble(CDSimilarity::weight).sum();
 		private final double weight;
-		private static final double TOTAL_WEIGHT = Arrays.stream(values()).mapToDouble(CDSimilarity::weight).sum();
 
 		CDSimilarity() {
 			this(1);
 		}
 
-		CDSimilarity(double weight) {
+		CDSimilarity(final double weight) {
 			this.weight = weight;
 		}
 
@@ -74,28 +39,76 @@ public class CDRecordComparator implements SimilarityMeasure {
 		}
 	}
 
-	private double calculateSimilarity(Map<String, String> firstRecord, Map<String, String> secondRecord) {
-		return similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
+	private static final double THRESHOLD = 0.5;
+
+	public static Map<CDSimilarity, Double> getSimilarityOfRecords(final CDRecord firstRecord,
+			final CDRecord secondRecord) {
+		final Map<CDSimilarity, Double> similarityMap = new HashMap<>();
+		similarityMap.put(CDSimilarity.ARTIST,
+				CDRecordComparator.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
+		similarityMap.put(CDSimilarity.DTITLE,
+				CDRecordComparator.levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
+		similarityMap.put(CDSimilarity.CATEGORY,
+				CDRecordComparator.levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
+		similarityMap.put(CDSimilarity.GENRE,
+				CDRecordComparator.levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
+		similarityMap.put(CDSimilarity.YEAR,
+				CDRecordComparator.levenshteinDistance(firstRecord.getYear() + "", secondRecord.getYear() + ""));
+		similarityMap.put(CDSimilarity.CDEXTRA,
+				CDRecordComparator.levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
+		similarityMap.put(CDSimilarity.TRACK,
+				CDRecordComparator.getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
+		return similarityMap;
 	}
-	
-	public static double similarity(CDRecord firstRecord, CDRecord secondRecord) {
-		Map<CDSimilarity, Double> similarityMap = getSimilarityOfRecords(firstRecord, secondRecord);
+
+	private static double getSimilarityOfTracks(final List<String> firstTracklist, final List<String> secondTracklist) {
+		final HashSet<String> set = new HashSet<>(firstTracklist);
+		set.retainAll(secondTracklist);
+		final int shared = set.size();
+		final Set<String> mergedTrackset = new HashSet<>();
+		mergedTrackset.addAll(firstTracklist);
+		mergedTrackset.addAll(secondTracklist);
+		if (mergedTrackset.size() == 0) {
+			return 1.0;
+		}
+		return (double) shared / mergedTrackset.size();
+	}
+
+	private static double levenshteinDistance(final String a, final String b) {
+		return 1.0 - (double) StringUtils.getLevenshteinDistance(a.toLowerCase(), b.toLowerCase())
+				/ Math.max(a.length(), b.length());
+	}
+
+	public static double similarity(final CDRecord firstRecord, final CDRecord secondRecord) {
+		final Map<CDSimilarity, Double> similarityMap = CDRecordComparator.getSimilarityOfRecords(firstRecord,
+				secondRecord);
 		double result = 0.0;
-		for (Entry<CDSimilarity, Double> entry : similarityMap.entrySet()) {
+		for (final Entry<CDSimilarity, Double> entry : similarityMap.entrySet()) {
 			result += entry.getKey().weight() * entry.getValue();
 		}
 		return result / CDSimilarity.TOTAL_WEIGHT;
 	}
-	
-	@Override
-	public double getThreshold() {
-		return THRESHOLD;
+
+	private final RecordStore<IdWrapper> store;
+
+	public CDRecordComparator(final RecordStore<IdWrapper> store) {
+		this.store = store;
+	}
+
+	private double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord) {
+		return CDRecordComparator.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
 	}
 
 	@Override
-	public Double calculateSimilarity(String recordID1, String recordID2, HashMap<String, String> parameters) {
-		Map<String, String> firstRecord = store.getRecord(recordID1).getObject();
-		Map<String, String> secondRecord = store.getRecord(recordID2).getObject();
+	public Double calculateSimilarity(final String recordID1, final String recordID2,
+			final HashMap<String, String> parameters) {
+		final Map<String, String> firstRecord = store.getRecord(recordID1).getObject();
+		final Map<String, String> secondRecord = store.getRecord(recordID2).getObject();
 		return calculateSimilarity(firstRecord, secondRecord);
+	}
+
+	@Override
+	public double getThreshold() {
+		return CDRecordComparator.THRESHOLD;
 	}
 }

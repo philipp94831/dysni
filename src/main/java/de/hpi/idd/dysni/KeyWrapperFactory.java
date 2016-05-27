@@ -1,11 +1,11 @@
 package de.hpi.idd.dysni;
 
-import de.hpi.idd.dysni.avl.KeyComparator;
+import de.hpi.idd.dysni.simavl.KeyComparator;
 
 interface KeyWrapperFactory<K, T> {
 
-	KeyWrapper<T> wrap(K rec);
-
 	KeyComparator<T> getComparator();
+
+	KeyWrapper<T> wrap(K rec);
 
 }

@@ -1,4 +1,4 @@
-package de.hpi.idd.dysni.avl;
+package de.hpi.idd.dysni.simavl;
 
 public interface KeyComparator<T> {
 

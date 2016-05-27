@@ -16,84 +16,85 @@ public class CDRecord {
 	private Short year;
 	private List<String> tracks;
 
-	public CDRecord(String dId, String artist, String dTitle, String category, String genre, String cdExtra, short year, List<String> tracks) {
-		this.dId = dId;
-		this.artist = artist;
-		this.dTitle = dTitle;
-		this.category = category;
-		this.genre = genre;
-		this.cdExtra = cdExtra;
-		this.year = year;
-		this.tracks = tracks;
-	}
-
 	public CDRecord() {
 	}
 
-	public void setdId(String dId) {
+	public CDRecord(final String dId, final String artist, final String dTitle, final String category,
+			final String genre, final String cdExtra, final short year, final List<String> tracks) {
 		this.dId = dId;
-	}
-
-	public void setArtist(String artist) {
 		this.artist = artist;
-	}
-
-	public void setdTitle(String dTitle) {
 		this.dTitle = dTitle;
-	}
-
-	public void setCategory(String category) {
 		this.category = category;
-	}
-
-	public void setGenre(String genre) {
 		this.genre = genre;
-	}
-
-	public void setCdExtra(String cdExtra) {
 		this.cdExtra = cdExtra;
-	}
-
-	public void setYear(short year) {
 		this.year = year;
-	}
-
-	public void setTracks(List<String> tracks) {
 		this.tracks = tracks;
-	}
-
-	public String getdId() {
-		return dId;
 	}
 
 	public String getArtist() {
 		return artist;
 	}
 
-	public String getdTitle() {
-		return dTitle;
-	}
-
 	public String getCategory() {
 		return category;
-	}
-
-	public String getGenre() {
-		return genre;
 	}
 
 	public String getCdExtra() {
 		return cdExtra;
 	}
 
-	public Short getYear() {
-		return year;
+	public String getdId() {
+		return dId;
+	}
+
+	public String getdTitle() {
+		return dTitle;
+	}
+
+	public String getGenre() {
+		return genre;
 	}
 
 	public List<String> getTracks() {
 		return tracks;
 	}
-	
+
+	public Short getYear() {
+		return year;
+	}
+
+	public void setArtist(final String artist) {
+		this.artist = artist;
+	}
+
+	public void setCategory(final String category) {
+		this.category = category;
+	}
+
+	public void setCdExtra(final String cdExtra) {
+		this.cdExtra = cdExtra;
+	}
+
+	public void setdId(final String dId) {
+		this.dId = dId;
+	}
+
+	public void setdTitle(final String dTitle) {
+		this.dTitle = dTitle;
+	}
+
+	public void setGenre(final String genre) {
+		this.genre = genre;
+	}
+
+	public void setTracks(final List<String> tracks) {
+		this.tracks = tracks;
+	}
+
+	public void setYear(final short year) {
+		this.year = year;
+	}
+
 	@Override
 	public String toString() {
 		return dId;

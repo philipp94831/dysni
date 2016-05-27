@@ -1,13 +1,15 @@
 package de.hpi.idd.dysni.avl;
 
+import de.hpi.idd.dysni.util.SelfGeneric;
+
 /**
- * This class implements AVL trees nodes.
+ * this class implements AVL trees nodes.
  * <p>
  * AVL tree nodes implement all the logical structure of the tree. Nodes are
  * created by the {@link AVLTree AVLTree} class.
  * </p>
  * <p>
- * The nodes are not independant from each other but must obey specific
+ * The nodes are not independent from each other but must obey specific
  * balancing constraints and the tree structure is rearranged as elements are
  * inserted or deleted from the tree. The creation, modification and
  * tree-related navigation methods have therefore restricted access. Only the
@@ -16,35 +18,34 @@ package de.hpi.idd.dysni.avl;
  *
  * @see AVLTree
  */
-public class Node<K extends Comparable<K>, V extends HasKey<K>> {
+public abstract class Node<K extends Comparable<K>, V extends HasKey<K>, C extends Container<K, V, C, N>, N extends Node<K, V, C, N>>
+		implements SelfGeneric<N> {
 
 	/** Elements contained in the current node. */
-	private Container<K, V> container;
-	private K key;
+	C container;
+	K key;
 	/** Left sub-tree. */
-	private Node<K, V> left;
-	private Node<K, V> next;
+	N left;
+	N next;
 	/** Parent tree. */
-	private Node<K, V> parent;
-	private Node<K, V> prev;
+	N parent;
+	N prev;
 	/** Right sub-tree. */
-	private Node<K, V> right;
+	N right;
 	/** Skew factor. */
-	private Skew skew;
-	private final KeyComparator<K> comp;
+	Skew skew;
 
 	/**
 	 * Build a node for a specified element.
 	 *
 	 * @param element
 	 *            element
-	 * @param comp
-	 *            comparator to measure similarity of keys
+	 * @param container
+	 *            container to hold the elements
 	 */
-	Node(final V element, KeyComparator<K> comp) {
-		setContainer(new Container<>(comp));
+	protected Node(final V element, final C container) {
+		setContainer(container);
 		this.key = element.getKey();
-		this.comp = comp;
 		add(element);
 		left = null;
 		right = null;
@@ -58,12 +59,15 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		container.add(newElement);
 	}
 
+	protected abstract N createNode(V newElement);
+
 	/**
 	 * Delete the element from the tree. If the node is empty afterwards, the
 	 * node is deleted from the tree
 	 *
-	 * @param element element to delete
-	 * 
+	 * @param element
+	 *            element to delete
+	 *
 	 * @return true if the deleted element was the root of the tree, false
 	 *         otherwise
 	 */
@@ -75,11 +79,11 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 				container = null;
 				return true;
 			} else {
-				Node<K, V> node;
-				Node<K, V> child;
+				N node;
+				N child;
 				boolean leftShrunk;
 				if (left == null && right == null) {
-					node = this;
+					node = getThis();
 					container = null;
 					prev.setNext(next);
 					leftShrunk = node == node.parent.left;
@@ -119,7 +123,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *
 	 * @return elements contained in the node
 	 */
-	public Container<K, V> getContainer() {
+	public C getContainer() {
 		return container;
 	}
 
@@ -135,27 +139,27 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *         at this node or null if the tree is empty
 	 * @see #getSmallest
 	 */
-	Node<K, V> getLargest() {
-		Node<K, V> node = this;
+	N getLargest() {
+		N node = getThis();
 		while (node.right != null) {
 			node = node.right;
 		}
 		return node;
 	}
 
-	public Node<K, V> getLeft() {
+	public N getLeft() {
 		return left;
 	}
 
-	public Node<K, V> getNext() {
+	public N getNext() {
 		return next;
 	}
 
-	public Node<K, V> getPrevious() {
+	public N getPrevious() {
 		return prev;
 	}
 
-	public Node<K, V> getRight() {
+	public N getRight() {
 		return right;
 	}
 
@@ -167,8 +171,8 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *         at this node or null if the tree is empty
 	 * @see #getLargest
 	 */
-	Node<K, V> getSmallest() {
-		Node<K, V> node = this;
+	N getSmallest() {
+		N node = getThis();
 		while (node.left != null) {
 			node = node.left;
 		}
@@ -186,7 +190,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		if (newElement.getKey().compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				setLeft(new Node<>(newElement, comp));
+				setLeft(createNode(newElement));
 				left.setPrev(prev);
 				setPrev(left);
 				return rebalanceLeftGrown();
@@ -199,7 +203,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			setRight(new Node<>(newElement, comp));
+			setRight(createNode(newElement));
 			right.setNext(next);
 			setNext(right);
 			return rebalanceRightGrown();
@@ -253,7 +257,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
-	private boolean rebalanceLeftShrunk() {
+	boolean rebalanceLeftShrunk() {
 		switch (skew) {
 		case LEFT_HIGH:
 			skew = Skew.BALANCED;
@@ -300,7 +304,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
-	private boolean rebalanceRightGrown() {
+	boolean rebalanceRightGrown() {
 		switch (skew) {
 		case LEFT_HIGH:
 			skew = Skew.BALANCED;
@@ -341,7 +345,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
-	private boolean rebalanceRightShrunk() {
+	boolean rebalanceRightShrunk() {
 		switch (skew) {
 		case RIGHT_HIGH:
 			skew = Skew.BALANCED;
@@ -390,13 +394,13 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 * updated by the caller
 	 * </p>
 	 */
-	private void rotateCCW() {
-		final Container<K, V> tmpElt = container;
+	void rotateCCW() {
+		final C tmpElt = container;
 		final K tmpSkv = key;
-		final Node<K, V> tmpNext = next == right ? this : next;
-		final Node<K, V> tmpPrev = prev;
-		final Node<K, V> tmpRightNext = right.next;
-		final Node<K, V> tmpRightPrev = right.prev == this ? right : right.prev;
+		final N tmpNext = next == right ? getThis() : next;
+		final N tmpPrev = prev;
+		final N tmpRightNext = right.next;
+		final N tmpRightPrev = right.prev == getThis() ? right : right.prev;
 		setContainer(right.container);
 		key = right.key;
 		setNext(tmpRightNext);
@@ -405,7 +409,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		right.key = tmpSkv;
 		right.setPrev(tmpPrev);
 		right.setNext(tmpNext);
-		final Node<K, V> tmpNode = right;
+		final N tmpNode = right;
 		setRight(tmpNode.right);
 		tmpNode.setRight(tmpNode.left);
 		tmpNode.setLeft(left);
@@ -419,13 +423,13 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 * updated by the caller
 	 * </p>
 	 */
-	private void rotateCW() {
-		final Container<K, V> tmpElt = container;
+	void rotateCW() {
+		final C tmpElt = container;
 		final K tmpSkv = key;
-		final Node<K, V> tmpNext = next;
-		final Node<K, V> tmpPrev = prev == left ? this : prev;
-		final Node<K, V> tmpLeftNext = left.next == this ? left : left.next;
-		final Node<K, V> tmpLeftPrev = left.prev;
+		final N tmpNext = next;
+		final N tmpPrev = prev == left ? getThis() : prev;
+		final N tmpLeftNext = left.next == getThis() ? left : left.next;
+		final N tmpLeftPrev = left.prev;
 		setContainer(left.container);
 		key = left.key;
 		setPrev(tmpLeftPrev);
@@ -434,50 +438,50 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		left.key = tmpSkv;
 		left.setNext(tmpNext);
 		left.setPrev(tmpPrev);
-		final Node<K, V> tmpNode = left;
+		final N tmpNode = left;
 		setLeft(tmpNode.left);
 		tmpNode.setLeft(tmpNode.right);
 		tmpNode.setRight(right);
 		setRight(tmpNode);
 	}
 
-	private void setContainer(Container<K, V> container) {
+	void setContainer(final C container) {
 		this.container = container;
-		container.setNode(this);
+		container.setNode(getThis());
 	}
 
-	private void setLeft(Node<K, V> child) {
+	void setLeft(final N child) {
 		left = child;
 		if (child != null) {
-			child.parent = this;
+			child.parent = getThis();
 		}
 	}
 
-	private void setNext(final Node<K, V> next) {
+	void setNext(final N next) {
 		this.next = next;
-		if (this.next != null) {
-			this.next.prev = this;
+		if (getThis().next != null) {
+			this.next.prev = getThis();
 		}
 	}
 
-	private void setPrev(final Node<K, V> prev) {
+	void setPrev(final N prev) {
 		this.prev = prev;
 		if (this.prev != null) {
-			this.prev.next = this;
+			this.prev.next = getThis();
 		}
 	}
 
-	private void setRight(Node<K, V> child) {
+	void setRight(final N child) {
 		right = child;
 		if (child != null) {
-			child.parent = this;
+			child.parent = getThis();
 		}
 	}
 
 	/**
 	 * Get the number of elements of the tree rooted at this node.
 	 *
-	 * @return number of elements contained in the tree rooted at this node
+	 * @return number of elements contained in the tree rooted at node
 	 */
 	int size() {
 		return 1 + (left == null ? 0 : left.size()) + (right == null ? 0 : right.size());
