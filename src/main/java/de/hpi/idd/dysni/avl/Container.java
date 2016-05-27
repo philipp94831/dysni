@@ -3,10 +3,9 @@ package de.hpi.idd.dysni.avl;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class Container<K extends Comparable<K>, V extends HasKey<K>, C extends Container<K, V, C, N>, N extends Node<K, V, C, N>> {
+public abstract class Container<V> {
 
 	private final Collection<V> elements = new ArrayList<>();
-	protected N node;
 
 	public void add(final V element) {
 		elements.add(element);
@@ -26,9 +25,5 @@ public abstract class Container<K extends Comparable<K>, V extends HasKey<K>, C 
 
 	public void remove(final V element) {
 		elements.remove(element);
-	}
-
-	public void setNode(final N node) {
-		this.node = node;
 	}
 }

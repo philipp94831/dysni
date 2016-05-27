@@ -15,13 +15,13 @@ public class SimilarityTest {
 
 	@Test
 	public void test() {
-		tree.insert(Foo.C);
-		tree.insert(Foo.A);
-		tree.insert(Foo.D);
-		tree.insert(Foo.B);
-		tree.insert(Foo.E);
-		tree.insert(Foo.DE);
-		final Collection<Foo> candidates = tree.findCandidates(Foo.DE);
+		tree.insert(Foo.C.getKey(), Foo.C);
+		tree.insert(Foo.A.getKey(), Foo.A);
+		tree.insert(Foo.D.getKey(), Foo.D);
+		tree.insert(Foo.B.getKey(), Foo.B);
+		tree.insert(Foo.E.getKey(), Foo.E);
+		tree.insert(Foo.DE.getKey(), Foo.DE);
+		final Collection<Foo> candidates = tree.findCandidates(Foo.DE.getKey(), Foo.DE);
 		Assert.assertTrue(candidates.contains(Foo.D));
 		Assert.assertTrue(candidates.contains(Foo.E));
 		Assert.assertEquals(2, candidates.size());

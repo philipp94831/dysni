@@ -11,14 +11,14 @@ public class AVLTreeTest {
 
 	@Test
 	public void testDeletion() {
-		tree.insert(Foo.C);
-		tree.insert(Foo.A);
-		tree.insert(Foo.D);
-		tree.insert(Foo.B);
-		tree.insert(Foo.F);
-		tree.insert(Foo.E);
-		tree.delete(Foo.A);
-		tree.delete(Foo.E);
+		tree.insert(Foo.C.getKey(), Foo.C);
+		tree.insert(Foo.A.getKey(), Foo.A);
+		tree.insert(Foo.D.getKey(), Foo.D);
+		tree.insert(Foo.B.getKey(), Foo.B);
+		tree.insert(Foo.F.getKey(), Foo.F);
+		tree.insert(Foo.E.getKey(), Foo.E);
+		tree.delete(Foo.A.getKey(), Foo.A);
+		tree.delete(Foo.E.getKey(), Foo.E);
 		final SimpleNode<String, Foo> c = tree.getRoot();
 		Assert.assertEquals(c.getKey(), "c");
 		Assert.assertEquals(c.getPrevious().getKey(), "b");
@@ -44,26 +44,26 @@ public class AVLTreeTest {
 
 	@Test
 	public void testDeletionWihtMultipleElements() {
-		tree.insert(Foo.A);
-		tree.insert(Foo.A);
-		tree.delete(Foo.A);
+		tree.insert(Foo.A.getKey(), Foo.A);
+		tree.insert(Foo.A.getKey(), Foo.A);
+		tree.delete(Foo.A.getKey(), Foo.A);
 		Assert.assertFalse(tree.isEmpty());
 		final SimpleNode<String, Foo> a = tree.getRoot();
 		Assert.assertEquals(a.getKey(), "a");
 		Assert.assertNull(a.getNext());
 		Assert.assertNull(a.getPrevious());
-		tree.delete(Foo.A);
+		tree.delete(Foo.A.getKey(), Foo.A);
 		Assert.assertTrue(tree.isEmpty());
 	}
 
 	@Test
 	public void testIterator() {
-		tree.insert(Foo.D);
-		tree.insert(Foo.F);
-		tree.insert(Foo.C);
-		tree.insert(Foo.E);
-		tree.insert(Foo.A);
-		tree.insert(Foo.B);
+		tree.insert(Foo.D.getKey(), Foo.D);
+		tree.insert(Foo.F.getKey(), Foo.F);
+		tree.insert(Foo.C.getKey(), Foo.C);
+		tree.insert(Foo.E.getKey(), Foo.E);
+		tree.insert(Foo.A.getKey(), Foo.A);
+		tree.insert(Foo.B.getKey(), Foo.B);
 		final Iterator<SimpleNode<String, Foo>> it = tree.iterator();
 		Assert.assertEquals(it.next().getKey(), "a");
 		Assert.assertEquals(it.next().getKey(), "b");
@@ -76,15 +76,15 @@ public class AVLTreeTest {
 
 	@Test
 	public void testLeftRotation() {
-		tree.insert(Foo.C);
-		tree.insert(Foo.A);
-		tree.insert(Foo.E);
-		tree.insert(Foo.B);
-		tree.insert(Foo.D);
-		tree.insert(Foo.G);
-		tree.insert(Foo.F);
-		tree.insert(Foo.H);
-		tree.insert(Foo.I);
+		tree.insert(Foo.C.getKey(), Foo.C);
+		tree.insert(Foo.A.getKey(), Foo.A);
+		tree.insert(Foo.E.getKey(), Foo.E);
+		tree.insert(Foo.B.getKey(), Foo.B);
+		tree.insert(Foo.D.getKey(), Foo.D);
+		tree.insert(Foo.G.getKey(), Foo.G);
+		tree.insert(Foo.F.getKey(), Foo.F);
+		tree.insert(Foo.H.getKey(), Foo.H);
+		tree.insert(Foo.I.getKey(), Foo.I);
 		final SimpleNode<String, Foo> c = tree.getRoot();
 		Assert.assertEquals(c.getKey(), "c");
 		Assert.assertEquals(c.getPrevious().getKey(), "b");
@@ -135,15 +135,15 @@ public class AVLTreeTest {
 
 	@Test
 	public void testRightRotation() {
-		tree.insert(Foo.G);
-		tree.insert(Foo.I);
-		tree.insert(Foo.E);
-		tree.insert(Foo.H);
-		tree.insert(Foo.F);
-		tree.insert(Foo.C);
-		tree.insert(Foo.D);
-		tree.insert(Foo.B);
-		tree.insert(Foo.A);
+		tree.insert(Foo.G.getKey(), Foo.G);
+		tree.insert(Foo.I.getKey(), Foo.I);
+		tree.insert(Foo.E.getKey(), Foo.E);
+		tree.insert(Foo.H.getKey(), Foo.H);
+		tree.insert(Foo.F.getKey(), Foo.F);
+		tree.insert(Foo.C.getKey(), Foo.C);
+		tree.insert(Foo.D.getKey(), Foo.D);
+		tree.insert(Foo.B.getKey(), Foo.B);
+		tree.insert(Foo.A.getKey(), Foo.A);
 		final SimpleNode<String, Foo> g = tree.getRoot();
 		Assert.assertEquals(g.getKey(), "g");
 		Assert.assertEquals(g.getPrevious().getKey(), "f");

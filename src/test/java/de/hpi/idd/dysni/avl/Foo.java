@@ -1,6 +1,6 @@
 package de.hpi.idd.dysni.avl;
 
-enum Foo implements HasKey<String> {
+enum Foo {
 	A("a"), B("b"), C("c"), D("d"), DE("de"), E("e"), F("f"), G("g"), H("h"), I("i");
 
 	private final String key;
@@ -9,7 +9,6 @@ enum Foo implements HasKey<String> {
 		this.key = key;
 	}
 
-	@Override
 	public String getKey() {
 		return key;
 	}

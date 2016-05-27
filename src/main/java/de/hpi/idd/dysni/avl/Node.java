@@ -18,7 +18,7 @@ import de.hpi.idd.dysni.util.SelfGeneric;
  *
  * @see AVLTree
  */
-public abstract class Node<K extends Comparable<K>, V extends HasKey<K>, C extends Container<K, V, C, N>, N extends Node<K, V, C, N>>
+public abstract class Node<K extends Comparable<K>, V, C extends Container<V>, N extends Node<K, V, C, N>>
 		implements SelfGeneric<N> {
 
 	/** Elements contained in the current node. */
@@ -43,9 +43,9 @@ public abstract class Node<K extends Comparable<K>, V extends HasKey<K>, C exten
 	 * @param container
 	 *            container to hold the elements
 	 */
-	protected Node(final V element, final C container) {
+	protected Node(final K key, final V element, final C container) {
 		setContainer(container);
-		this.key = element.getKey();
+		this.key = key;
 		add(element);
 		left = null;
 		right = null;
@@ -59,7 +59,7 @@ public abstract class Node<K extends Comparable<K>, V extends HasKey<K>, C exten
 		container.add(newElement);
 	}
 
-	protected abstract N createNode(V newElement);
+	protected abstract N createNode(K key, V newElement);
 
 	/**
 	 * Delete the element from the tree. If the node is empty afterwards, the
@@ -186,29 +186,29 @@ public abstract class Node<K extends Comparable<K>, V extends HasKey<K>, C exten
 	 *            element to insert
 	 * @return true if the parent tree should be re-Skew.BALANCED
 	 */
-	boolean insert(final V newElement) {
-		if (newElement.getKey().compareTo(this.key) < 0) {
+	boolean insert(final K key, final V newElement) {
+		if (key.compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				setLeft(createNode(newElement));
+				setLeft(createNode(key, newElement));
 				left.setPrev(prev);
 				setPrev(left);
 				return rebalanceLeftGrown();
 			}
-			return left.insert(newElement) && rebalanceLeftGrown();
+			return left.insert(key, newElement) && rebalanceLeftGrown();
 		}
-		if (newElement.getKey().compareTo(this.key) == 0) {
+		if (key.compareTo(this.key) == 0) {
 			add(newElement);
 			return false;
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			setRight(createNode(newElement));
+			setRight(createNode(key, newElement));
 			right.setNext(next);
 			setNext(right);
 			return rebalanceRightGrown();
 		}
-		return right.insert(newElement) && rebalanceRightGrown();
+		return right.insert(key, newElement) && rebalanceRightGrown();
 	}
 
 	/**
@@ -445,9 +445,8 @@ public abstract class Node<K extends Comparable<K>, V extends HasKey<K>, C exten
 		setRight(tmpNode);
 	}
 
-	void setContainer(final C container) {
+	protected void setContainer(final C container) {
 		this.container = container;
-		container.setNode(getThis());
 	}
 
 	void setLeft(final N child) {

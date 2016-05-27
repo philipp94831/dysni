@@ -19,39 +19,35 @@ import de.hpi.idd.dysni.store.RecordStore;
 
 public class App {
 
-	private static class CDRecordFactory implements KeyWrapperFactory<IdWrapper, String> {
+	private static class CDRecordFactory implements KeyComputer<IdWrapper, String> {
+
+		@Override
+		public String computeKey(final IdWrapper rec) {
+			final Map<String, String> obj = rec.getObject();
+			final String title = obj.get("dtitle");
+			final String artist = obj.get("artist");
+			return title.substring(0, Math.min(3, title.length())) + artist.substring(0, Math.min(3, artist.length()));
+		}
 
 		@Override
 		public KeyComparator<String> getComparator() {
 			return App.COMPARATOR;
-		}
-
-		@Override
-		public KeyWrapper<String> wrap(final IdWrapper rec) {
-			final Map<String, String> obj = rec.getObject();
-			final String title = obj.get("dtitle");
-			final String artist = obj.get("artist");
-			final String key = title.substring(0, Math.min(3, title.length()))
-					+ artist.substring(0, Math.min(3, artist.length()));
-			return new KeyWrapper<>(rec.getId(), key);
 		}
 	}
 
-	private static class CDRecordFactory2 implements KeyWrapperFactory<IdWrapper, String> {
+	private static class CDRecordFactory2 implements KeyComputer<IdWrapper, String> {
+
+		@Override
+		public String computeKey(final IdWrapper rec) {
+			final Map<String, String> obj = rec.getObject();
+			final String title = obj.get("dtitle");
+			final String artist = obj.get("artist");
+			return artist.substring(0, Math.min(3, artist.length())) + title.substring(0, Math.min(3, title.length()));
+		}
 
 		@Override
 		public KeyComparator<String> getComparator() {
 			return App.COMPARATOR;
-		}
-
-		@Override
-		public KeyWrapper<String> wrap(final IdWrapper rec) {
-			final Map<String, String> obj = rec.getObject();
-			final String title = obj.get("dtitle");
-			final String artist = obj.get("artist");
-			final String key = artist.substring(0, Math.min(3, artist.length()))
-					+ title.substring(0, Math.min(3, title.length()));
-			return new KeyWrapper<>(rec.getId(), key);
 		}
 	}
 

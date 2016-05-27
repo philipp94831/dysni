@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import de.hpi.idd.dysni.avl.Container;
-import de.hpi.idd.dysni.avl.HasKey;
 
-class SimilarityAwareContainer<K extends Comparable<K>, V extends HasKey<K>>
-		extends Container<K, V, SimilarityAwareContainer<K, V>, SimilarityAwareNode<K, V>> {
+class SimilarityAwareContainer<K extends Comparable<K>, V> extends Container<V> {
 
 	private final Map<K, Double> similarities = new HashMap<>();
 	private final KeyComparator<K> comp;
+	private SimilarityAwareNode<K, V> node;
 
 	public SimilarityAwareContainer(final KeyComparator<K> comp) {
 		super();
@@ -51,6 +50,10 @@ class SimilarityAwareContainer<K extends Comparable<K>, V extends HasKey<K>>
 			node2.getContainer().addSimilarity(node.getKey(), sim);
 		}
 		return sim;
+	}
+
+	public void setNode(final SimilarityAwareNode<K, V> node) {
+		this.node = node;
 	}
 
 }

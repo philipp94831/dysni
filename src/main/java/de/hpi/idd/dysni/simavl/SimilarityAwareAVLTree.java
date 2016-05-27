@@ -5,9 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import de.hpi.idd.dysni.avl.AVLTree;
-import de.hpi.idd.dysni.avl.HasKey;
 
-public class SimilarityAwareAVLTree<K extends Comparable<K>, V extends HasKey<K>>
+public class SimilarityAwareAVLTree<K extends Comparable<K>, V>
 		extends AVLTree<K, V, SimilarityAwareContainer<K, V>, SimilarityAwareNode<K, V>> {
 
 	private final KeyComparator<K> comp;
@@ -17,12 +16,12 @@ public class SimilarityAwareAVLTree<K extends Comparable<K>, V extends HasKey<K>
 	}
 
 	@Override
-	protected SimilarityAwareNode<K, V> createNode(final V element) {
-		return new SimilarityAwareNode<>(element, comp);
+	protected SimilarityAwareNode<K, V> createNode(final K key, final V element) {
+		return new SimilarityAwareNode<>(key, element, comp);
 	}
 
-	public Collection<V> findCandidates(final V elem) {
-		final SimilarityAwareNode<K, V> node = find(elem);
+	public Collection<V> findCandidates(final K key, final V elem) {
+		final SimilarityAwareNode<K, V> node = find(key);
 		if (node == null) {
 			return Collections.emptyList();
 		}

@@ -52,13 +52,13 @@ import java.util.Iterator;
  * @param <K>
  *            the type of the skv of the elements
  */
-public abstract class AVLTree<K extends Comparable<K>, V extends HasKey<K>, C extends Container<K, V, C, N>, N extends Node<K, V, C, N>>
+public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>, N extends Node<K, V, C, N>>
 		implements Iterable<N> {
 
 	/** Top level node. */
 	private N top;
 
-	protected abstract N createNode(V element);
+	protected abstract N createNode(K Key, V element);
 
 	/**
 	 * Delete an element from the tree.
@@ -75,9 +75,9 @@ public abstract class AVLTree<K extends Comparable<K>, V extends HasKey<K>, C ex
 	 *            element to delete (silently ignored if null)
 	 * @return true if the element was deleted from the tree
 	 */
-	public boolean delete(final V element) {
+	public boolean delete(final K key, final V element) {
 		if (element != null) {
-			final N node = find(element);
+			final N node = find(key);
 			if (node == null) {
 				return false;
 			}
@@ -92,14 +92,14 @@ public abstract class AVLTree<K extends Comparable<K>, V extends HasKey<K>, C ex
 		return false;
 	}
 
-	protected N find(final V element) {
+	protected N find(final K key) {
 		for (N node = top; node != null;) {
-			if (node.getKey().compareTo(element.getKey()) < 0) {
+			if (node.getKey().compareTo(key) < 0) {
 				if (node.getRight() == null) {
 					return null;
 				}
 				node = node.getRight();
-			} else if (node.getKey().compareTo(element.getKey()) > 0) {
+			} else if (node.getKey().compareTo(key) > 0) {
 				if (node.getLeft() == null) {
 					return null;
 				}
@@ -147,12 +147,12 @@ public abstract class AVLTree<K extends Comparable<K>, V extends HasKey<K>, C ex
 	 * @param element
 	 *            element to insert (silently ignored if null)
 	 */
-	public void insert(final V element) {
+	public void insert(final K key, final V element) {
 		if (element != null) {
 			if (top == null) {
-				top = createNode(element);
+				top = createNode(key, element);
 			} else {
-				top.insert(element);
+				top.insert(key, element);
 			}
 		}
 	}
