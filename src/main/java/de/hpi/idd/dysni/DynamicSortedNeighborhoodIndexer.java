@@ -4,19 +4,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.hpi.idd.RecordComparator;
 import de.hpi.idd.dysni.avl.AVLTree;
 
-public class DynamicSortedNeighborhoodIndexer<T> {
+public class DynamicSortedNeighborhoodIndexer<T extends Map<String, String>> {
 
 	private UnionFind<T> uf = new UnionFind<>();
-	private final RecordComparator<T> comp;
+	private final RecordComparator comp;
 	private final List<Tuple<WrapperFactory<T>, AVLTree<String, ElementWrapper<T>>>> trees = new ArrayList<>();
 
-	public DynamicSortedNeighborhoodIndexer(RecordComparator<T> comp, List<WrapperFactory<T>> factories) {
+	public DynamicSortedNeighborhoodIndexer(RecordComparator comp, List<WrapperFactory<T>> factories) {
 		this.comp = comp;
 		for (WrapperFactory<T> factory : factories) {
 			trees.add(new Tuple<>(factory, new AVLTree<>()));

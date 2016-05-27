@@ -23,8 +23,8 @@ public class App {
 		long start = System.nanoTime();
 		int i = 0;
 		int count = 0;
-		DynamicSortedNeighborhoodIndexer<Map<String, String>> dysni = new DynamicSortedNeighborhoodIndexer<>(
-				new CDRecordComparator(), Arrays.asList(new CDRecordFactory(), new CDRecordFactory2()));
+		DynamicSortedNeighborhoodIndexer<Map<String, String>> dysni = new DynamicSortedNeighborhoodIndexer<>(new CDRecordComparator(),
+				Arrays.asList(new CDRecordFactory(), new CDRecordFactory2()));
 		try {
 			CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new FileReader("data/cd_dataset.csv"));
 			for (CSVRecord record : parser) {

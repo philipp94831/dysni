@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class CDRecordParser {
 
-	public CDRecord parse(Map<String, String> record) {
+	public static CDRecord parse(Map<String, String> record) {
 		CDRecord cd = new CDRecord();
 		cd.setdId(record.get("did"));
 		cd.setArtist(record.get("artist"));

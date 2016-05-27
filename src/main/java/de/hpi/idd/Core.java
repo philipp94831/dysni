@@ -18,10 +18,10 @@ public interface Core {
 	 * 
 	 * Insert the record in the index.
 	 * 
-	 * @param record: A generic, CSV-like type to provide the values of the record.
+	 * @param record: A generic, CSV-like type to provide the values of the record in a Key-Value style.
 	 * @return: true if successful, false otherwise
 	 */
-	public boolean insertRecord(ArrayList<String> record, Integer recordID);
+	public boolean insertRecord(HashMap<String, String> record, HashMap<String, String> parameters);
 	
 //	/**
 //	 * 
@@ -36,10 +36,10 @@ public interface Core {
 	 * 
 	 * Given a duplicate, return all the matching records you could find in your index.
 	 * 
-	 * @param record: A generic, CSV-like type to provide the values of the record.
-	 * @return: The results in a CSV-like type (for each record), in a ArrayList container.
+//	 * @param record: A generic, CSV-like type to provide the values of the record in a Key-Value style.
+	 * @return: The result record IDs in an ArrayList container.
 	 */
-	public ArrayList<Integer> getDuplicates(ArrayList<String> record);
+	public ArrayList<String> getDuplicates(HashMap<String, String> record, HashMap<String, String> parameters);
 	
 	/**
 	 * 
@@ -51,9 +51,9 @@ public interface Core {
 	public boolean destroyIndex(HashMap<String, String> parameters);
 	
 	/**
-	 * Get the attributes from the record with this record ID.
+	 * Get the record with this record ID.
 	 * @param recordID
 	 * @return
 	 */
-	public ArrayList<String> getRecordAttributes(Integer recordID);
+	public ArrayList<String> getRecord(String recordID);
 }

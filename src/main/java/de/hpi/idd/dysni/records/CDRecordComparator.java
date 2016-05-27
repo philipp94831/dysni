@@ -10,7 +10,7 @@ import de.hpi.idd.RecordComparator;
 /**
  * Created by dennis on 08.05.16.
  */
-public class CDRecordComparator implements RecordComparator<Map<String, String>> {
+public class CDRecordComparator implements RecordComparator {
 
 	private static final double THRESHOLD = 0.5;
 
@@ -27,12 +27,6 @@ public class CDRecordComparator implements RecordComparator<Map<String, String>>
 				levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
 		similarityMap.put(CDSimilarity.TRACK, getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
 		return similarityMap;
-	}
-
-	@Override
-	public boolean areSimilar(Map<String, String> firstRecord, Map<String, String> secondRecord) {
-		CDRecordParser p = new CDRecordParser();
-		return similarity(p.parse(firstRecord), p.parse(secondRecord)) > THRESHOLD;
 	}
 
 	private static double getSimilarityOfTracks(List<String> firstTracklist, List<String> secondTracklist) {
@@ -72,6 +66,11 @@ public class CDRecordComparator implements RecordComparator<Map<String, String>>
 		}
 	}
 
+	@Override
+	public double calculateSimilarity(Map<String, String> firstRecord, Map<String, String> secondRecord) {
+		return similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
+	}
+	
 	public static double similarity(CDRecord firstRecord, CDRecord secondRecord) {
 		Map<CDSimilarity, Double> similarityMap = getSimilarityOfRecords(firstRecord, secondRecord);
 		double result = 0.0;
@@ -79,5 +78,10 @@ public class CDRecordComparator implements RecordComparator<Map<String, String>>
 			result += entry.getKey().weight() * entry.getValue();
 		}
 		return result / CDSimilarity.TOTAL_WEIGHT;
+	}
+
+	@Override
+	public double getThreshold() {
+		return THRESHOLD;
 	}
 }
