@@ -1,7 +1,7 @@
 package de.hpi.idd.dysni;
 
 
-public interface HasId<T> {
+interface HasId<T> {
 	
 	T getId();
 

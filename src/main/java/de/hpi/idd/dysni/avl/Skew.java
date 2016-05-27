@@ -7,5 +7,5 @@ enum Skew {
 	/** Code for left high trees. */
 	LEFT_HIGH,
 	/** Code for right high trees. */
-	RIGHT_HIGH;
+	RIGHT_HIGH
 }

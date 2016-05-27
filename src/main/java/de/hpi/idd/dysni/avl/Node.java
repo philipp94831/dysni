@@ -1,7 +1,5 @@
 package de.hpi.idd.dysni.avl;
 
-import java.util.List;
-
 /**
  * This class implements AVL trees nodes.
  * <p>
@@ -25,7 +23,6 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	private K key;
 	/** Left sub-tree. */
 	private Node<K, V> left;
-	private boolean needsRebalance;
 	private Node<K, V> next;
 	/** Parent tree. */
 	private Node<K, V> parent;
@@ -41,13 +38,14 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *
 	 * @param element
 	 *            element
-	 * @param parent
-	 *            parent node
+	 * @param comp
+	 *            comparator to measure similarity of keys
 	 */
-	Node(final K key, KeyComparator<K> comp) {
+	Node(final V element, KeyComparator<K> comp) {
 		setContainer(new Container<>(comp));
-		this.key = key;
+		this.key = element.getKey();
 		this.comp = comp;
+		add(element);
 		left = null;
 		right = null;
 		parent = null;
@@ -56,15 +54,15 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		next = null;
 	}
 
-	List<V> add(final V newElement) {
-		return container.add(newElement);
+	private void add(final V newElement) {
+		container.add(newElement);
 	}
 
 	/**
 	 * Delete the element from the tree. If the node is empty afterwards, the
 	 * node is deleted from the tree
 	 *
-	 * @param element
+	 * @param element element to delete
 	 * 
 	 * @return true if the deleted element was the root of the tree, false
 	 *         otherwise
@@ -184,36 +182,29 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	 *            element to insert
 	 * @return true if the parent tree should be re-Skew.BALANCED
 	 */
-	List<V> insert(final V newElement) {
+	boolean insert(final V newElement) {
 		if (newElement.getKey().compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				setLeft(new Node<K, V>(newElement.getKey(), comp));
+				setLeft(new Node<>(newElement, comp));
 				left.setPrev(prev);
 				setPrev(left);
-				needsRebalance = rebalanceLeftGrown();
-				return left.add(newElement);
+				return rebalanceLeftGrown();
 			}
-			List<V> candidates = left.insert(newElement);
-			needsRebalance = left.needsRebalance ? rebalanceLeftGrown() : false;
-			return candidates;
+			return left.insert(newElement) && rebalanceLeftGrown();
 		}
 		if (newElement.getKey().compareTo(this.key) == 0) {
-			List<V> candidates = add(newElement);
-			needsRebalance = false;
-			return candidates;
+			add(newElement);
+			return false;
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			setRight(new Node<K, V>(newElement.getKey(), comp));
+			setRight(new Node<>(newElement, comp));
 			right.setNext(next);
 			setNext(right);
-			needsRebalance = rebalanceRightGrown();
-			return right.add(newElement);
+			return rebalanceRightGrown();
 		}
-		List<V> candidates = right.insert(newElement);
-		needsRebalance = right.needsRebalance ? rebalanceRightGrown() : false;
-		return candidates;
+		return right.insert(newElement) && rebalanceRightGrown();
 	}
 
 	/**

@@ -17,6 +17,7 @@
 package de.hpi.idd.dysni.avl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -86,6 +87,9 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 	public boolean delete(final V element) {
 		if (element != null) {
 			final Node<K, V> node = find(element);
+			if(node == null) {
+				return false;
+			}
 			if (node.getContainer().contains(element)) {
 				if (node.delete(element)) {
 					top = null;
@@ -97,7 +101,7 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 		return false;
 	}
 
-	public Node<K, V> find(final V element) {
+	private Node<K, V> find(final V element) {
 		for (Node<K, V> node = top; node != null;) {
 			if (node.getKey().compareTo(element.getKey()) < 0) {
 				if (node.getRight() == null) {
@@ -142,7 +146,7 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 	 * @see Node#getPrevious
 	 * @see Node#getNext
 	 */
-	public Node<K, V> getSmallest() {
+	private Node<K, V> getSmallest() {
 		return top == null ? null : top.getSmallest();
 	}
 
@@ -151,18 +155,15 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 	 *
 	 * @param element
 	 *            element to insert (silently ignored if null)
-	 * @return candidates that are in the adaptive similarity window
 	 */
-	public List<V> insert(final V element) {
+	public void insert(final V element) {
 		if (element != null) {
 			if (top == null) {
-				top = new Node<K, V>(element.getKey(), comp);
-				return top.add(element);
+				top = new Node<>(element, comp);
 			} else {
-				return top.insert(element);
+				top.insert(element);
 			}
 		}
-		return null;
 	}
 
 	/**
@@ -176,7 +177,7 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 
 	@Override
 	public Iterator<Node<K, V>> iterator() {
-		return new AVLTreeIterator<K, V>(getSmallest());
+		return new AVLTreeIterator<>(getSmallest());
 	}
 
 	/**
@@ -189,7 +190,11 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 	}
 
 	public Collection<V> findCandidates(V elem) {
-		List<V> candidates = find(elem).getContainer().getSimilarCandidates();
+		Node<K, V> node = find(elem);
+		if(node == null) {
+			return Collections.emptyList();
+		}
+		List<V> candidates = node.getContainer().getSimilarCandidates();
 		candidates.remove(elem);
 		return candidates;
 	}

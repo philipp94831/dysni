@@ -50,22 +50,22 @@ public class CDRecordComparator implements SimilarityMeasure {
 		return (double) shared / mergedTrackset.size();
 	}
 
-	public static double levenshteinDistance(String a, String b) {
+	private static double levenshteinDistance(String a, String b) {
 		return 1.0 - (double) StringUtils.getLevenshteinDistance(a.toLowerCase(), b.toLowerCase())
 				/ Math.max(a.length(), b.length());
 	}
 
-	public static enum CDSimilarity {
+	public enum CDSimilarity {
 		ARTIST, DTITLE, GENRE, YEAR, CDEXTRA, TRACK, CATEGORY;
 
 		private final double weight;
 		private static final double TOTAL_WEIGHT = Arrays.stream(values()).mapToDouble(CDSimilarity::weight).sum();
 
-		private CDSimilarity() {
+		CDSimilarity() {
 			this(1);
 		}
 
-		private CDSimilarity(double weight) {
+		CDSimilarity(double weight) {
 			this.weight = weight;
 		}
 
@@ -74,7 +74,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 		}
 	}
 
-	public double calculateSimilarity(Map<String, String> firstRecord, Map<String, String> secondRecord) {
+	private double calculateSimilarity(Map<String, String> firstRecord, Map<String, String> secondRecord) {
 		return similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
 	}
 	

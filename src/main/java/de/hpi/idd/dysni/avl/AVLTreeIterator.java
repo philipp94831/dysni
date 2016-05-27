@@ -2,7 +2,7 @@ package de.hpi.idd.dysni.avl;
 
 import java.util.Iterator;
 
-public class AVLTreeIterator<K extends Comparable<K>, V extends HasKey<K>> implements Iterator<Node<K, V>> {
+class AVLTreeIterator<K extends Comparable<K>, V extends HasKey<K>> implements Iterator<Node<K, V>> {
 
 	private Node<K, V> next;
 

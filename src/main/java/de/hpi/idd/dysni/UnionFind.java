@@ -21,8 +21,8 @@ import java.util.Stack;
  */
 public class UnionFind<T> {
 	
-	private Map<T, Node<T>> nodes = new HashMap<>();
-	private Set<Node<T>> roots = new HashSet<>();
+	private final Map<T, Node<T>> nodes = new HashMap<>();
+	private final Set<Node<T>> roots = new HashSet<>();
 
 	/**
 	 * Returns true if the the two sites are in the same component.
@@ -37,7 +37,7 @@ public class UnionFind<T> {
 	public boolean connected(T t, T u) {
 		Node<T> nodeT = find(t);
 		Node<T> nodeU = find(u);
-		return nodeT == null || nodeU == null? false : nodeT.equals(nodeU);
+		return !(nodeT == null || nodeU == null) && nodeT.equals(nodeU);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class UnionFind<T> {
 	 * @return the component identifier for the component containing site
 	 *         <tt>t</tt>
 	 */
-	public Node<T> find(T t) {
+	private Node<T> find(T t) {
 		Node<T> node = nodes.get(t);
 		if(node == null) {
 			return null;

@@ -9,21 +9,19 @@ import java.util.Map;
 public class Container<K extends Comparable<K>, V extends HasKey<K>> {
 
 	private final KeyComparator<K> comp;
-	private Collection<V> elements = new ArrayList<>();
+	private final Collection<V> elements = new ArrayList<>();
 	private Node<K, V> node;
-	private Map<K, Double> similarities = new HashMap<>();
+	private final Map<K, Double> similarities = new HashMap<>();
 
 	public Container(KeyComparator<K> comp) {
 		this.comp = comp;
 	}
 
-	public List<V> add(V element) {
-		List<V> candidates = getSimilarCandidates();
+	public void add(V element) {
 		elements.add(element);
-		return candidates;
 	}
 
-	public void addSimilarity(K skv, Double sim) {
+	void addSimilarity(K skv, Double sim) {
 		similarities.put(skv, sim);
 	}
 
@@ -31,7 +29,7 @@ public class Container<K extends Comparable<K>, V extends HasKey<K>> {
 		return elements.contains(element);
 	}
 
-	public Collection<V> getAll() {
+	Collection<V> getAll() {
 		return elements;
 	}
 

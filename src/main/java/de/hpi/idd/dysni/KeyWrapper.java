@@ -4,7 +4,7 @@ import de.hpi.idd.dysni.avl.HasKey;
 
 public class KeyWrapper<T> implements HasKey<String> {
 	
-	protected final T object;
+	private final T object;
 	private final String key;
 	
 	public KeyWrapper(T object, String key) {

@@ -3,7 +3,7 @@ package de.hpi.idd.dysni.records;
 import java.util.Arrays;
 import java.util.Map;
 
-public class CDRecordParser {
+class CDRecordParser {
 
 	public static CDRecord parse(Map<String, String> record) {
 		CDRecord cd = new CDRecord();
