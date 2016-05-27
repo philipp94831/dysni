@@ -1,6 +1,5 @@
 package de.hpi.idd.dysni;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -13,13 +12,12 @@ import org.apache.commons.csv.CSVRecord;
 
 import de.hpi.idd.dysni.comp.LevenshteinComparator;
 import de.hpi.idd.dysni.records.CDRecordComparator;
-import de.hpi.idd.dysni.simavl.KeyComparator;
 import de.hpi.idd.dysni.store.MemoryStore;
 import de.hpi.idd.dysni.store.RecordStore;
 
 public class App {
 
-	private static class CDRecordFactory implements KeyComputer<IdWrapper, String> {
+	private static class CDKeyHandler implements KeyHandler<IdWrapper, String> {
 
 		@Override
 		public String computeKey(final IdWrapper rec) {
@@ -35,7 +33,7 @@ public class App {
 		}
 	}
 
-	private static class CDRecordFactory2 implements KeyComputer<IdWrapper, String> {
+	private static class CDKeyHandler2 implements KeyHandler<IdWrapper, String> {
 
 		@Override
 		public String computeKey(final IdWrapper rec) {
@@ -59,7 +57,7 @@ public class App {
 		int count = 0;
 		final RecordStore<IdWrapper> store = new MemoryStore<>();
 		final DynamicSortedNeighborhoodIndexer<IdWrapper> dysni = new DynamicSortedNeighborhoodIndexer<>(store,
-				new CDRecordComparator(store), Arrays.asList(new CDRecordFactory(), new CDRecordFactory2()));
+				new CDRecordComparator(store), Arrays.asList(new CDKeyHandler(), new CDKeyHandler2()));
 		try {
 			final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
 					.parse(new FileReader("data/cd_dataset.csv"));
@@ -71,9 +69,6 @@ public class App {
 				System.out.println("Duplicates for " + rec.getId() + ": " + duplicates);
 				i++;
 			}
-		} catch (final FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.hpi.idd.SimilarityMeasure;
-import de.hpi.idd.dysni.simavl.SimilarityAwareAVLTree;
 import de.hpi.idd.dysni.store.RecordStore;
-import de.hpi.idd.dysni.util.Tuple;
 
 public class DynamicSortedNeighborhoodIndexer<T extends HasId<String>> {
 
@@ -18,34 +16,30 @@ public class DynamicSortedNeighborhoodIndexer<T extends HasId<String>> {
 	private final SimilarityMeasure comp;
 	private final RecordStore<T> store;
 
-	private final List<Tuple<KeyComputer<T, String>, SimilarityAwareAVLTree<String, String>>> trees = new ArrayList<>();
+	private final List<DysniIndex<T, String, String>> indexes = new ArrayList<>();
 
 	public DynamicSortedNeighborhoodIndexer(final RecordStore<T> store, final SimilarityMeasure comp,
-			final List<KeyComputer<T, String>> factories) {
+			final List<KeyHandler<T, String>> keyHandlers) {
 		this.store = store;
 		this.comp = comp;
-		for (final KeyComputer<T, String> factory : factories) {
-			trees.add(new Tuple<>(factory, new SimilarityAwareAVLTree<>(factory.getComparator())));
+		for (final KeyHandler<T, String> keyHandler : keyHandlers) {
+			indexes.add(new DysniIndex<>(keyHandler));
 		}
 	}
 
 	public void add(final T rec) {
 		final String recId = rec.getId();
 		store.storeRecord(recId, rec);
-		for (final Tuple<KeyComputer<T, String>, SimilarityAwareAVLTree<String, String>> tuple : trees) {
-			final KeyComputer<T, String> factory = tuple.getLeft();
-			final SimilarityAwareAVLTree<String, String> tree = tuple.getRight();
-			tree.insert(factory.computeKey(rec), rec.getId());
+		for (final DysniIndex<T, String, String> index : indexes) {
+			index.insert(rec, rec.getId());
 		}
 	}
 
 	public Collection<String> findDuplicates(final T rec) {
 		final String recId = rec.getId();
 		final Set<String> candidates = new HashSet<>();
-		for (final Tuple<KeyComputer<T, String>, SimilarityAwareAVLTree<String, String>> tuple : trees) {
-			final KeyComputer<T, String> factory = tuple.getLeft();
-			final SimilarityAwareAVLTree<String, String> tree = tuple.getRight();
-			final Collection<String> newCandidates = tree.findCandidates(factory.computeKey(rec), rec.getId());
+		for (final DysniIndex<T, String, String> index : indexes) {
+			final Collection<String> newCandidates = index.findCandidates(rec, rec.getId());
 			candidates.addAll(newCandidates);
 		}
 		for (final String candidate : candidates) {

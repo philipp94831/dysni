@@ -2,12 +2,11 @@ package de.hpi.idd.dysni.avl;
 
 import java.util.Iterator;
 
-class AVLTreeIterator<K extends Comparable<K>, V, C extends Container<V>, N extends Node<K, V, C, N>>
-		implements Iterator<N> {
+class AVLTreeIterator<K extends Comparable<K>, V> implements Iterator<Node<K, V>> {
 
-	private N next;
+	private Node<K, V> next;
 
-	public AVLTreeIterator(final N smallest) {
+	public AVLTreeIterator(final Node<K, V> smallest) {
 		next = smallest;
 	}
 
@@ -17,11 +16,11 @@ class AVLTreeIterator<K extends Comparable<K>, V, C extends Container<V>, N exte
 	}
 
 	@Override
-	public N next() {
+	public Node<K, V> next() {
 		if (next == null) {
 			throw new IllegalStateException("There is no next element");
 		}
-		final N ret = next;
+		final Node<K, V> ret = next;
 		next = next.getNext();
 		return ret;
 	}

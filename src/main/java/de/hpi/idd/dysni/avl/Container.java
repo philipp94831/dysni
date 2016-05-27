@@ -3,7 +3,7 @@ package de.hpi.idd.dysni.avl;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class Container<V> {
+public class Container<V> {
 
 	private final Collection<V> elements = new ArrayList<>();
 
@@ -15,7 +15,7 @@ public abstract class Container<V> {
 		return elements.contains(element);
 	}
 
-	protected Collection<V> getAll() {
+	Collection<V> getAll() {
 		return elements;
 	}
 

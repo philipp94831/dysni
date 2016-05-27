@@ -52,13 +52,10 @@ import java.util.Iterator;
  * @param <K>
  *            the type of the skv of the elements
  */
-public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>, N extends Node<K, V, C, N>>
-		implements Iterable<N> {
+public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>> {
 
 	/** Top level node. */
-	private N top;
-
-	protected abstract N createNode(K Key, V element);
+	private Node<K, V> top;
 
 	/**
 	 * Delete an element from the tree.
@@ -77,7 +74,7 @@ public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>
 	 */
 	public boolean delete(final K key, final V element) {
 		if (element != null) {
-			final N node = find(key);
+			final Node<K, V> node = find(key);
 			if (node == null) {
 				return false;
 			}
@@ -92,8 +89,8 @@ public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>
 		return false;
 	}
 
-	protected N find(final K key) {
-		for (N node = top; node != null;) {
+	public Node<K, V> find(final K key) {
+		for (Node<K, V> node = top; node != null;) {
 			if (node.getKey().compareTo(key) < 0) {
 				if (node.getRight() == null) {
 					return null;
@@ -120,11 +117,11 @@ public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>
 	 * @see Node#getPrevious
 	 * @see Node#getNext
 	 */
-	public N getLargest() {
+	public Node<K, V> getLargest() {
 		return top == null ? null : top.getLargest();
 	}
 
-	N getRoot() {
+	Node<K, V> getRoot() {
 		return top;
 	}
 
@@ -137,7 +134,7 @@ public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>
 	 * @see Node#getPrevious
 	 * @see Node#getNext
 	 */
-	public N getSmallest() {
+	public Node<K, V> getSmallest() {
 		return top == null ? null : top.getSmallest();
 	}
 
@@ -150,7 +147,7 @@ public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>
 	public void insert(final K key, final V element) {
 		if (element != null) {
 			if (top == null) {
-				top = createNode(key, element);
+				top = new Node<>(key, element);
 			} else {
 				top.insert(key, element);
 			}
@@ -167,7 +164,7 @@ public abstract class AVLTree<K extends Comparable<K>, V, C extends Container<V>
 	}
 
 	@Override
-	public Iterator<N> iterator() {
+	public Iterator<Node<K, V>> iterator() {
 		return new AVLTreeIterator<>(getSmallest());
 	}
 

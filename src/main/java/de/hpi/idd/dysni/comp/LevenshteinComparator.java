@@ -2,7 +2,7 @@ package de.hpi.idd.dysni.comp;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.hpi.idd.dysni.simavl.KeyComparator;
+import de.hpi.idd.dysni.KeyComparator;
 
 public class LevenshteinComparator implements KeyComparator<String> {
 
