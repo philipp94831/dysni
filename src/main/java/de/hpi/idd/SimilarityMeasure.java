@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public interface SimilarityMeasure {
 
-	public double datasetThreshold = Double.MIN_VALUE;
+	public double getThreshold();
 
 	/**
 	 * 

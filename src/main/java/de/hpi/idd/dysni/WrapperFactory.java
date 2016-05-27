@@ -1,8 +1,8 @@
 package de.hpi.idd.dysni;
 
 
-public interface WrapperFactory<T> {
+public interface WrapperFactory<K, T> {
 
-	ElementWrapper<T> wrap(T rec);
+	ElementWrapper<T> wrap(K rec);
 
 }

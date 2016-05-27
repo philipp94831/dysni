@@ -5,14 +5,21 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.hpi.idd.RecordComparator;
+import de.hpi.idd.SimilarityMeasure;
+import de.hpi.idd.dysni.RecordStore;
 
 /**
  * Created by dennis on 08.05.16.
  */
-public class CDRecordComparator implements RecordComparator {
+public class CDRecordComparator<T extends Map<String, String>> implements SimilarityMeasure {
 
 	private static final double THRESHOLD = 0.5;
+	private final RecordStore<T> store;
+	
+	
+	public CDRecordComparator(RecordStore<T> store) {
+		this.store = store;
+	}
 
 	public static Map<CDSimilarity, Double> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
 		Map<CDSimilarity, Double> similarityMap = new HashMap<>();
@@ -66,8 +73,7 @@ public class CDRecordComparator implements RecordComparator {
 		}
 	}
 
-	@Override
-	public double calculateSimilarity(Map<String, String> firstRecord, Map<String, String> secondRecord) {
+	public double calculateSimilarity(T firstRecord, T secondRecord) {
 		return similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
 	}
 	
@@ -79,9 +85,16 @@ public class CDRecordComparator implements RecordComparator {
 		}
 		return result / CDSimilarity.TOTAL_WEIGHT;
 	}
-
+	
 	@Override
 	public double getThreshold() {
 		return THRESHOLD;
+	}
+
+	@Override
+	public Double calculateSimilarity(String recordID1, String recordID2, HashMap<String, String> parameters) {
+		T firstRecord = store.getRecord(recordID1);
+		T secondRecord = store.getRecord(recordID2);
+		return calculateSimilarity(firstRecord, secondRecord);
 	}
 }
