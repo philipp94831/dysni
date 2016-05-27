@@ -23,27 +23,18 @@ public class DynamicSortedNeighborhoodIndexer<T extends HasId<String>> {
 		this.store = store;
 		this.comp = comp;
 		for (KeyWrapperFactory<T, String> factory : factories) {
-			trees.add(new Tuple<>(factory, new AVLTree<>()));
+			trees.add(new Tuple<>(factory, new AVLTree<>(factory.getComparator())));
 		}
 	}
 
-	public Collection<String> add(T rec) {
+	public void add(T rec) {
 		String recId = rec.getId();
 		store.storeRecord(recId, rec);
-		Set<String> candidates = new HashSet<>();
 		for (Tuple<KeyWrapperFactory<T, String>, AVLTree<String, KeyWrapper<String>>> tuple : trees) {
 			KeyWrapperFactory<T, String> factory = tuple.getLeft();
 			AVLTree<String, KeyWrapper<String>> tree = tuple.getRight();
-			List<String> newCandidates = tree.insert(factory.wrap(rec)).stream().map(KeyWrapper::getObject)
-					.collect(Collectors.toList());
-			candidates.addAll(newCandidates);
+			tree.insert(factory.wrap(rec));
 		}
-		for (String candidate : candidates) {
-			if (comp.getThreshold() <= comp.calculateSimilarity(recId, candidate, new HashMap<>())) {
-				uf.union(recId, candidate);
-			}
-		}
-		return uf.getComponent(recId);
 	}
 	
 	public Collection<String> findDuplicates(T rec) {

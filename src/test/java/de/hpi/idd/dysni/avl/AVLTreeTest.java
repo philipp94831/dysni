@@ -9,9 +9,11 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
+import de.hpi.idd.dysni.comp.LevenshteinComparator;
+
 public class AVLTreeTest {
 
-	private final AVLTree<String, Foo> tree = new AVLTree<>();
+	private final AVLTree<String, Foo> tree = new AVLTree<>(new LevenshteinComparator(0.5));
 
 	@Test
 	public void testDeletion() {

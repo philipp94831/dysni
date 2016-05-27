@@ -58,11 +58,13 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 
 	/** Top level node. */
 	private Node<K, V> top;
+	private final KeyComparator<K> comp;
 
 	/**
 	 * Build an empty tree.
 	 */
-	public AVLTree() {
+	public AVLTree(KeyComparator<K> comp) {
+		this.comp = comp;
 		top = null;
 	}
 
@@ -154,7 +156,7 @@ public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements It
 	public List<V> insert(final V element) {
 		if (element != null) {
 			if (top == null) {
-				top = new Node<K, V>(element.getKey(), element.getComparator());
+				top = new Node<K, V>(element.getKey(), comp);
 				return top.add(element);
 			} else {
 				return top.insert(element);

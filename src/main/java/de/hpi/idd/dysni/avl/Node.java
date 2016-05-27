@@ -34,6 +34,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	private Node<K, V> right;
 	/** Skew factor. */
 	private Skew skew;
+	private final KeyComparator<K> comp;
 
 	/**
 	 * Build a node for a specified element.
@@ -46,6 +47,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 	Node(final K key, KeyComparator<K> comp) {
 		setContainer(new Container<>(comp));
 		this.key = key;
+		this.comp = comp;
 		left = null;
 		right = null;
 		parent = null;
@@ -186,7 +188,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		if (newElement.getKey().compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				setLeft(new Node<K, V>(newElement.getKey(), newElement.getComparator()));
+				setLeft(new Node<K, V>(newElement.getKey(), comp));
 				left.setPrev(prev);
 				setPrev(left);
 				needsRebalance = rebalanceLeftGrown();
@@ -203,7 +205,7 @@ public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			setRight(new Node<K, V>(newElement.getKey(), newElement.getComparator()));
+			setRight(new Node<K, V>(newElement.getKey(), comp));
 			right.setNext(next);
 			setNext(right);
 			needsRebalance = rebalanceRightGrown();

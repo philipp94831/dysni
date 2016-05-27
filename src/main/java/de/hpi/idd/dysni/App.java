@@ -10,6 +10,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import de.hpi.idd.dysni.avl.KeyComparator;
 import de.hpi.idd.dysni.comp.LevenshteinComparator;
 import de.hpi.idd.dysni.records.CDRecordComparator;
 import de.hpi.idd.dysni.store.MemoryStore;
@@ -29,10 +30,11 @@ public class App {
 		try {
 			CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new FileReader("data/cd_dataset.csv"));
 			for (CSVRecord record : parser) {
-				Map<String, String> rec = record.toMap();
-				Collection<String> duplicates = dysni.add(new IdWrapper(rec));
+				IdWrapper rec = new IdWrapper(record.toMap());
+				dysni.add(rec);
+				Collection<String> duplicates = dysni.findDuplicates(rec);
 				count += duplicates.isEmpty() ? 0 : 1;
-				System.out.println("Duplicates for " + rec.get("did") + ": " + duplicates);
+				System.out.println("Duplicates for " + rec.getId() + ": " + duplicates);
 				i++;
 			}
 		} catch (FileNotFoundException e) {
@@ -56,7 +58,12 @@ public class App {
 			String artist = obj.get("artist");
 			String key = title.substring(0, Math.min(3, title.length()))
 					+ artist.substring(0, Math.min(3, artist.length()));
-			return new KeyWrapper<>(rec.getId(), key, COMPARATOR);
+			return new KeyWrapper<>(rec.getId(), key);
+		}
+
+		@Override
+		public KeyComparator<String> getComparator() {
+			return COMPARATOR;
 		}
 	}
 
@@ -69,7 +76,12 @@ public class App {
 			String artist = obj.get("artist");
 			String key = artist.substring(0, Math.min(3, artist.length()))
 					+ title.substring(0, Math.min(3, title.length()));
-			return new KeyWrapper<>(rec.getId(), key, COMPARATOR);
+			return new KeyWrapper<>(rec.getId(), key);
+		}
+
+		@Override
+		public KeyComparator<String> getComparator() {
+			return COMPARATOR;
 		}
 	}
 }
