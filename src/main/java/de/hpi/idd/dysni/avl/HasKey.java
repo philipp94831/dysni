@@ -1,6 +1,6 @@
 package de.hpi.idd.dysni.avl;
 
-public interface Element<K extends Comparable<K>> {
+public interface HasKey<K extends Comparable<K>> {
 
 	public KeyComparator<K> getComparator();
 

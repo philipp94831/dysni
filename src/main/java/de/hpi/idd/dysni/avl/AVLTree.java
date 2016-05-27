@@ -54,7 +54,7 @@ import java.util.List;
  * @param <K>
  *            the type of the skv of the elements
  */
-public class AVLTree<K extends Comparable<K>, V extends Element<K>> implements Iterable<Node<K, V>> {
+public class AVLTree<K extends Comparable<K>, V extends HasKey<K>> implements Iterable<Node<K, V>> {
 
 	/** Top level node. */
 	private Node<K, V> top;

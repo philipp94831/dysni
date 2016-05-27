@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @see AVLTree
  */
-public class Node<K extends Comparable<K>, V extends Element<K>> {
+public class Node<K extends Comparable<K>, V extends HasKey<K>> {
 
 	/** Elements contained in the current node. */
 	private Container<K, V> container;

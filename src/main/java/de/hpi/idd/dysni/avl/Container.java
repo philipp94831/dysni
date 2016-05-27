@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Container<K extends Comparable<K>, V extends Element<K>> {
+public class Container<K extends Comparable<K>, V extends HasKey<K>> {
 
 	private final KeyComparator<K> comp;
 	private Collection<V> elements = new ArrayList<>();

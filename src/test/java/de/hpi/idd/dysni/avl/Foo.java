@@ -2,7 +2,7 @@ package de.hpi.idd.dysni.avl;
 
 import de.hpi.idd.dysni.comp.LevenshteinComparator;
 
-enum Foo implements Element<String> {
+enum Foo implements HasKey<String> {
 	A("a"), B("b"), C("c"), D("d"), DE("de"), E("e"), F("f"), G("g"), H("h"), I("i");
 
 	private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
