@@ -21,6 +21,16 @@ import java.util.Collection;
  */
 public class Node<K extends Comparable<K>, V> {
 
+	/** Enum for tree skew factor. */
+	enum Skew {
+		/** Code for Skew.BALANCED trees. */
+		BALANCED,
+		/** Code for left high trees. */
+		LEFT_HIGH,
+		/** Code for right high trees. */
+		RIGHT_HIGH
+	}
+
 	/** Elements contained in the current node. */
 	private Collection<V> elements;
 	private K key;

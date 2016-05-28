@@ -2,7 +2,6 @@ package de.hpi.idd.dysni;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,55 +14,26 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import de.hpi.idd.cd.CDRecordComparator;
+import de.hpi.idd.Dataset;
+import de.hpi.idd.KeyHandlerManager;
+import de.hpi.idd.SimilarityMeasure;
+import de.hpi.idd.SimilarityMeasureManager;
 import de.hpi.idd.cd.CDRecordMatchingQualityChecker;
-import de.hpi.idd.dysni.key.KeyComparator;
 import de.hpi.idd.dysni.key.KeyHandler;
-import de.hpi.idd.dysni.key.LevenshteinComparator;
 import de.hpi.idd.dysni.sim.IDDSimilarityMeasure;
 import de.hpi.idd.dysni.store.MemoryStore;
 
 public class App {
 
-	private static class CDKeyHandler implements KeyHandler<Map<String, String>, String> {
-
-		@Override
-		public String computeKey(final Map<String, String> obj) {
-			final String title = obj.get("dtitle");
-			final String artist = obj.get("artist");
-			return title.substring(0, Math.min(3, title.length())) + artist.substring(0, Math.min(3, artist.length()));
-		}
-
-		@Override
-		public KeyComparator<String> getComparator() {
-			return App.COMPARATOR;
-		}
-	}
-
-	private static class CDKeyHandler2 implements KeyHandler<Map<String, String>, String> {
-
-		@Override
-		public String computeKey(final Map<String, String> obj) {
-			final String title = obj.get("dtitle");
-			final String artist = obj.get("artist");
-			return artist.substring(0, Math.min(3, artist.length())) + title.substring(0, Math.min(3, title.length()));
-		}
-
-		@Override
-		public KeyComparator<String> getComparator() {
-			return App.COMPARATOR;
-		}
-	}
-
-	private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
-
 	public static void main(final String[] args) {
 		final long start = System.nanoTime();
 		int i = 0;
 		int count = 0;
+		final Dataset dataset = Dataset.getForName("cd");
+		final List<KeyHandler<Map<String, String>, String>> keyHandlers = KeyHandlerManager.getKeyHandlers(dataset);
+		final SimilarityMeasure similarityMeasure = SimilarityMeasureManager.getSimilarityMeasure(dataset);
 		final DynamicSortedNeighborhoodIndexer<String, Map<String, String>, String> dysni = new DynamicSortedNeighborhoodIndexer<>(
-				new MemoryStore<>(), new IDDSimilarityMeasure(new CDRecordComparator()),
-				Arrays.asList(new CDKeyHandler(), new CDKeyHandler2()));
+				new MemoryStore<>(), new IDDSimilarityMeasure(similarityMeasure), keyHandlers);
 		final Map<String, List<String>> duplicatesToCheck = new HashMap<>();
 		final Set<String> keys = new HashSet<>();
 		try {

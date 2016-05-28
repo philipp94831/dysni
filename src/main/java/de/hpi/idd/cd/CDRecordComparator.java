@@ -209,6 +209,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 	}
 
 	private static Double yearDistance(final Short year, final Short year2) {
+		// TODO default?
 		if (year == null && year2 == null) {
 			return 1.0;
 		}
@@ -219,8 +220,9 @@ public class CDRecordComparator implements SimilarityMeasure {
 		int max = 0;
 		final int n = Math.max(CDRecordComparator.getNumberOfDigits(year), CDRecordComparator.getNumberOfDigits(year2));
 		for (int i = 0; i < n; i++) {
-			max += (i + 1) * 9;
-			diff += (i + 1)
+			final int weight = i + 1;
+			max += weight * 9;
+			diff += weight
 					* Math.abs(CDRecordComparator.getNthDigit(year, i) - CDRecordComparator.getNthDigit(year2, i));
 		}
 		return 1 - (double) diff / max;
