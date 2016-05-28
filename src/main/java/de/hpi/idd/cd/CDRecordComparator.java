@@ -132,7 +132,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 	}
 
 	public enum CDSimilarity {
-		ARTIST, CATEGORY, CDEXTRA, DTITLE, GENRE, TRACK, YEAR;
+		ARTIST(5), CATEGORY, CDEXTRA, DTITLE(3), GENRE, TRACK(2), YEAR;
 
 		private static final double TOTAL_WEIGHT = Arrays.stream(CDSimilarity.values())
 				.mapToDouble(CDSimilarity::weight).sum();
@@ -151,7 +151,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 		}
 	}
 
-	private static final double THRESHOLD = 0.5;
+	private static final double THRESHOLD = 0.7;
 
 	private static int getNthDigit(final int number, final int n) {
 		return (int) (Math.abs(number) / Math.pow(10, n) % 10);
@@ -187,7 +187,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 		final Set<String> mergedTrackset = new HashSet<>();
 		mergedTrackset.addAll(firstTracklist);
 		mergedTrackset.addAll(secondTracklist);
-		if (mergedTrackset.size() == 0) {
+		if (mergedTrackset.isEmpty()) {
 			return 1.0;
 		}
 		return (double) shared / mergedTrackset.size();

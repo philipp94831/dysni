@@ -8,7 +8,7 @@ import de.hpi.idd.dysni.key.LevenshteinComparator;
 
 public class CDKeyHandler2 implements KeyHandler<Map<String, String>, String> {
 
-	private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.5);
+	private static final LevenshteinComparator COMPARATOR = new LevenshteinComparator(0.8);
 
 	@Override
 	public String computeKey(final Map<String, String> obj) {
