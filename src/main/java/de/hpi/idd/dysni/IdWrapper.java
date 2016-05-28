@@ -2,17 +2,18 @@ package de.hpi.idd.dysni;
 
 import java.util.Map;
 
-public class IdWrapper implements HasId<String> {
+class IdWrapper {
 
 	private final Map<String, String> object;
+	private final String id;
 
-	public IdWrapper(final Map<String, String> object) {
+	public IdWrapper(final Map<String, String> object, final String idField) {
 		this.object = object;
+		id = object.get(idField);
 	}
 
-	@Override
 	public String getId() {
-		return object.get("did");
+		return id;
 	}
 
 	public Map<String, String> getObject() {

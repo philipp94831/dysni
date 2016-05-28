@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 import de.hpi.idd.SimilarityMeasure;
+import de.hpi.idd.dysni.key.KeyHandler;
 import de.hpi.idd.dysni.store.RecordStore;
 
-public class DynamicSortedNeighborhoodIndexer<T extends HasId<String>> {
+public class DynamicSortedNeighborhoodIndexer<T extends IdWrapper> {
 
 	private final UnionFind<String> uf = new UnionFind<>();
 	private final SimilarityMeasure comp;
@@ -36,17 +37,18 @@ public class DynamicSortedNeighborhoodIndexer<T extends HasId<String>> {
 	}
 
 	public Collection<String> findDuplicates(final T rec) {
-		final String recId = rec.getId();
 		final Set<String> candidates = new HashSet<>();
 		for (final DysniIndex<T, String, String> index : indexes) {
-			final Collection<String> newCandidates = index.findCandidates(rec, rec.getId());
+			final Collection<String> newCandidates = index.findCandidates(rec);
+			newCandidates.remove(rec.getId());
 			candidates.addAll(newCandidates);
 		}
 		for (final String candidate : candidates) {
-			if (comp.getThreshold() <= comp.calculateSimilarity(recId, candidate, new HashMap<>())) {
-				uf.union(recId, candidate);
+			if (comp.getThreshold() <= comp.calculateSimilarity(rec.getObject(), store.getRecord(candidate).getObject(),
+					new HashMap<>())) {
+				uf.union(rec.getId(), candidate);
 			}
 		}
-		return uf.getComponent(recId);
+		return uf.getComponent(rec.getId());
 	}
 }

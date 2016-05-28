@@ -5,42 +5,40 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.idd.dysni.Foo;
-
 public class AVLTreeTest {
 
-	private final AVLTree<String, Foo> tree = new AVLTree<>();
+	private final AVLTree<String, String> tree = new AVLTree<>();
 
-	private void insert(final Foo foo) {
-		tree.insert(foo.name(), foo);
+	private void insert(final String String) {
+		tree.insert(String, String.toLowerCase());
 	}
 
 	@Test
 	public void testDeletion() {
-		insert(Foo.C);
-		insert(Foo.A);
-		insert(Foo.D);
-		insert(Foo.B);
-		insert(Foo.F);
-		insert(Foo.E);
-		tree.delete(Foo.A.name(), Foo.A);
-		tree.delete(Foo.E.name(), Foo.E);
-		final Node<String, Foo> c = tree.getRoot();
+		insert("C");
+		insert("A");
+		insert("D");
+		insert("B");
+		insert("F");
+		insert("E");
+		tree.delete("A", "a");
+		tree.delete("E", "e");
+		final Node<String, String> c = tree.getRoot();
 		Assert.assertEquals(c.getKey(), "C");
 		Assert.assertEquals(c.getPrevious().getKey(), "B");
 		Assert.assertEquals(c.getNext().getKey(), "D");
-		final Node<String, Foo> d = c.getRight();
+		final Node<String, String> d = c.getRight();
 		Assert.assertEquals(d.getKey(), "D");
 		Assert.assertEquals(d.getPrevious().getKey(), "C");
 		Assert.assertEquals(d.getNext().getKey(), "F");
 		Assert.assertNull(d.getLeft());
-		final Node<String, Foo> f = d.getRight();
+		final Node<String, String> f = d.getRight();
 		Assert.assertEquals(f.getKey(), "F");
 		Assert.assertEquals(f.getPrevious().getKey(), "D");
 		Assert.assertNull(f.getNext());
 		Assert.assertNull(f.getLeft());
 		Assert.assertNull(f.getRight());
-		final Node<String, Foo> b = c.getLeft();
+		final Node<String, String> b = c.getLeft();
 		Assert.assertEquals(b.getKey(), "B");
 		Assert.assertEquals(b.getNext().getKey(), "C");
 		Assert.assertNull(b.getPrevious());
@@ -50,27 +48,27 @@ public class AVLTreeTest {
 
 	@Test
 	public void testDeletionWihtMultipleElements() {
-		insert(Foo.A);
-		insert(Foo.A);
-		tree.delete(Foo.A.name(), Foo.A);
+		insert("A");
+		insert("A");
+		tree.delete("A", "a");
 		Assert.assertFalse(tree.isEmpty());
-		final Node<String, Foo> a = tree.getRoot();
+		final Node<String, String> a = tree.getRoot();
 		Assert.assertEquals(a.getKey(), "A");
 		Assert.assertNull(a.getNext());
 		Assert.assertNull(a.getPrevious());
-		tree.delete(Foo.A.name(), Foo.A);
+		tree.delete("A", "a");
 		Assert.assertTrue(tree.isEmpty());
 	}
 
 	@Test
 	public void testIterator() {
-		insert(Foo.D);
-		insert(Foo.F);
-		insert(Foo.C);
-		insert(Foo.E);
-		insert(Foo.A);
-		insert(Foo.B);
-		final Iterator<Node<String, Foo>> it = tree.iterator();
+		insert("D");
+		insert("F");
+		insert("C");
+		insert("E");
+		insert("A");
+		insert("B");
+		final Iterator<Node<String, String>> it = tree.iterator();
 		Assert.assertEquals(it.next().getKey(), "A");
 		Assert.assertEquals(it.next().getKey(), "B");
 		Assert.assertEquals(it.next().getKey(), "C");
@@ -82,56 +80,56 @@ public class AVLTreeTest {
 
 	@Test
 	public void testLeftRotation() {
-		insert(Foo.C);
-		insert(Foo.A);
-		insert(Foo.E);
-		insert(Foo.B);
-		insert(Foo.D);
-		insert(Foo.G);
-		insert(Foo.F);
-		insert(Foo.H);
-		insert(Foo.I);
-		final Node<String, Foo> c = tree.getRoot();
+		insert("C");
+		insert("A");
+		insert("E");
+		insert("B");
+		insert("D");
+		insert("G");
+		insert("F");
+		insert("H");
+		insert("I");
+		final Node<String, String> c = tree.getRoot();
 		Assert.assertEquals(c.getKey(), "C");
 		Assert.assertEquals(c.getPrevious().getKey(), "B");
 		Assert.assertEquals(c.getNext().getKey(), "D");
-		final Node<String, Foo> a = c.getLeft();
+		final Node<String, String> a = c.getLeft();
 		Assert.assertEquals(a.getKey(), "A");
 		Assert.assertEquals(a.getNext().getKey(), "B");
 		Assert.assertNull(a.getPrevious());
 		Assert.assertNull(a.getLeft());
-		final Node<String, Foo> b = a.getRight();
+		final Node<String, String> b = a.getRight();
 		Assert.assertEquals(b.getKey(), "B");
 		Assert.assertEquals(b.getPrevious().getKey(), "A");
 		Assert.assertEquals(b.getNext().getKey(), "C");
 		Assert.assertNull(b.getLeft());
 		Assert.assertNull(b.getRight());
-		final Node<String, Foo> g = c.getRight();
+		final Node<String, String> g = c.getRight();
 		Assert.assertEquals(g.getKey(), "G");
 		Assert.assertEquals(g.getPrevious().getKey(), "F");
 		Assert.assertEquals(g.getNext().getKey(), "H");
-		final Node<String, Foo> e = g.getLeft();
+		final Node<String, String> e = g.getLeft();
 		Assert.assertEquals(e.getKey(), "E");
 		Assert.assertEquals(e.getPrevious().getKey(), "D");
 		Assert.assertEquals(e.getNext().getKey(), "F");
-		final Node<String, Foo> d = e.getLeft();
+		final Node<String, String> d = e.getLeft();
 		Assert.assertEquals(d.getKey(), "D");
 		Assert.assertEquals(d.getPrevious().getKey(), "C");
 		Assert.assertEquals(d.getNext().getKey(), "E");
 		Assert.assertNull(d.getLeft());
 		Assert.assertNull(d.getRight());
-		final Node<String, Foo> f = e.getRight();
+		final Node<String, String> f = e.getRight();
 		Assert.assertEquals(f.getKey(), "F");
 		Assert.assertEquals(f.getPrevious().getKey(), "E");
 		Assert.assertEquals(f.getNext().getKey(), "G");
 		Assert.assertNull(f.getLeft());
 		Assert.assertNull(f.getRight());
-		final Node<String, Foo> h = g.getRight();
+		final Node<String, String> h = g.getRight();
 		Assert.assertEquals(h.getKey(), "H");
 		Assert.assertEquals(h.getPrevious().getKey(), "G");
 		Assert.assertEquals(h.getNext().getKey(), "I");
 		Assert.assertNull(h.getLeft());
-		final Node<String, Foo> i = h.getRight();
+		final Node<String, String> i = h.getRight();
 		Assert.assertEquals(i.getKey(), "I");
 		Assert.assertEquals(i.getPrevious().getKey(), "H");
 		Assert.assertNull(i.getNext());
@@ -141,56 +139,56 @@ public class AVLTreeTest {
 
 	@Test
 	public void testRightRotation() {
-		insert(Foo.G);
-		insert(Foo.I);
-		insert(Foo.E);
-		insert(Foo.H);
-		insert(Foo.F);
-		insert(Foo.C);
-		insert(Foo.D);
-		insert(Foo.B);
-		insert(Foo.A);
-		final Node<String, Foo> g = tree.getRoot();
+		insert("G");
+		insert("I");
+		insert("E");
+		insert("H");
+		insert("F");
+		insert("C");
+		insert("D");
+		insert("B");
+		insert("A");
+		final Node<String, String> g = tree.getRoot();
 		Assert.assertEquals(g.getKey(), "G");
 		Assert.assertEquals(g.getPrevious().getKey(), "F");
 		Assert.assertEquals(g.getNext().getKey(), "H");
-		final Node<String, Foo> i = g.getRight();
+		final Node<String, String> i = g.getRight();
 		Assert.assertEquals(i.getKey(), "I");
 		Assert.assertEquals(i.getPrevious().getKey(), "H");
 		Assert.assertNull(i.getNext());
 		Assert.assertNull(i.getRight());
-		final Node<String, Foo> h = i.getLeft();
+		final Node<String, String> h = i.getLeft();
 		Assert.assertEquals(h.getKey(), "H");
 		Assert.assertEquals(h.getPrevious().getKey(), "G");
 		Assert.assertEquals(h.getNext().getKey(), "I");
 		Assert.assertNull(h.getLeft());
 		Assert.assertNull(h.getRight());
-		final Node<String, Foo> c = g.getLeft();
+		final Node<String, String> c = g.getLeft();
 		Assert.assertEquals(c.getKey(), "C");
 		Assert.assertEquals(c.getPrevious().getKey(), "B");
 		Assert.assertEquals(c.getNext().getKey(), "D");
-		final Node<String, Foo> e = c.getRight();
+		final Node<String, String> e = c.getRight();
 		Assert.assertEquals(e.getKey(), "E");
 		Assert.assertEquals(e.getPrevious().getKey(), "D");
 		Assert.assertEquals(e.getNext().getKey(), "F");
-		final Node<String, Foo> f = e.getRight();
+		final Node<String, String> f = e.getRight();
 		Assert.assertEquals(f.getKey(), "F");
 		Assert.assertEquals(f.getPrevious().getKey(), "E");
 		Assert.assertEquals(f.getNext().getKey(), "G");
 		Assert.assertNull(f.getLeft());
 		Assert.assertNull(f.getRight());
-		final Node<String, Foo> d = e.getLeft();
+		final Node<String, String> d = e.getLeft();
 		Assert.assertEquals(d.getKey(), "D");
 		Assert.assertEquals(d.getPrevious().getKey(), "C");
 		Assert.assertEquals(d.getNext().getKey(), "E");
 		Assert.assertNull(d.getLeft());
 		Assert.assertNull(d.getRight());
-		final Node<String, Foo> b = c.getLeft();
+		final Node<String, String> b = c.getLeft();
 		Assert.assertEquals(b.getKey(), "B");
 		Assert.assertEquals(b.getPrevious().getKey(), "A");
 		Assert.assertEquals(b.getNext().getKey(), "C");
 		Assert.assertNull(b.getRight());
-		final Node<String, Foo> a = b.getLeft();
+		final Node<String, String> a = b.getLeft();
 		Assert.assertEquals(a.getKey(), "A");
 		Assert.assertEquals(a.getNext().getKey(), "B");
 		Assert.assertNull(a.getPrevious());

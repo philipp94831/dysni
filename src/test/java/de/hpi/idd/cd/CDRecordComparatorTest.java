@@ -1,4 +1,4 @@
-package de.hpi.idd.dysni.records;
+package de.hpi.idd.cd;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,8 +7,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.idd.dysni.records.CDRecordComparator.CDRecord;
-import de.hpi.idd.dysni.records.CDRecordComparator.CDSimilarity;
+import de.hpi.idd.cd.CDRecordComparator.CDRecord;
+import de.hpi.idd.cd.CDRecordComparator.CDSimilarity;
 
 /**
  * Created by dennis on 08.05.16.

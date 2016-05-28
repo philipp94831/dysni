@@ -1,5 +1,6 @@
 package de.hpi.idd.dysni.avl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Collection;
 public class Node<K extends Comparable<K>, V> {
 
 	/** Elements contained in the current node. */
-	private Container<V> container;
+	private Collection<V> elements;
 	private K key;
 	/** Left sub-tree. */
 	private Node<K, V> left;
@@ -41,9 +42,9 @@ public class Node<K extends Comparable<K>, V> {
 	 *            element
 	 */
 	Node(final K key, final V element) {
-		setContainer(new Container<>());
+		elements = new ArrayList<>();
 		this.key = key;
-		add(element);
+		elements.add(element);
 		left = null;
 		right = null;
 		parent = null;
@@ -52,8 +53,8 @@ public class Node<K extends Comparable<K>, V> {
 		next = null;
 	}
 
-	private void add(final V newElement) {
-		container.add(newElement);
+	boolean contains(final V element) {
+		return elements.contains(element);
 	}
 
 	/**
@@ -66,12 +67,12 @@ public class Node<K extends Comparable<K>, V> {
 	 * @return true if the deleted element was the root of the tree, false
 	 *         otherwise
 	 */
-	public boolean delete(final V element) {
-		container.remove(element);
-		if (container.isEmpty()) {
+	boolean delete(final V element) {
+		elements.remove(element);
+		if (elements.isEmpty()) {
 			if (parent == null && left == null && right == null) {
 				// this was the last node, the tree is now empty
-				container = null;
+				elements = null;
 				return true;
 			} else {
 				Node<K, V> node;
@@ -79,13 +80,13 @@ public class Node<K extends Comparable<K>, V> {
 				boolean leftShrunk;
 				if (left == null && right == null) {
 					node = this;
-					container = null;
+					elements = null;
 					prev.setNext(next);
 					leftShrunk = node == node.parent.left;
 					child = null;
 				} else {
 					node = left != null ? prev : next;
-					setContainer(node.container);
+					elements = node.elements;
 					key = node.key;
 					if (left != null) {
 						setPrev(node.prev);
@@ -113,17 +114,8 @@ public class Node<K extends Comparable<K>, V> {
 		return false;
 	}
 
-	public Collection<V> getAll() {
-		return container.getAll();
-	}
-
-	/**
-	 * Get the contained elements.
-	 *
-	 * @return elements contained in the node
-	 */
-	public Container<V> getContainer() {
-		return container;
+	public Collection<V> getElements() {
+		return elements;
 	}
 
 	public K getKey() {
@@ -197,7 +189,7 @@ public class Node<K extends Comparable<K>, V> {
 			return left.insert(key, newElement) && rebalanceLeftGrown();
 		}
 		if (key.compareTo(this.key) == 0) {
-			add(newElement);
+			elements.add(newElement);
 			return false;
 		}
 		// the inserted element is greater than the node
@@ -256,7 +248,7 @@ public class Node<K extends Comparable<K>, V> {
 	 *
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
-	boolean rebalanceLeftShrunk() {
+	private boolean rebalanceLeftShrunk() {
 		switch (skew) {
 		case LEFT_HIGH:
 			skew = Skew.BALANCED;
@@ -344,7 +336,7 @@ public class Node<K extends Comparable<K>, V> {
 	 *
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
-	boolean rebalanceRightShrunk() {
+	private boolean rebalanceRightShrunk() {
 		switch (skew) {
 		case RIGHT_HIGH:
 			skew = Skew.BALANCED;
@@ -393,18 +385,18 @@ public class Node<K extends Comparable<K>, V> {
 	 * updated by the caller
 	 * </p>
 	 */
-	void rotateCCW() {
-		final Container<V> tmpElt = container;
+	private void rotateCCW() {
+		final Collection<V> tmpElt = elements;
 		final K tmpSkv = key;
 		final Node<K, V> tmpNext = next == right ? this : next;
 		final Node<K, V> tmpPrev = prev;
 		final Node<K, V> tmpRightNext = right.next;
 		final Node<K, V> tmpRightPrev = right.prev == this ? right : right.prev;
-		setContainer(right.container);
+		elements = right.elements;
 		key = right.key;
 		setNext(tmpRightNext);
 		setPrev(tmpRightPrev);
-		right.setContainer(tmpElt);
+		right.elements = tmpElt;
 		right.key = tmpSkv;
 		right.setPrev(tmpPrev);
 		right.setNext(tmpNext);
@@ -422,18 +414,18 @@ public class Node<K extends Comparable<K>, V> {
 	 * updated by the caller
 	 * </p>
 	 */
-	void rotateCW() {
-		final Container<V> tmpElt = container;
+	private void rotateCW() {
+		final Collection<V> tmpElt = elements;
 		final K tmpSkv = key;
 		final Node<K, V> tmpNext = next;
 		final Node<K, V> tmpPrev = prev == left ? this : prev;
 		final Node<K, V> tmpLeftNext = left.next == this ? left : left.next;
 		final Node<K, V> tmpLeftPrev = left.prev;
-		setContainer(left.container);
+		elements = left.elements;
 		key = left.key;
 		setPrev(tmpLeftPrev);
 		setNext(tmpLeftNext);
-		left.setContainer(tmpElt);
+		left.elements = tmpElt;
 		left.key = tmpSkv;
 		left.setNext(tmpNext);
 		left.setPrev(tmpPrev);
@@ -444,32 +436,28 @@ public class Node<K extends Comparable<K>, V> {
 		setRight(tmpNode);
 	}
 
-	void setContainer(final Container<V> container) {
-		this.container = container;
-	}
-
-	void setLeft(final Node<K, V> child) {
+	private void setLeft(final Node<K, V> child) {
 		left = child;
 		if (child != null) {
 			child.parent = this;
 		}
 	}
 
-	void setNext(final Node<K, V> next) {
+	private void setNext(final Node<K, V> next) {
 		this.next = next;
 		if (this.next != null) {
 			this.next.prev = this;
 		}
 	}
 
-	void setPrev(final Node<K, V> prev) {
+	private void setPrev(final Node<K, V> prev) {
 		this.prev = prev;
 		if (this.prev != null) {
 			this.prev.next = this;
 		}
 	}
 
-	void setRight(final Node<K, V> child) {
+	private void setRight(final Node<K, V> child) {
 		right = child;
 		if (child != null) {
 			child.parent = this;

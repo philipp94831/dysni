@@ -54,6 +54,30 @@ import java.util.Iterator;
  */
 public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>> {
 
+	private static class AVLTreeIterator<K extends Comparable<K>, V> implements Iterator<Node<K, V>> {
+
+		private Node<K, V> next;
+
+		public AVLTreeIterator(final Node<K, V> smallest) {
+			next = smallest;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return next != null;
+		}
+
+		@Override
+		public Node<K, V> next() {
+			if (next == null) {
+				throw new IllegalStateException("There is no next element");
+			}
+			final Node<K, V> ret = next;
+			next = next.getNext();
+			return ret;
+		}
+	}
+
 	/** Top level node. */
 	private Node<K, V> top;
 
@@ -78,7 +102,7 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 			if (node == null) {
 				return false;
 			}
-			if (node.getContainer().contains(element)) {
+			if (node.contains(element)) {
 				if (node.delete(element)) {
 					top = null;
 				}
@@ -176,4 +200,5 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 	public int size() {
 		return top == null ? 0 : top.size();
 	}
+
 }

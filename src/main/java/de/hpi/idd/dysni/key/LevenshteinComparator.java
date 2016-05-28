@@ -1,8 +1,6 @@
-package de.hpi.idd.dysni.comp;
+package de.hpi.idd.dysni.key;
 
 import org.apache.commons.lang3.StringUtils;
-
-import de.hpi.idd.dysni.KeyComparator;
 
 public class LevenshteinComparator implements KeyComparator<String> {
 

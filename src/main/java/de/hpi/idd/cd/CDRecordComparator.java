@@ -1,4 +1,4 @@
-package de.hpi.idd.dysni.records;
+package de.hpi.idd.cd;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,8 +11,6 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import de.hpi.idd.SimilarityMeasure;
-import de.hpi.idd.dysni.IdWrapper;
-import de.hpi.idd.dysni.store.RecordStore;
 
 /**
  * Created by dennis on 08.05.16.
@@ -204,22 +202,10 @@ public class CDRecordComparator implements SimilarityMeasure {
 		return result / CDSimilarity.TOTAL_WEIGHT;
 	}
 
-	private final RecordStore<IdWrapper> store;
-
-	public CDRecordComparator(final RecordStore<IdWrapper> store) {
-		this.store = store;
-	}
-
-	private double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord) {
-		return CDRecordComparator.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
-	}
-
 	@Override
-	public Double calculateSimilarity(final String recordID1, final String recordID2,
+	public Double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord,
 			final HashMap<String, String> parameters) {
-		final Map<String, String> firstRecord = store.getRecord(recordID1).getObject();
-		final Map<String, String> secondRecord = store.getRecord(recordID2).getObject();
-		return calculateSimilarity(firstRecord, secondRecord);
+		return CDRecordComparator.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
 	}
 
 	@Override

@@ -5,15 +5,17 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.idd.dysni.comp.LevenshteinComparator;
+import de.hpi.idd.dysni.key.KeyComparator;
+import de.hpi.idd.dysni.key.KeyHandler;
+import de.hpi.idd.dysni.key.LevenshteinComparator;
 
 public class DisnyIndexTest {
 
-	private static class FooKeyHandler implements KeyHandler<Foo, String> {
+	private static class FooKeyHandler implements KeyHandler<String, String> {
 
 		@Override
-		public String computeKey(final Foo foo) {
-			return foo.name();
+		public String computeKey(final String foo) {
+			return foo;
 		}
 
 		@Override
@@ -25,23 +27,24 @@ public class DisnyIndexTest {
 
 	private static final KeyComparator<String> COMPARATOR = new LevenshteinComparator(0.5);
 
-	private final DysniIndex<Foo, String, Foo> index = new DysniIndex<>(new FooKeyHandler());
+	private final DysniIndex<String, String, String> index = new DysniIndex<>(new FooKeyHandler());
 
-	private void insert(final Foo foo) {
-		index.insert(foo, foo);
+	private void insert(final String foo) {
+		index.insert(foo, foo.toLowerCase());
 	}
 
 	@Test
 	public void test() {
-		insert(Foo.C);
-		insert(Foo.A);
-		insert(Foo.D);
-		insert(Foo.B);
-		insert(Foo.E);
-		insert(Foo.DE);
-		final Collection<Foo> candidates = index.findCandidates(Foo.DE, Foo.DE);
-		Assert.assertTrue(candidates.contains(Foo.D));
-		Assert.assertTrue(candidates.contains(Foo.E));
-		Assert.assertEquals(2, candidates.size());
+		insert("C");
+		insert("A");
+		insert("D");
+		insert("B");
+		insert("E");
+		insert("DE");
+		final Collection<String> candidates = index.findCandidates("DE");
+		Assert.assertTrue(candidates.contains("d"));
+		Assert.assertTrue(candidates.contains("e"));
+		Assert.assertTrue(candidates.contains("de"));
+		Assert.assertEquals(3, candidates.size());
 	}
 }

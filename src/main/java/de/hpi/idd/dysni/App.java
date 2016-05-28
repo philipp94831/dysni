@@ -10,10 +10,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import de.hpi.idd.dysni.comp.LevenshteinComparator;
-import de.hpi.idd.dysni.records.CDRecordComparator;
+import de.hpi.idd.cd.CDRecordComparator;
+import de.hpi.idd.dysni.key.KeyComparator;
+import de.hpi.idd.dysni.key.KeyHandler;
+import de.hpi.idd.dysni.key.LevenshteinComparator;
 import de.hpi.idd.dysni.store.MemoryStore;
-import de.hpi.idd.dysni.store.RecordStore;
 
 public class App {
 
@@ -55,14 +56,13 @@ public class App {
 		final long start = System.nanoTime();
 		int i = 0;
 		int count = 0;
-		final RecordStore<IdWrapper> store = new MemoryStore<>();
-		final DynamicSortedNeighborhoodIndexer<IdWrapper> dysni = new DynamicSortedNeighborhoodIndexer<>(store,
-				new CDRecordComparator(store), Arrays.asList(new CDKeyHandler(), new CDKeyHandler2()));
+		final DynamicSortedNeighborhoodIndexer<IdWrapper> dysni = new DynamicSortedNeighborhoodIndexer<>(
+				new MemoryStore<>(), new CDRecordComparator(), Arrays.asList(new CDKeyHandler(), new CDKeyHandler2()));
 		try {
 			final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
 					.parse(new FileReader("data/cd_dataset.csv"));
 			for (final CSVRecord record : parser) {
-				final IdWrapper rec = new IdWrapper(record.toMap());
+				final IdWrapper rec = new IdWrapper(record.toMap(), "did");
 				dysni.add(rec);
 				final Collection<String> duplicates = dysni.findDuplicates(rec);
 				count += duplicates.isEmpty() ? 0 : 1;
