@@ -35,19 +35,29 @@ public class CDRecordMatchingQualityChecker {
 		}
 	}
 
-	public void checkDuplicates(final Map<String, List<String>> duplicatesToCheck) {
-		for (final String key : duplicatesToCheck.keySet()) {
-			final List<String> trueDuplicates = duplicates.get(key);
-			if (!(trueDuplicates == null)) {
-				for (final String recordId : duplicatesToCheck.get(key)) {
-					if (trueDuplicates.contains(recordId)) {
-					} else {
-					}
-				}
-			} else {
-				duplicatesToCheck.get(key).size();
-			}
-		}
-		System.out.println("debug");
-	}
+    public void checkDuplicates(Map<String, List<String>> duplicatesToCheck) {
+        int wrong = 0;
+        int right = 0;
+
+        for (String key : duplicatesToCheck.keySet()) {
+            List<String> trueDuplicates = this.duplicates.get(key);
+
+            if (!(trueDuplicates == null)) {
+                for (String recordId : duplicatesToCheck.get(key)) {
+                    if (trueDuplicates.contains(recordId)) {
+                        right++;
+                        System.out.println("CORRECT resolution: " + key + " " + recordId);
+                    } else {
+                        wrong++;
+                        System.out.println("INCORRECT resolution: " + key + " " + recordId);
+                    }
+                }
+            } else {
+                wrong += duplicatesToCheck.get(key).size();
+            }
+        }
+        double precision = (double) right / 298;
+        System.out.println("Of the found duplicates " + right + " are correct and " + wrong +  " are incorrect.");
+        System.out.println("Precision is " + precision);
+    }
 }
