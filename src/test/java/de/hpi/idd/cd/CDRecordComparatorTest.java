@@ -50,9 +50,9 @@ public class CDRecordComparatorTest {
 		Assert.assertEquals(similarityMap.get(CDSimilarity.CATEGORY), 1.0 / 5, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.GENRE), 1.0 / 4, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.CDEXTRA), 1.0, CDRecordComparatorTest.DOUBLE_TOLERANCE);
-		Assert.assertEquals(similarityMap.get(CDSimilarity.YEAR), 3.0 / 4, CDRecordComparatorTest.DOUBLE_TOLERANCE);
+		Assert.assertEquals(similarityMap.get(CDSimilarity.YEAR), 89.0 / 90, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.TRACK), 1.0 / 6, CDRecordComparatorTest.DOUBLE_TOLERANCE);
-		Assert.assertEquals(CDRecordComparator.similarity(firstRecord, secondRecord), 383.0 / 630,
+		Assert.assertEquals(CDRecordComparator.similarity(firstRecord, secondRecord), 809.0 / 1260,
 				CDRecordComparatorTest.DOUBLE_TOLERANCE);
 	}
 }

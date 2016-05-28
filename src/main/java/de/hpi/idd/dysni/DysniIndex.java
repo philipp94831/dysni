@@ -10,31 +10,31 @@ import de.hpi.idd.dysni.avl.Node;
 import de.hpi.idd.dysni.key.KeyHandler;
 import de.hpi.idd.dysni.util.SymmetricTable;
 
-class DysniIndex<T, K extends Comparable<K>, V> {
+class DysniIndex<ELEMENT, KEY extends Comparable<KEY>, VALUE> {
 
-	private final KeyHandler<T, K> keyHandler;
-	private final SymmetricTable<K, Double> similarities = new SymmetricTable<>();
-	private final AVLTree<K, V> tree = new AVLTree<>();
+	private final KeyHandler<ELEMENT, KEY> keyHandler;
+	private final SymmetricTable<KEY, Double> similarities = new SymmetricTable<>();
+	private final AVLTree<KEY, VALUE> tree = new AVLTree<>();
 
-	public DysniIndex(final KeyHandler<T, K> keyHandler) {
+	public DysniIndex(final KeyHandler<ELEMENT, KEY> keyHandler) {
 		this.keyHandler = keyHandler;
 	}
 
-	public Collection<V> findCandidates(final T rec) {
-		final Node<K, V> node = tree.find(keyHandler.computeKey(rec));
+	public Collection<VALUE> findCandidates(final ELEMENT rec) {
+		final Node<KEY, VALUE> node = tree.find(keyHandler.computeKey(rec));
 		if (node == null) {
 			return Collections.emptyList();
 		}
-		final List<V> candidates = new ArrayList<>();
+		final List<VALUE> candidates = new ArrayList<>();
 		candidates.addAll(node.getElements());
-		for (Node<K, V> prevNode = node.getPrevious(); prevNode != null; prevNode = prevNode.getPrevious()) {
+		for (Node<KEY, VALUE> prevNode = node.getPrevious(); prevNode != null; prevNode = prevNode.getPrevious()) {
 			if (getSimilarity(prevNode, node) >= keyHandler.getComparator().getThreshold()) {
 				candidates.addAll(prevNode.getElements());
 			} else {
 				break;
 			}
 		}
-		for (Node<K, V> nextNode = node.getNext(); nextNode != null; nextNode = nextNode.getNext()) {
+		for (Node<KEY, VALUE> nextNode = node.getNext(); nextNode != null; nextNode = nextNode.getNext()) {
 			if (getSimilarity(nextNode, node) >= keyHandler.getComparator().getThreshold()) {
 				candidates.addAll(nextNode.getElements());
 			} else {
@@ -44,7 +44,7 @@ class DysniIndex<T, K extends Comparable<K>, V> {
 		return candidates;
 	}
 
-	private double getSimilarity(final Node<K, V> node2, final Node<K, V> node) {
+	private double getSimilarity(final Node<KEY, VALUE> node2, final Node<KEY, VALUE> node) {
 		Double sim = similarities.get(node2.getKey(), node.getKey());
 		if (sim == null) {
 			sim = keyHandler.getComparator().compare(node.getKey(), node2.getKey());
@@ -53,7 +53,7 @@ class DysniIndex<T, K extends Comparable<K>, V> {
 		return sim;
 	}
 
-	public void insert(final T element, final V value) {
+	public void insert(final ELEMENT element, final VALUE value) {
 		tree.insert(keyHandler.computeKey(element), value);
 	}
 }

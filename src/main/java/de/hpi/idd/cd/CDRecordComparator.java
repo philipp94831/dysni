@@ -153,6 +153,14 @@ public class CDRecordComparator implements SimilarityMeasure {
 
 	private static final double THRESHOLD = 0.5;
 
+	private static int getNthDigit(final int number, final int n) {
+		return (int) (Math.abs(number) / Math.pow(10, n) % 10);
+	}
+
+	private static int getNumberOfDigits(final int number) {
+		return (int) (Math.log10(Math.abs(number)) + 1);
+	}
+
 	public static Map<CDSimilarity, Double> getSimilarityOfRecords(final CDRecord firstRecord, final CDRecord secondRecord) {
 		final Map<CDSimilarity, Double> similarityMap = new HashMap<>();
 		similarityMap.put(CDSimilarity.ARTIST,
@@ -164,7 +172,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 		similarityMap.put(CDSimilarity.GENRE,
 				CDRecordComparator.levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
 		similarityMap.put(CDSimilarity.YEAR,
-				CDRecordComparator.levenshteinDistance(firstRecord.getYear() + "", secondRecord.getYear() + ""));
+				CDRecordComparator.yearDistance(firstRecord.getYear(), secondRecord.getYear()));
 		similarityMap.put(CDSimilarity.CDEXTRA,
 				CDRecordComparator.levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
 		similarityMap.put(CDSimilarity.TRACK,
@@ -198,6 +206,24 @@ public class CDRecordComparator implements SimilarityMeasure {
 			result += entry.getKey().weight() * entry.getValue();
 		}
 		return result / CDSimilarity.TOTAL_WEIGHT;
+	}
+
+	private static Double yearDistance(final Short year, final Short year2) {
+		if (year == null && year2 == null) {
+			return 1.0;
+		}
+		if (year == null || year2 == null) {
+			return 0.0;
+		}
+		int diff = 0;
+		int max = 0;
+		final int n = Math.max(CDRecordComparator.getNumberOfDigits(year), CDRecordComparator.getNumberOfDigits(year2));
+		for (int i = 0; i < n; i++) {
+			max += (i + 1) * 9;
+			diff += (i + 1)
+					* Math.abs(CDRecordComparator.getNthDigit(year, i) - CDRecordComparator.getNthDigit(year2, i));
+		}
+		return 1 - (double) diff / max;
 	}
 
 	@Override

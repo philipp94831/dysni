@@ -2,14 +2,21 @@ package de.hpi.idd.dysni;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import de.hpi.idd.cd.CDRecordMatchingQualityChecker;
 import de.hpi.idd.cd.CDRecordComparator;
+import de.hpi.idd.cd.CDRecordMatchingQualityChecker;
 import de.hpi.idd.dysni.key.KeyComparator;
 import de.hpi.idd.dysni.key.KeyHandler;
 import de.hpi.idd.dysni.key.LevenshteinComparator;
@@ -57,9 +64,8 @@ public class App {
 		final DynamicSortedNeighborhoodIndexer<String, Map<String, String>, String> dysni = new DynamicSortedNeighborhoodIndexer<>(
 				new MemoryStore<>(), new IDDSimilarityMeasure(new CDRecordComparator()),
 				Arrays.asList(new CDKeyHandler(), new CDKeyHandler2()));
-
-		Map<String, List<String>> duplicatesToCheck = new HashMap<>();
-		Set<String> keys = new HashSet<>();
+		final Map<String, List<String>> duplicatesToCheck = new HashMap<>();
+		final Set<String> keys = new HashSet<>();
 		try {
 			final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
 					.parse(new FileReader("data/cd_dataset.csv"));
@@ -73,12 +79,12 @@ public class App {
 				} else {
 					keys.add(rec.getId());
 				}
-				if (!duplicates.isEmpty()){
+				if (!duplicates.isEmpty()) {
 					duplicatesToCheck.put(rec.getId(), new LinkedList<>());
 					duplicatesToCheck.get(rec.getId()).addAll(duplicates);
 				}
 				count += duplicates.isEmpty() ? 0 : 1;
-				System.out.println("Duplicates for " + rec.getId() + ": " + duplicates);
+				System.out.println("Duplicates for " + rec.getId() + ": " + duplicates.size());
 				i++;
 			}
 		} catch (final IOException e) {
@@ -88,7 +94,7 @@ public class App {
 		final long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
 		System.out.println("Found " + count + " duplicates");
-		CDRecordMatchingQualityChecker checker = new CDRecordMatchingQualityChecker();
+		final CDRecordMatchingQualityChecker checker = new CDRecordMatchingQualityChecker();
 		checker.checkDuplicates(duplicatesToCheck);
 	}
 }

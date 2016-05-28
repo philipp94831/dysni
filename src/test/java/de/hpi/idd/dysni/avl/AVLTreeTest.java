@@ -9,8 +9,8 @@ public class AVLTreeTest {
 
 	private final AVLTree<String, String> tree = new AVLTree<>();
 
-	private void insert(final String String) {
-		tree.insert(String, String.toLowerCase());
+	private void insert(final String s) {
+		tree.insert(s, s.toLowerCase());
 	}
 
 	@Test

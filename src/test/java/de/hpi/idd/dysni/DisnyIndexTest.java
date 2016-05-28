@@ -11,11 +11,11 @@ import de.hpi.idd.dysni.key.LevenshteinComparator;
 
 public class DisnyIndexTest {
 
-	private static class FooKeyHandler implements KeyHandler<String, String> {
+	private static class StringKeyHandler implements KeyHandler<String, String> {
 
 		@Override
-		public String computeKey(final String foo) {
-			return foo;
+		public String computeKey(final String s) {
+			return s;
 		}
 
 		@Override
@@ -25,10 +25,10 @@ public class DisnyIndexTest {
 	}
 
 	private static final KeyComparator<String> COMPARATOR = new LevenshteinComparator(0.5);
-	private final DysniIndex<String, String, String> index = new DysniIndex<>(new FooKeyHandler());
+	private final DysniIndex<String, String, String> index = new DysniIndex<>(new StringKeyHandler());
 
-	private void insert(final String foo) {
-		index.insert(foo, foo.toLowerCase());
+	private void insert(final String s) {
+		index.insert(s, s.toLowerCase());
 	}
 
 	@Test

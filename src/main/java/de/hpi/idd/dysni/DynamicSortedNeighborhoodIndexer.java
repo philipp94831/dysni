@@ -10,38 +10,38 @@ import de.hpi.idd.dysni.key.KeyHandler;
 import de.hpi.idd.dysni.sim.GenericSimilarityMeasure;
 import de.hpi.idd.dysni.store.RecordStore;
 
-public class DynamicSortedNeighborhoodIndexer<ID, VALUE, KEY extends Comparable<KEY>> {
+public class DynamicSortedNeighborhoodIndexer<ID, ELEMENT, KEY extends Comparable<KEY>> {
 
-	private final GenericSimilarityMeasure<VALUE> comp;
-	private final List<DysniIndex<VALUE, KEY, ID>> indexes = new ArrayList<>();
-	private final RecordStore<ID, VALUE> store;
+	private final GenericSimilarityMeasure<ELEMENT> comp;
+	private final List<DysniIndex<ELEMENT, KEY, ID>> indexes = new ArrayList<>();
+	private final RecordStore<ID, ELEMENT> store;
 	private final UnionFind<ID> uf = new UnionFind<>();
 
-	public DynamicSortedNeighborhoodIndexer(final RecordStore<ID, VALUE> store, final GenericSimilarityMeasure<VALUE> comp, final List<KeyHandler<VALUE, KEY>> keyHandlers) {
+	public DynamicSortedNeighborhoodIndexer(final RecordStore<ID, ELEMENT> store, final GenericSimilarityMeasure<ELEMENT> comp, final List<KeyHandler<ELEMENT, KEY>> keyHandlers) {
 		this.store = store;
 		this.comp = comp;
-		for (final KeyHandler<VALUE, KEY> keyHandler : keyHandlers) {
+		for (final KeyHandler<ELEMENT, KEY> keyHandler : keyHandlers) {
 			indexes.add(new DysniIndex<>(keyHandler));
 		}
 	}
 
-	public void add(final IdWrapper<ID, VALUE> rec) {
+	public void add(final IdWrapper<ID, ELEMENT> rec) {
 		final ID recId = rec.getId();
 		store.storeRecord(recId, rec.getObject());
-		for (final DysniIndex<VALUE, KEY, ID> index : indexes) {
+		for (final DysniIndex<ELEMENT, KEY, ID> index : indexes) {
 			index.insert(rec.getObject(), rec.getId());
 		}
 	}
 
-	public Collection<ID> findDuplicates(final IdWrapper<ID, VALUE> rec) {
+	public Collection<ID> findDuplicates(final IdWrapper<ID, ELEMENT> rec) {
 		final Set<ID> candidates = new HashSet<>();
-		for (final DysniIndex<VALUE, KEY, ID> index : indexes) {
+		for (final DysniIndex<ELEMENT, KEY, ID> index : indexes) {
 			final Collection<ID> newCandidates = index.findCandidates(rec.getObject());
-			newCandidates.remove(rec.getId());
 			candidates.addAll(newCandidates);
 		}
+		candidates.remove(rec.getId());
 		for (final ID candidate : candidates) {
-			if (comp.getThreshold() <= comp.calculateSimilarity(rec.getObject(), store.getRecord(candidate))) {
+			if (comp.areSimilar(rec.getObject(), store.getRecord(candidate))) {
 				uf.union(rec.getId(), candidate);
 			}
 		}
