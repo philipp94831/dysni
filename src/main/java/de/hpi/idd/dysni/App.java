@@ -12,8 +12,8 @@ import org.apache.commons.csv.CSVRecord;
 
 import de.hpi.idd.Dataset;
 import de.hpi.idd.DatasetManager;
+import de.hpi.idd.Evaluator;
 import de.hpi.idd.SimilarityMeasure;
-import de.hpi.idd.cd.CDRecordMatchingQualityChecker;
 import de.hpi.idd.dysni.key.KeyHandler;
 import de.hpi.idd.dysni.sim.IDDSimilarityMeasure;
 import de.hpi.idd.dysni.store.MemoryStore;
@@ -57,7 +57,7 @@ public class App {
 		}
 		final long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
-		final CDRecordMatchingQualityChecker checker = new CDRecordMatchingQualityChecker();
-		checker.checkDuplicates(duplicatesToCheck);
+		final Evaluator checker = new Evaluator("data/" + DatasetManager.getGroundThruth(dataset));
+		checker.evaluate(duplicatesToCheck);
 	}
 }

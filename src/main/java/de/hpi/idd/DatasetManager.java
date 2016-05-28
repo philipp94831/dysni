@@ -21,6 +21,15 @@ public class DatasetManager {
 		}
 	}
 
+	public static String getGroundThruth(final Dataset dataset) {
+		switch (dataset) {
+		case CD:
+			return "cd_dataset_duplicates.csv";
+		default:
+			return null;
+		}
+	}
+
 	public static String getIdColumn(final Dataset dataset) {
 		switch (dataset) {
 		case CD:

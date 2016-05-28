@@ -1,4 +1,4 @@
-package de.hpi.idd.dysni;
+package de.hpi.idd.dysni.util;
 
 import java.util.Collection;
 import java.util.HashMap;

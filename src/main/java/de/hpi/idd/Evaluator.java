@@ -1,4 +1,4 @@
-package de.hpi.idd.cd;
+package de.hpi.idd;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,31 +11,31 @@ import org.apache.commons.csv.CSVRecord;
 
 import com.google.common.collect.Table.Cell;
 
-import de.hpi.idd.dysni.UnionFind;
 import de.hpi.idd.dysni.util.SymmetricTable;
+import de.hpi.idd.dysni.util.UnionFind;
 
 /**
  * Created by dennis on 26.05.16.
  */
-public class CDRecordMatchingQualityChecker {
+public class Evaluator {
 
 	private static final boolean VERBOSE = false;
 	private final UnionFind<String> duplicates;
 
-	public CDRecordMatchingQualityChecker() {
+	public Evaluator(final String groundThruthFile) {
 		duplicates = new UnionFind<>();
 		try {
 			final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
-					.parse(new FileReader("data/cd_dataset_duplicates.csv"));
+					.parse(new FileReader(groundThruthFile));
 			for (final CSVRecord rec : parser) {
-				duplicates.union(rec.get("firstId"), rec.get("secondId"));
+				duplicates.union(rec.get(0), rec.get(1));
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void checkDuplicates(final SymmetricTable<String, Boolean> duplicatesToCheck) {
+	public void evaluate(final SymmetricTable<String, Boolean> duplicatesToCheck) {
 		int fp = 0;
 		int tp = 0;
 		int fn = 0;
@@ -44,7 +44,7 @@ public class CDRecordMatchingQualityChecker {
 				tp++;
 			} else {
 				fp++;
-				if (CDRecordMatchingQualityChecker.VERBOSE) {
+				if (Evaluator.VERBOSE) {
 					System.out.println("INCORRECT resolution: " + cell.getRowKey() + " " + cell.getColumnKey());
 				}
 			}
@@ -58,7 +58,7 @@ public class CDRecordMatchingQualityChecker {
 					t++;
 					if (!duplicatesToCheck.contains(elems.get(i), elems.get(j))) {
 						fn++;
-						if (CDRecordMatchingQualityChecker.VERBOSE) {
+						if (Evaluator.VERBOSE) {
 							System.out.println("MISSED resolution: " + elems.get(i) + " " + elems.get(j));
 						}
 					}

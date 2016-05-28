@@ -10,6 +10,7 @@ import de.hpi.idd.dysni.key.KeyHandler;
 import de.hpi.idd.dysni.sim.GenericSimilarityMeasure;
 import de.hpi.idd.dysni.store.RecordStore;
 import de.hpi.idd.dysni.store.StoreException;
+import de.hpi.idd.dysni.util.UnionFind;
 
 public class DynamicSortedNeighborhoodIndexer<ID, ELEMENT, KEY extends Comparable<KEY>> {
 
