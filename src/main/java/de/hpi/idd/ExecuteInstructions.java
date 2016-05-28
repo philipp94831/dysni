@@ -26,5 +26,4 @@ public interface ExecuteInstructions {
 	 * @param instruction
 	 */
 	public void executeInstruction(ArrayList<String> instruction);
-
 }

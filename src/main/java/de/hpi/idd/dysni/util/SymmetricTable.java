@@ -22,5 +22,4 @@ public class SymmetricTable<K, V> {
 			table.put(key2, key1, value);
 		}
 	}
-
 }

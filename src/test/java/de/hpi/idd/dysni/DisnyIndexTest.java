@@ -22,11 +22,9 @@ public class DisnyIndexTest {
 		public KeyComparator<String> getComparator() {
 			return DisnyIndexTest.COMPARATOR;
 		}
-
 	}
 
 	private static final KeyComparator<String> COMPARATOR = new LevenshteinComparator(0.5);
-
 	private final DysniIndex<String, String, String> index = new DysniIndex<>(new FooKeyHandler());
 
 	private void insert(final String foo) {

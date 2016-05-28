@@ -13,8 +13,8 @@ import de.hpi.idd.dysni.util.SymmetricTable;
 class DysniIndex<T, K extends Comparable<K>, V> {
 
 	private final KeyHandler<T, K> keyHandler;
-	private final AVLTree<K, V> tree = new AVLTree<>();
 	private final SymmetricTable<K, Double> similarities = new SymmetricTable<>();
+	private final AVLTree<K, V> tree = new AVLTree<>();
 
 	public DysniIndex(final KeyHandler<T, K> keyHandler) {
 		this.keyHandler = keyHandler;
@@ -56,5 +56,4 @@ class DysniIndex<T, K extends Comparable<K>, V> {
 	public void insert(final T element, final V value) {
 		tree.insert(keyHandler.computeKey(element), value);
 	}
-
 }

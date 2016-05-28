@@ -1,9 +1,8 @@
 package de.hpi.idd.dysni.store;
 
-public interface RecordStore<T> {
+public interface RecordStore<K, V> {
 
-	T getRecord(String id);
+	V getRecord(K id);
 
-	void storeRecord(String id, T record);
-
+	void storeRecord(K id, V record);
 }

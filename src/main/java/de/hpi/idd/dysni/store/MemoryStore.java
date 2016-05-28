@@ -3,18 +3,17 @@ package de.hpi.idd.dysni.store;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MemoryStore<T> implements RecordStore<T> {
+public class MemoryStore<K, V> implements RecordStore<K, V> {
 
-	private final Map<String, T> store = new HashMap<>();
+	private final Map<K, V> store = new HashMap<>();
 
 	@Override
-	public T getRecord(final String id) {
+	public V getRecord(final K id) {
 		return store.get(id);
 	}
 
 	@Override
-	public void storeRecord(final String id, final T record) {
+	public void storeRecord(final K id, final V record) {
 		store.put(id, record);
 	}
-
 }

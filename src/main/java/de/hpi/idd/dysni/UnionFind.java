@@ -23,9 +23,9 @@ public class UnionFind<T> {
 
 	private class Node<U> {
 
+		private final Collection<Node<U>> children = new HashSet<>();
 		private final U element;
 		private Node<U> parent;
-		private final Collection<Node<U>> children = new HashSet<>();
 		private byte rank;
 
 		public Node(final U element) {
@@ -72,7 +72,6 @@ public class UnionFind<T> {
 	}
 
 	private final Map<T, Node<T>> nodes = new HashMap<>();
-
 	private final Set<Node<T>> roots = new HashSet<>();
 
 	/**

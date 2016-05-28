@@ -12,5 +12,4 @@ public class SymmetricTableTest {
 		Assert.assertEquals("foo", table.get(1, 2));
 		Assert.assertEquals("foo", table.get(2, 1));
 	}
-
 }

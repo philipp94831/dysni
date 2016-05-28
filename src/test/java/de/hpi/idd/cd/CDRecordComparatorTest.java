@@ -27,9 +27,7 @@ public class CDRecordComparatorTest {
 				"None", (short) 2016, firstTracklist);
 		CDRecord secondRecord = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None",
 				(short) 2016, firstTracklist);
-
 		Map<CDSimilarity, Double> similarityMap = CDRecordComparator.getSimilarityOfRecords(firstRecord, secondRecord);
-
 		Assert.assertEquals(similarityMap.get(CDSimilarity.ARTIST), 1.0, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.DTITLE), 1.0, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.CATEGORY), 1.0, CDRecordComparatorTest.DOUBLE_TOLERANCE);
@@ -39,7 +37,6 @@ public class CDRecordComparatorTest {
 		Assert.assertEquals(similarityMap.get(CDSimilarity.TRACK), 1.0, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(CDRecordComparator.similarity(firstRecord, secondRecord), 1.0,
 				CDRecordComparatorTest.DOUBLE_TOLERANCE);
-
 		final List<String> secondTracklist = new LinkedList<>();
 		secondTracklist.add("Track 3");
 		secondTracklist.add("Track 4");
@@ -47,9 +44,7 @@ public class CDRecordComparatorTest {
 		secondTracklist.add("Track 6");
 		secondRecord = new CDRecord("1", "The Rolling Tones", "Overpriced Best CD", "trash", "Pop", "None",
 				(short) 2017, secondTracklist);
-
 		similarityMap = CDRecordComparator.getSimilarityOfRecords(firstRecord, secondRecord);
-
 		Assert.assertEquals(similarityMap.get(CDSimilarity.ARTIST), 17.0 / 18, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.DTITLE), 17.0 / 18, CDRecordComparatorTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.CATEGORY), 1.0 / 5, CDRecordComparatorTest.DOUBLE_TOLERANCE);
@@ -60,5 +55,4 @@ public class CDRecordComparatorTest {
 		Assert.assertEquals(CDRecordComparator.similarity(firstRecord, secondRecord), 383.0 / 630,
 				CDRecordComparatorTest.DOUBLE_TOLERANCE);
 	}
-
 }

@@ -1,23 +1,20 @@
 package de.hpi.idd.dysni;
 
-import java.util.Map;
+class IdWrapper<K, V> {
 
-class IdWrapper {
+	private final K id;
+	private final V object;
 
-	private final Map<String, String> object;
-	private final String id;
-
-	public IdWrapper(final Map<String, String> object, final String idField) {
+	public IdWrapper(final V object, final K id) {
 		this.object = object;
-		id = object.get(idField);
+		this.id = id;
 	}
 
-	public String getId() {
+	public K getId() {
 		return id;
 	}
 
-	public Map<String, String> getObject() {
+	public V getObject() {
 		return object;
 	}
-
 }

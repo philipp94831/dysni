@@ -19,20 +19,19 @@ public class CDRecordComparator implements SimilarityMeasure {
 
 	static class CDRecord {
 
-		private String dId;
 		private String artist;
-		private String dTitle;
 		private String category;
-		private String genre;
 		private String cdExtra;
-		private Short year;
+		private String dId;
+		private String dTitle;
+		private String genre;
 		private List<String> tracks;
+		private Short year;
 
 		public CDRecord() {
 		}
 
-		public CDRecord(final String dId, final String artist, final String dTitle, final String category,
-				final String genre, final String cdExtra, final short year, final List<String> tracks) {
+		public CDRecord(final String dId, final String artist, final String dTitle, final String category, final String genre, final String cdExtra, final short year, final List<String> tracks) {
 			this.dId = dId;
 			this.artist = artist;
 			this.dTitle = dTitle;
@@ -133,7 +132,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 	}
 
 	public enum CDSimilarity {
-		ARTIST, DTITLE, GENRE, YEAR, CDEXTRA, TRACK, CATEGORY;
+		ARTIST, CATEGORY, CDEXTRA, DTITLE, GENRE, TRACK, YEAR;
 
 		private static final double TOTAL_WEIGHT = Arrays.stream(CDSimilarity.values())
 				.mapToDouble(CDSimilarity::weight).sum();
@@ -154,8 +153,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 
 	private static final double THRESHOLD = 0.5;
 
-	public static Map<CDSimilarity, Double> getSimilarityOfRecords(final CDRecord firstRecord,
-			final CDRecord secondRecord) {
+	public static Map<CDSimilarity, Double> getSimilarityOfRecords(final CDRecord firstRecord, final CDRecord secondRecord) {
 		final Map<CDSimilarity, Double> similarityMap = new HashMap<>();
 		similarityMap.put(CDSimilarity.ARTIST,
 				CDRecordComparator.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
@@ -203,8 +201,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 	}
 
 	@Override
-	public Double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord,
-			final HashMap<String, String> parameters) {
+	public Double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord, final HashMap<String, String> parameters) {
 		return CDRecordComparator.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
 	}
 

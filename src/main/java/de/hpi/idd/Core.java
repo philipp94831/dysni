@@ -34,7 +34,6 @@ public interface Core {
 	// * @return: true if successful, false otherwise
 	// */
 	// public boolean removeRecord(Integer recordID);
-
 	/**
 	 *
 	 * Given a duplicate, return all the matching records you could find in your
