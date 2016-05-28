@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 /**
  * Based on the implementation by Robert Sedgewick and Kevin Wayne from
@@ -141,8 +142,8 @@ public class UnionFind<T> {
 		return component;
 	}
 
-	public Set<Node<T>> getRoots() {
-		return roots;
+	public Set<T> getRoots() {
+		return roots.stream().map(Node::getElement).collect(Collectors.toSet());
 	}
 
 	private void insert(final T t) {

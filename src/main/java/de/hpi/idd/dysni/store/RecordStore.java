@@ -2,7 +2,7 @@ package de.hpi.idd.dysni.store;
 
 public interface RecordStore<K, V> {
 
-	V getRecord(K id);
+	V getRecord(K id) throws StoreException;
 
-	void storeRecord(K id, V record);
+	void storeRecord(K id, V record) throws StoreException;
 }

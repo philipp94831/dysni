@@ -9,6 +9,7 @@ import java.util.Set;
 import de.hpi.idd.dysni.key.KeyHandler;
 import de.hpi.idd.dysni.sim.GenericSimilarityMeasure;
 import de.hpi.idd.dysni.store.RecordStore;
+import de.hpi.idd.dysni.store.StoreException;
 
 public class DynamicSortedNeighborhoodIndexer<ID, ELEMENT, KEY extends Comparable<KEY>> {
 
@@ -25,7 +26,7 @@ public class DynamicSortedNeighborhoodIndexer<ID, ELEMENT, KEY extends Comparabl
 		}
 	}
 
-	public void add(final IdWrapper<ID, ELEMENT> rec) {
+	public void add(final IdWrapper<ID, ELEMENT> rec) throws StoreException {
 		final ID recId = rec.getId();
 		store.storeRecord(recId, rec.getObject());
 		for (final DysniIndex<ELEMENT, KEY, ID> index : indexes) {
@@ -33,7 +34,7 @@ public class DynamicSortedNeighborhoodIndexer<ID, ELEMENT, KEY extends Comparabl
 		}
 	}
 
-	public Collection<ID> findDuplicates(final IdWrapper<ID, ELEMENT> rec) {
+	public Collection<ID> findDuplicates(final IdWrapper<ID, ELEMENT> rec) throws StoreException {
 		final Set<ID> candidates = new HashSet<>();
 		for (final DysniIndex<ELEMENT, KEY, ID> index : indexes) {
 			final Collection<ID> newCandidates = index.findCandidates(rec.getObject());
