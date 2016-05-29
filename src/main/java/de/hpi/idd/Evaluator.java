@@ -69,8 +69,8 @@ public class Evaluator {
 		final double recall = (double) tp / t;
 		final double precision = (double) tp / p;
 		final double fmeasure = 2 * (precision * recall) / (precision + recall);
-		System.out.println("Of the " + t + " duplicates " + tp + " were found and " + fn + " were missed. " + fp
-				+ " found duplicates are wrong.");
+		System.out.println("Found " + p + " duplicates. Of the " + t + " true duplicates " + tp + " were found and "
+				+ fn + " were missed. " + fp + " found duplicates are wrong.");
 		System.out.println("Precision is " + precision);
 		System.out.println("Recall is " + recall);
 		System.out.println("F-Measure is " + fmeasure);

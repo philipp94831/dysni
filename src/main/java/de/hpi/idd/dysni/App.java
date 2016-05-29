@@ -37,17 +37,16 @@ public class App {
 		try (final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
 				.parse(new FileReader(App.DATA_DIR + DatasetManager.getFileName(dataset)))) {
 			for (final CSVRecord record : parser) {
-				final Map<String, String> map = record.toMap();
-				final IdWrapper<String, Map<String, String>> rec = new IdWrapper<>(map,
-						map.get(DatasetManager.getIdColumn(dataset)));
-				dysni.add(rec);
-				final Collection<String> duplicates = dysni.findDuplicates(rec);
+				final Map<String, String> rec = record.toMap();
+				final String id = rec.get(DatasetManager.getIdField(dataset));
+				dysni.add(rec, id);
+				final Collection<String> duplicates = dysni.findDuplicates(rec, id);
 				if (!duplicates.isEmpty()) {
 					for (final String duplicate : duplicates) {
-						duplicatesToCheck.put(rec.getId(), duplicate, true);
+						duplicatesToCheck.put(id, duplicate, true);
 					}
 				}
-				System.out.println("Duplicates for " + rec.getId() + ": " + duplicates);
+				System.out.println("Duplicates for " + id + ": " + duplicates);
 				i++;
 			}
 		} catch (final IOException e) {

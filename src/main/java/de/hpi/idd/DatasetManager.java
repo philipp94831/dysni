@@ -30,7 +30,7 @@ public class DatasetManager {
 		}
 	}
 
-	public static String getIdColumn(final Dataset dataset) {
+	public static String getIdField(final Dataset dataset) {
 		switch (dataset) {
 		case CD:
 			return "did";
