@@ -52,7 +52,7 @@ public class DatasetManager {
 		case MOVIES:
 			return " id";
 		default:
-			return null;
+			return "id";
 		}
 	}
 

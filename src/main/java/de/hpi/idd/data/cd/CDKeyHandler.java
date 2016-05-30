@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.Map;
 
 import de.hpi.idd.dysni.KeyHandler;
+import de.hpi.idd.dysni.sim.DefaultAssessor;
 import de.hpi.idd.dysni.sim.LevenshteinMetric;
+import de.hpi.idd.dysni.sim.SimilarityAssessor;
 import de.hpi.idd.dysni.sim.SimilarityMeasure;
 
 public class CDKeyHandler {
 
-	private static final LevenshteinMetric LEVENSHTEIN = new LevenshteinMetric();
+	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinMetric();
 
 	public static Collection<KeyHandler<Map<String, String>, ?>> keyHandler() {
 		return Arrays.asList(new KeyHandler<Map<String, String>, String>() {
@@ -24,13 +26,8 @@ public class CDKeyHandler {
 			}
 
 			@Override
-			public SimilarityMeasure<String> getSimilarityMeasure() {
-				return CDKeyHandler.LEVENSHTEIN;
-			}
-
-			@Override
-			public double getThreshold() {
-				return 0.8;
+			public SimilarityAssessor<String> getSimilarityMeasure() {
+				return new DefaultAssessor<>(CDKeyHandler.LEVENSHTEIN, 0.8);
 			}
 		}, new KeyHandler<Map<String, String>, String>() {
 
@@ -43,13 +40,8 @@ public class CDKeyHandler {
 			}
 
 			@Override
-			public SimilarityMeasure<String> getSimilarityMeasure() {
-				return CDKeyHandler.LEVENSHTEIN;
-			}
-
-			@Override
-			public double getThreshold() {
-				return 0.6;
+			public SimilarityAssessor<String> getSimilarityMeasure() {
+				return new DefaultAssessor<>(CDKeyHandler.LEVENSHTEIN, 0.6);
 			}
 		});
 	}

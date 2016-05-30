@@ -3,7 +3,6 @@ package de.hpi.idd.dysni;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import de.hpi.idd.dysni.avl.AVLTree;
 import de.hpi.idd.dysni.avl.Node;
@@ -24,17 +23,17 @@ class DysniIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 		if (node == null) {
 			return Collections.emptyList();
 		}
-		final List<ID> candidates = new ArrayList<>();
+		final Collection<ID> candidates = new ArrayList<>();
 		candidates.addAll(node.getElements());
 		for (Node<KEY, ID> prevNode = node.getPrevious(); prevNode != null; prevNode = prevNode.getPrevious()) {
-			if (getSimilarity(prevNode, node) >= keyHandler.getThreshold()) {
+			if (keyHandler.getSimilarityMeasure().isSimilarity(getSimilarity(prevNode, node))) {
 				candidates.addAll(prevNode.getElements());
 			} else {
 				break;
 			}
 		}
 		for (Node<KEY, ID> nextNode = node.getNext(); nextNode != null; nextNode = nextNode.getNext()) {
-			if (getSimilarity(nextNode, node) >= keyHandler.getThreshold()) {
+			if (keyHandler.getSimilarityMeasure().isSimilarity(getSimilarity(nextNode, node))) {
 				candidates.addAll(nextNode.getElements());
 			} else {
 				break;

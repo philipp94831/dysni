@@ -3,7 +3,6 @@ package de.hpi.idd.dysni;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.hpi.idd.dysni.sim.SimilarityAssessor;
@@ -14,7 +13,7 @@ import de.hpi.idd.dysni.util.UnionFind;
 public class DynamicSortedNeighborhoodIndexer<RECORD, ID> {
 
 	private final SimilarityAssessor<RECORD> sim;
-	private final List<DysniIndex<RECORD, ?, ID>> indexes = new ArrayList<>();
+	private final Collection<DysniIndex<RECORD, ?, ID>> indexes = new ArrayList<>();
 	private final RecordStore<ID, RECORD> store;
 	private final UnionFind<ID> uf = new UnionFind<>();
 

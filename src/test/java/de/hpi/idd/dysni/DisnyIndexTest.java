@@ -5,7 +5,9 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.hpi.idd.dysni.sim.DefaultAssessor;
 import de.hpi.idd.dysni.sim.LevenshteinMetric;
+import de.hpi.idd.dysni.sim.SimilarityAssessor;
 import de.hpi.idd.dysni.sim.SimilarityMeasure;
 
 public class DisnyIndexTest {
@@ -18,13 +20,8 @@ public class DisnyIndexTest {
 		}
 
 		@Override
-		public SimilarityMeasure<String> getSimilarityMeasure() {
-			return DisnyIndexTest.LEVENSHTEIN;
-		}
-
-		@Override
-		public double getThreshold() {
-			return 0.5;
+		public SimilarityAssessor<String> getSimilarityMeasure() {
+			return new DefaultAssessor<>(DisnyIndexTest.LEVENSHTEIN, 0.5);
 		}
 	}
 
