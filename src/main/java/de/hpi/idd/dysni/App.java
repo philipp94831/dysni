@@ -32,7 +32,8 @@ public class App {
 		long start = System.nanoTime();
 		int i = 0;
 		Dataset dataset = Dataset.getForName(App.DATASET_NAME);
-		Collection<KeyHandler<Map<String, String>, ?>> keyHandlers = DatasetManager.getKeyHandlers(dataset);
+		Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> keyHandlers = DatasetManager
+				.getKeyHandlers(dataset);
 		SimilarityMeasure similarityMeasure = DatasetManager.getSimilarityMeasure(dataset);
 		SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
 		try (Reader in = new FileReader(App.DATA_DIR + DatasetManager.getFileName(dataset));

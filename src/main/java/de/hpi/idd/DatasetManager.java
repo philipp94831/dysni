@@ -9,7 +9,7 @@ import de.hpi.idd.data.cd.CDSimilarityMeasure;
 import de.hpi.idd.data.cora.CoraKeyHandler;
 import de.hpi.idd.data.movies.MoviesKeyHandler;
 import de.hpi.idd.data.ncvoters.NCVotersKeyHandler;
-import de.hpi.idd.dysni.KeyHandler;
+import de.hpi.idd.dysni.DySNIndexConfiguration;
 
 public class DatasetManager {
 
@@ -56,7 +56,7 @@ public class DatasetManager {
 		}
 	}
 
-	public static Collection<KeyHandler<Map<String, String>, ?>> getKeyHandlers(Dataset dataset) {
+	public static Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> getKeyHandlers(Dataset dataset) {
 		switch (dataset) {
 		case CD:
 			return CDKeyHandler.keyHandler();

@@ -5,10 +5,9 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.idd.dysni.sim.DefaultAssessor;
 import de.hpi.idd.dysni.sim.LevenshteinMetric;
-import de.hpi.idd.dysni.sim.SimilarityAssessor;
 import de.hpi.idd.dysni.sim.SimilarityMeasure;
+import de.hpi.idd.dysni.window.AdaptiveKeySimilarityWindowBuilder;
 
 public class DySNIndexTest {
 
@@ -18,15 +17,12 @@ public class DySNIndexTest {
 		public String computeKey(String s) {
 			return s;
 		}
-
-		@Override
-		public SimilarityAssessor<String> getSimilarityMeasure() {
-			return new DefaultAssessor<>(DySNIndexTest.LEVENSHTEIN, 0.5);
-		}
 	}
 
 	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinMetric();
-	private final DySNIndex<String, String, String> index = new DySNIndex<>(new StringKeyHandler());
+	private final DySNIndex<String, String, String> index = new DySNIndex<>(
+			new DySNIndexConfiguration<>(new StringKeyHandler(),
+					new AdaptiveKeySimilarityWindowBuilder<>(DySNIndexTest.LEVENSHTEIN.asAssessor(0.5))));
 
 	private void insert(String s) {
 		index.insert(s, s.toLowerCase());

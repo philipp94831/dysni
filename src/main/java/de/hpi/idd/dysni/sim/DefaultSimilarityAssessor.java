@@ -1,11 +1,11 @@
 package de.hpi.idd.dysni.sim;
 
-public class DefaultAssessor<T> implements SimilarityAssessor<T> {
+class DefaultSimilarityAssessor<T> implements SimilarityAssessor<T> {
 
 	private final SimilarityMeasure<T> sim;
 	private final double threshold;
 
-	public DefaultAssessor(SimilarityMeasure<T> sim, double threshold) {
+	public DefaultSimilarityAssessor(SimilarityMeasure<T> sim, double threshold) {
 		this.sim = sim;
 		this.threshold = threshold;
 	}

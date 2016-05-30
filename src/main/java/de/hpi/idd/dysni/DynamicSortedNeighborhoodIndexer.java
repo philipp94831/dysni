@@ -18,11 +18,11 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> {
 	private final UnionFind<ID> uf = new UnionFind<>();
 
 	public DynamicSortedNeighborhoodIndexer(RecordStore<ID, RECORD> store, SimilarityAssessor<RECORD> sim,
-			Collection<KeyHandler<RECORD, ?>> keyHandlers) {
+			Collection<DySNIndexConfiguration<RECORD, ?, ID>> configs) {
 		this.store = store;
 		this.sim = sim;
-		for (KeyHandler<RECORD, ?> keyHandler : keyHandlers) {
-			indexes.add(new DySNIndex<>(keyHandler));
+		for (DySNIndexConfiguration<RECORD, ?, ID> conf : configs) {
+			indexes.add(new DySNIndex<>(conf));
 		}
 	}
 
