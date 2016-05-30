@@ -10,7 +10,7 @@ import de.hpi.idd.dysni.sim.SimilarityMeasure;
 
 public class CDKeyHandler {
 
-	private static final LevenshteinMetric LEVENSHTEIN_COMPARATOR = new LevenshteinMetric();
+	private static final LevenshteinMetric LEVENSHTEIN = new LevenshteinMetric();
 
 	public static Collection<KeyHandler<Map<String, String>, ?>> keyHandler() {
 		return Arrays.asList(new KeyHandler<Map<String, String>, String>() {
@@ -24,8 +24,8 @@ public class CDKeyHandler {
 			}
 
 			@Override
-			public SimilarityMeasure<String> getComparator() {
-				return CDKeyHandler.LEVENSHTEIN_COMPARATOR;
+			public SimilarityMeasure<String> getSimilarityMeasure() {
+				return CDKeyHandler.LEVENSHTEIN;
 			}
 
 			@Override
@@ -43,8 +43,8 @@ public class CDKeyHandler {
 			}
 
 			@Override
-			public SimilarityMeasure<String> getComparator() {
-				return CDKeyHandler.LEVENSHTEIN_COMPARATOR;
+			public SimilarityMeasure<String> getSimilarityMeasure() {
+				return CDKeyHandler.LEVENSHTEIN;
 			}
 
 			@Override

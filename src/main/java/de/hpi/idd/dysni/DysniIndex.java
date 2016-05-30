@@ -46,7 +46,7 @@ class DysniIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 	private double getSimilarity(final Node<KEY, ID> node2, final Node<KEY, ID> node) {
 		Double sim = similarities.get(node2.getKey(), node.getKey());
 		if (sim == null) {
-			sim = keyHandler.getComparator().calculateSimilarity(node.getKey(), node2.getKey());
+			sim = keyHandler.getSimilarityMeasure().calculateSimilarity(node.getKey(), node2.getKey());
 			similarities.put(node2.getKey(), node.getKey(), sim);
 		}
 		return sim;

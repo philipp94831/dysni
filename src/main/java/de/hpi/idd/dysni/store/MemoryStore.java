@@ -8,6 +8,10 @@ public class MemoryStore<K, V> implements RecordStore<K, V> {
 	private final Map<K, V> store = new HashMap<>();
 
 	@Override
+	public void close() {
+	}
+
+	@Override
 	public V getRecord(final K id) {
 		return store.get(id);
 	}

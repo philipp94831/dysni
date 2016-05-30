@@ -11,17 +11,17 @@ import de.hpi.idd.dysni.store.RecordStore;
 import de.hpi.idd.dysni.store.StoreException;
 import de.hpi.idd.dysni.util.UnionFind;
 
-public class DynamicSortedNeighborhoodIndexer<ID, RECORD> {
+public class DynamicSortedNeighborhoodIndexer<RECORD, ID> {
 
-	private final SimilarityAssessor<RECORD> comp;
+	private final SimilarityAssessor<RECORD> sim;
 	private final List<DysniIndex<RECORD, ?, ID>> indexes = new ArrayList<>();
 	private final RecordStore<ID, RECORD> store;
 	private final UnionFind<ID> uf = new UnionFind<>();
 
-	public DynamicSortedNeighborhoodIndexer(final RecordStore<ID, RECORD> store, final SimilarityAssessor<RECORD> comp,
+	public DynamicSortedNeighborhoodIndexer(final RecordStore<ID, RECORD> store, final SimilarityAssessor<RECORD> sim,
 			final Collection<KeyHandler<RECORD, ?>> keyHandlers) {
 		this.store = store;
-		this.comp = comp;
+		this.sim = sim;
 		for (final KeyHandler<RECORD, ?> keyHandler : keyHandlers) {
 			indexes.add(new DysniIndex<>(keyHandler));
 		}
@@ -41,7 +41,7 @@ public class DynamicSortedNeighborhoodIndexer<ID, RECORD> {
 		}
 		candidates.remove(recId);
 		for (final ID candidate : candidates) {
-			if (comp.areSimilar(rec, store.getRecord(candidate))) {
+			if (sim.areSimilar(rec, store.getRecord(candidate))) {
 				uf.union(recId, candidate);
 			}
 		}

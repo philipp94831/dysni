@@ -13,7 +13,7 @@ import de.hpi.idd.Dataset;
 import de.hpi.idd.DatasetManager;
 import de.hpi.idd.Evaluator;
 import de.hpi.idd.SimilarityMeasure;
-import de.hpi.idd.dysni.sim.IDDAssessor;
+import de.hpi.idd.dysni.sim.IDDSimilarityAssessor;
 import de.hpi.idd.dysni.store.MemoryStore;
 import de.hpi.idd.dysni.store.StoreException;
 import de.hpi.idd.dysni.util.SymmetricTable;
@@ -29,8 +29,8 @@ public class App {
 		final Dataset dataset = Dataset.getForName(App.DATASET_NAME);
 		final Collection<KeyHandler<Map<String, String>, ?>> keyHandlers = DatasetManager.getKeyHandlers(dataset);
 		final SimilarityMeasure similarityMeasure = DatasetManager.getSimilarityMeasure(dataset);
-		final DynamicSortedNeighborhoodIndexer<String, Map<String, String>> dysni = new DynamicSortedNeighborhoodIndexer<>(
-				new MemoryStore<>(), new IDDAssessor(similarityMeasure), keyHandlers);
+		final DynamicSortedNeighborhoodIndexer<Map<String, String>, String> dysni = new DynamicSortedNeighborhoodIndexer<>(
+				new MemoryStore<>(), new IDDSimilarityAssessor(similarityMeasure), keyHandlers);
 		final SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
 		try (final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
 				.parse(new FileReader(App.DATA_DIR + DatasetManager.getFileName(dataset)))) {

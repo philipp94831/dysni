@@ -18,8 +18,8 @@ public class DisnyIndexTest {
 		}
 
 		@Override
-		public SimilarityMeasure<String> getComparator() {
-			return DisnyIndexTest.COMPARATOR;
+		public SimilarityMeasure<String> getSimilarityMeasure() {
+			return DisnyIndexTest.LEVENSHTEIN;
 		}
 
 		@Override
@@ -28,7 +28,7 @@ public class DisnyIndexTest {
 		}
 	}
 
-	private static final SimilarityMeasure<String> COMPARATOR = new LevenshteinMetric();
+	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinMetric();
 	private final DysniIndex<String, String, String> index = new DysniIndex<>(new StringKeyHandler());
 
 	private void insert(final String s) {

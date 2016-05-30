@@ -6,7 +6,7 @@ public interface KeyHandler<ELEMENT, KEY extends Comparable<KEY>> {
 
 	KEY computeKey(ELEMENT rec);
 
-	SimilarityMeasure<KEY> getComparator();
+	SimilarityMeasure<KEY> getSimilarityMeasure();
 
 	double getThreshold();
 }

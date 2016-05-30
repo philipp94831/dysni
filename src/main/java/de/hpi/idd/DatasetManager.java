@@ -6,6 +6,9 @@ import java.util.Map;
 
 import de.hpi.idd.data.cd.CDKeyHandler;
 import de.hpi.idd.data.cd.CDSimilarityMeasure;
+import de.hpi.idd.data.cora.CoraKeyHandler;
+import de.hpi.idd.data.movies.MoviesKeyHandler;
+import de.hpi.idd.data.ncvoters.NCVotersKeyHandler;
 import de.hpi.idd.dysni.KeyHandler;
 
 public class DatasetManager {
@@ -14,6 +17,12 @@ public class DatasetManager {
 		switch (dataset) {
 		case CD:
 			return "cd_dataset.csv";
+		case CORA:
+			return "cora.csv";
+		case MOVIES:
+			return "movies_dataset.csv";
+		case NCVOTERS:
+			return "ncvoters.csv";
 		default:
 			return null;
 		}
@@ -23,6 +32,12 @@ public class DatasetManager {
 		switch (dataset) {
 		case CD:
 			return "cd_dataset_duplicates.csv";
+		case CORA:
+			return "cora_ground_truth.csv";
+		case MOVIES:
+			return "movies_ground_truth.csv";
+		case NCVOTERS:
+			return "ncvoters_ground_truth.csv";
 		default:
 			return null;
 		}
@@ -32,6 +47,10 @@ public class DatasetManager {
 		switch (dataset) {
 		case CD:
 			return "did";
+		case CORA:
+			return "id";
+		case MOVIES:
+			return " id";
 		default:
 			return null;
 		}
@@ -41,6 +60,12 @@ public class DatasetManager {
 		switch (dataset) {
 		case CD:
 			return CDKeyHandler.keyHandler();
+		case CORA:
+			return CoraKeyHandler.keyHandler();
+		case MOVIES:
+			return MoviesKeyHandler.keyHandler();
+		case NCVOTERS:
+			return NCVotersKeyHandler.keyHandler();
 		default:
 			return Collections.emptyList();
 		}
