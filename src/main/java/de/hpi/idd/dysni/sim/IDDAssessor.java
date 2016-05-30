@@ -5,11 +5,11 @@ import java.util.Map;
 
 import de.hpi.idd.SimilarityMeasure;
 
-public class IDDSimilarityMeasure implements GenericSimilarityMeasure<Map<String, String>> {
+public class IDDAssessor implements SimilarityAssessor<Map<String, String>> {
 
 	private final SimilarityMeasure sim;
 
-	public IDDSimilarityMeasure(final SimilarityMeasure sim) {
+	public IDDAssessor(final SimilarityMeasure sim) {
 		this.sim = sim;
 	}
 

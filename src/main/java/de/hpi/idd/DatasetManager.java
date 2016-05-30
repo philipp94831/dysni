@@ -1,14 +1,12 @@
 package de.hpi.idd;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
-import de.hpi.idd.cd.CDKeyHandler;
-import de.hpi.idd.cd.CDKeyHandler2;
-import de.hpi.idd.cd.CDRecordComparator;
-import de.hpi.idd.dysni.key.KeyHandler;
+import de.hpi.idd.data.cd.CDKeyHandler;
+import de.hpi.idd.data.cd.CDSimilarityMeasure;
+import de.hpi.idd.dysni.KeyHandler;
 
 public class DatasetManager {
 
@@ -39,10 +37,10 @@ public class DatasetManager {
 		}
 	}
 
-	public static List<KeyHandler<Map<String, String>, String>> getKeyHandlers(final Dataset dataset) {
+	public static Collection<KeyHandler<Map<String, String>, ?>> getKeyHandlers(final Dataset dataset) {
 		switch (dataset) {
 		case CD:
-			return Arrays.asList(new CDKeyHandler(), new CDKeyHandler2());
+			return CDKeyHandler.keyHandler();
 		default:
 			return Collections.emptyList();
 		}
@@ -51,7 +49,7 @@ public class DatasetManager {
 	public static SimilarityMeasure getSimilarityMeasure(final Dataset dataset) {
 		switch (dataset) {
 		case CD:
-			return new CDRecordComparator();
+			return new CDSimilarityMeasure();
 		default:
 			return null;
 		}

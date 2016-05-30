@@ -5,9 +5,8 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.idd.dysni.key.KeyComparator;
-import de.hpi.idd.dysni.key.KeyHandler;
-import de.hpi.idd.dysni.key.LevenshteinComparator;
+import de.hpi.idd.dysni.sim.LevenshteinMetric;
+import de.hpi.idd.dysni.sim.SimilarityMeasure;
 
 public class DisnyIndexTest {
 
@@ -19,12 +18,17 @@ public class DisnyIndexTest {
 		}
 
 		@Override
-		public KeyComparator<String> getComparator() {
+		public SimilarityMeasure<String> getComparator() {
 			return DisnyIndexTest.COMPARATOR;
+		}
+
+		@Override
+		public double getThreshold() {
+			return 0.5;
 		}
 	}
 
-	private static final KeyComparator<String> COMPARATOR = new LevenshteinComparator(0.5);
+	private static final SimilarityMeasure<String> COMPARATOR = new LevenshteinMetric();
 	private final DysniIndex<String, String, String> index = new DysniIndex<>(new StringKeyHandler());
 
 	private void insert(final String s) {

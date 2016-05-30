@@ -15,7 +15,8 @@ public interface SimilarityMeasure {
 	 *            You could pass your parameters in a key, value form.
 	 * @return: The result record IDs in an ArrayList container.
 	 */
-	public Double calculateSimilarity(Map<String, String> record, Map<String, String> record2, HashMap<String, String> parameters);
+	public Double calculateSimilarity(Map<String, String> record, Map<String, String> record2,
+			HashMap<String, String> parameters);
 
 	public double getThreshold();
 }

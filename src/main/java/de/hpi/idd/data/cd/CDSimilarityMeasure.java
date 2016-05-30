@@ -1,4 +1,4 @@
-package de.hpi.idd.cd;
+package de.hpi.idd.data.cd;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import de.hpi.idd.SimilarityMeasure;
 /**
  * Created by dennis on 08.05.16.
  */
-public class CDRecordComparator implements SimilarityMeasure {
+public class CDSimilarityMeasure implements SimilarityMeasure {
 
 	static class CDRecord {
 
@@ -31,7 +31,8 @@ public class CDRecordComparator implements SimilarityMeasure {
 		public CDRecord() {
 		}
 
-		public CDRecord(final String dId, final String artist, final String dTitle, final String category, final String genre, final String cdExtra, final short year, final List<String> tracks) {
+		public CDRecord(final String dId, final String artist, final String dTitle, final String category,
+				final String genre, final String cdExtra, final short year, final List<String> tracks) {
 			this.dId = dId;
 			this.artist = artist;
 			this.dTitle = dTitle;
@@ -161,22 +162,23 @@ public class CDRecordComparator implements SimilarityMeasure {
 		return (int) (Math.log10(Math.abs(number)) + 1);
 	}
 
-	public static Map<CDSimilarity, Double> getSimilarityOfRecords(final CDRecord firstRecord, final CDRecord secondRecord) {
+	public static Map<CDSimilarity, Double> getSimilarityOfRecords(final CDRecord firstRecord,
+			final CDRecord secondRecord) {
 		final Map<CDSimilarity, Double> similarityMap = new HashMap<>();
 		similarityMap.put(CDSimilarity.ARTIST,
-				CDRecordComparator.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
+				CDSimilarityMeasure.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
 		similarityMap.put(CDSimilarity.DTITLE,
-				CDRecordComparator.levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
+				CDSimilarityMeasure.levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
 		similarityMap.put(CDSimilarity.CATEGORY,
-				CDRecordComparator.levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
+				CDSimilarityMeasure.levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
 		similarityMap.put(CDSimilarity.GENRE,
-				CDRecordComparator.levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
+				CDSimilarityMeasure.levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
 		similarityMap.put(CDSimilarity.YEAR,
-				CDRecordComparator.yearDistance(firstRecord.getYear(), secondRecord.getYear()));
+				CDSimilarityMeasure.yearDistance(firstRecord.getYear(), secondRecord.getYear()));
 		similarityMap.put(CDSimilarity.CDEXTRA,
-				CDRecordComparator.levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
+				CDSimilarityMeasure.levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
 		similarityMap.put(CDSimilarity.TRACK,
-				CDRecordComparator.getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
+				CDSimilarityMeasure.getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
 		return similarityMap;
 	}
 
@@ -199,7 +201,7 @@ public class CDRecordComparator implements SimilarityMeasure {
 	}
 
 	public static double similarity(final CDRecord firstRecord, final CDRecord secondRecord) {
-		final Map<CDSimilarity, Double> similarityMap = CDRecordComparator.getSimilarityOfRecords(firstRecord,
+		final Map<CDSimilarity, Double> similarityMap = CDSimilarityMeasure.getSimilarityOfRecords(firstRecord,
 				secondRecord);
 		double result = 0.0;
 		for (final Entry<CDSimilarity, Double> entry : similarityMap.entrySet()) {
@@ -218,23 +220,25 @@ public class CDRecordComparator implements SimilarityMeasure {
 		}
 		int diff = 0;
 		int max = 0;
-		final int n = Math.max(CDRecordComparator.getNumberOfDigits(year), CDRecordComparator.getNumberOfDigits(year2));
+		final int n = Math.max(CDSimilarityMeasure.getNumberOfDigits(year),
+				CDSimilarityMeasure.getNumberOfDigits(year2));
 		for (int i = 0; i < n; i++) {
 			final int weight = i + 1;
 			max += weight * 9;
 			diff += weight
-					* Math.abs(CDRecordComparator.getNthDigit(year, i) - CDRecordComparator.getNthDigit(year2, i));
+					* Math.abs(CDSimilarityMeasure.getNthDigit(year, i) - CDSimilarityMeasure.getNthDigit(year2, i));
 		}
 		return 1 - (double) diff / max;
 	}
 
 	@Override
-	public Double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord, final HashMap<String, String> parameters) {
-		return CDRecordComparator.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
+	public Double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord,
+			final HashMap<String, String> parameters) {
+		return CDSimilarityMeasure.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
 	}
 
 	@Override
 	public double getThreshold() {
-		return CDRecordComparator.THRESHOLD;
+		return CDSimilarityMeasure.THRESHOLD;
 	}
 }
