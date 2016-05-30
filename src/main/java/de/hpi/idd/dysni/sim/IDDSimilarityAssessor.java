@@ -9,12 +9,12 @@ public class IDDSimilarityAssessor implements SimilarityAssessor<Map<String, Str
 
 	private final SimilarityMeasure sim;
 
-	public IDDSimilarityAssessor(final SimilarityMeasure sim) {
+	public IDDSimilarityAssessor(SimilarityMeasure sim) {
 		this.sim = sim;
 	}
 
 	@Override
-	public double calculateSimilarity(final Map<String, String> record, final Map<String, String> record2) {
+	public double calculateSimilarity(Map<String, String> record, Map<String, String> record2) {
 		return sim.calculateSimilarity(record, record2, new HashMap<>());
 	}
 

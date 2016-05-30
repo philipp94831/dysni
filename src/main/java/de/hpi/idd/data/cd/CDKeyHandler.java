@@ -18,9 +18,9 @@ public class CDKeyHandler {
 		return Arrays.asList(new KeyHandler<Map<String, String>, String>() {
 
 			@Override
-			public String computeKey(final Map<String, String> obj) {
-				final String title = obj.get("dtitle");
-				final String artist = obj.get("artist");
+			public String computeKey(Map<String, String> obj) {
+				String title = obj.get("dtitle");
+				String artist = obj.get("artist");
 				return artist.substring(0, Math.min(3, artist.length()))
 						+ title.substring(0, Math.min(3, title.length()));
 			}
@@ -32,9 +32,9 @@ public class CDKeyHandler {
 		}, new KeyHandler<Map<String, String>, String>() {
 
 			@Override
-			public String computeKey(final Map<String, String> obj) {
-				final String title = obj.get("dtitle");
-				final String artist = obj.get("artist");
+			public String computeKey(Map<String, String> obj) {
+				String title = obj.get("dtitle");
+				String artist = obj.get("artist");
 				return title.substring(0, Math.min(3, title.length()))
 						+ artist.substring(0, Math.min(3, artist.length()));
 			}

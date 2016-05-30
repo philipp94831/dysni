@@ -3,7 +3,7 @@ package de.hpi.idd;
 public enum Dataset {
 	CD, CORA, MOVIES, NCVOTERS;
 
-	public static Dataset getForName(final String name) {
+	public static Dataset getForName(String name) {
 		switch (name.toLowerCase()) {
 		case "cd":
 			return CD;

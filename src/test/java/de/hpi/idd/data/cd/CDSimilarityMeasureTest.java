@@ -19,12 +19,12 @@ public class CDSimilarityMeasureTest {
 
 	@Test
 	public void testGetSimilarityOfRecords() {
-		final List<String> firstTracklist = new LinkedList<>();
+		List<String> firstTracklist = new LinkedList<>();
 		firstTracklist.add("Track 1");
 		firstTracklist.add("Track 2");
 		firstTracklist.add("Track 3");
-		final CDRecord firstRecord = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock",
-				"None", (short) 2016, firstTracklist);
+		CDRecord firstRecord = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None",
+				(short) 2016, firstTracklist);
 		CDRecord secondRecord = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None",
 				(short) 2016, firstTracklist);
 		Map<CDSimilarity, Double> similarityMap = CDSimilarityMeasure.getSimilarityOfRecords(firstRecord, secondRecord);
@@ -37,7 +37,7 @@ public class CDSimilarityMeasureTest {
 		Assert.assertEquals(similarityMap.get(CDSimilarity.TRACK), 1.0, CDSimilarityMeasureTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(CDSimilarityMeasure.similarity(firstRecord, secondRecord), 1.0,
 				CDSimilarityMeasureTest.DOUBLE_TOLERANCE);
-		final List<String> secondTracklist = new LinkedList<>();
+		List<String> secondTracklist = new LinkedList<>();
 		secondTracklist.add("Track 3");
 		secondTracklist.add("Track 4");
 		secondTracklist.add("Track 5");
@@ -55,7 +55,7 @@ public class CDSimilarityMeasureTest {
 		Assert.assertEquals(similarityMap.get(CDSimilarity.CDEXTRA), 1.0, CDSimilarityMeasureTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.YEAR), 89.0 / 90, CDSimilarityMeasureTest.DOUBLE_TOLERANCE);
 		Assert.assertEquals(similarityMap.get(CDSimilarity.TRACK), 1.0 / 6, CDSimilarityMeasureTest.DOUBLE_TOLERANCE);
-		final double sim = CDSimilarityMeasure.similarity(firstRecord, secondRecord);
+		double sim = CDSimilarityMeasure.similarity(firstRecord, secondRecord);
 		Assert.assertTrue(0.0 <= sim);
 		Assert.assertTrue(sim <= 1.0);
 	}

@@ -51,7 +51,7 @@ public class Node<K extends Comparable<K>, V> {
 	 * @param element
 	 *            element
 	 */
-	Node(final K key, final V element) {
+	Node(K key, V element) {
 		elements = new ArrayList<>();
 		this.key = key;
 		elements.add(element);
@@ -63,7 +63,7 @@ public class Node<K extends Comparable<K>, V> {
 		next = null;
 	}
 
-	boolean contains(final V element) {
+	boolean contains(V element) {
 		return elements.contains(element);
 	}
 
@@ -77,7 +77,7 @@ public class Node<K extends Comparable<K>, V> {
 	 * @return true if the deleted element was the root of the tree, false
 	 *         otherwise
 	 */
-	boolean delete(final V element) {
+	boolean delete(V element) {
 		elements.remove(element);
 		if (elements.isEmpty()) {
 			if (parent == null && left == null && right == null) {
@@ -187,7 +187,7 @@ public class Node<K extends Comparable<K>, V> {
 	 *            element to insert
 	 * @return true if the parent tree should be re-Skew.BALANCED
 	 */
-	boolean insert(final K key, final V newElement) {
+	boolean insert(K key, V newElement) {
 		if (key.compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
@@ -225,7 +225,7 @@ public class Node<K extends Comparable<K>, V> {
 				skew = Skew.BALANCED;
 				right.skew = Skew.BALANCED;
 			} else {
-				final Skew s = left.right.skew;
+				Skew s = left.right.skew;
 				left.rotateCCW();
 				rotateCW();
 				switch (s) {
@@ -275,7 +275,7 @@ public class Node<K extends Comparable<K>, V> {
 				left.skew = Skew.RIGHT_HIGH;
 				return false;
 			} else {
-				final Skew s = right.left.skew;
+				Skew s = right.left.skew;
 				right.rotateCW();
 				rotateCCW();
 				switch (s) {
@@ -316,7 +316,7 @@ public class Node<K extends Comparable<K>, V> {
 				skew = Skew.BALANCED;
 				left.skew = Skew.BALANCED;
 			} else {
-				final Skew s = right.left.skew;
+				Skew s = right.left.skew;
 				right.rotateCW();
 				rotateCCW();
 				switch (s) {
@@ -363,7 +363,7 @@ public class Node<K extends Comparable<K>, V> {
 				right.skew = Skew.LEFT_HIGH;
 				return false;
 			} else {
-				final Skew s = left.right.skew;
+				Skew s = left.right.skew;
 				left.rotateCCW();
 				rotateCW();
 				switch (s) {
@@ -446,28 +446,28 @@ public class Node<K extends Comparable<K>, V> {
 		setRight(tmpNode);
 	}
 
-	private void setLeft(final Node<K, V> child) {
+	private void setLeft(Node<K, V> child) {
 		left = child;
 		if (child != null) {
 			child.parent = this;
 		}
 	}
 
-	private void setNext(final Node<K, V> next) {
+	private void setNext(Node<K, V> next) {
 		this.next = next;
 		if (this.next != null) {
 			this.next.prev = this;
 		}
 	}
 
-	private void setPrev(final Node<K, V> prev) {
+	private void setPrev(Node<K, V> prev) {
 		this.prev = prev;
 		if (this.prev != null) {
 			this.prev.next = this;
 		}
 	}
 
-	private void setRight(final Node<K, V> child) {
+	private void setRight(Node<K, V> child) {
 		right = child;
 		if (child != null) {
 			child.parent = this;

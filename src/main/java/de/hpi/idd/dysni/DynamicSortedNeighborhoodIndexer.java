@@ -12,34 +12,34 @@ import de.hpi.idd.dysni.util.UnionFind;
 
 public class DynamicSortedNeighborhoodIndexer<RECORD, ID> {
 
+	private final Collection<DySNIndex<RECORD, ?, ID>> indexes = new ArrayList<>();
 	private final SimilarityAssessor<RECORD> sim;
-	private final Collection<DysniIndex<RECORD, ?, ID>> indexes = new ArrayList<>();
 	private final RecordStore<ID, RECORD> store;
 	private final UnionFind<ID> uf = new UnionFind<>();
 
-	public DynamicSortedNeighborhoodIndexer(final RecordStore<ID, RECORD> store, final SimilarityAssessor<RECORD> sim,
-			final Collection<KeyHandler<RECORD, ?>> keyHandlers) {
+	public DynamicSortedNeighborhoodIndexer(RecordStore<ID, RECORD> store, SimilarityAssessor<RECORD> sim,
+			Collection<KeyHandler<RECORD, ?>> keyHandlers) {
 		this.store = store;
 		this.sim = sim;
-		for (final KeyHandler<RECORD, ?> keyHandler : keyHandlers) {
-			indexes.add(new DysniIndex<>(keyHandler));
+		for (KeyHandler<RECORD, ?> keyHandler : keyHandlers) {
+			indexes.add(new DySNIndex<>(keyHandler));
 		}
 	}
 
-	public void add(final RECORD rec, final ID recId) throws StoreException {
+	public void add(RECORD rec, ID recId) throws StoreException {
 		store.storeRecord(recId, rec);
-		for (final DysniIndex<RECORD, ?, ID> index : indexes) {
+		for (DySNIndex<RECORD, ?, ID> index : indexes) {
 			index.insert(rec, recId);
 		}
 	}
 
-	public Collection<ID> findDuplicates(final RECORD rec, final ID recId) throws StoreException {
-		final Set<ID> candidates = new HashSet<>();
-		for (final DysniIndex<RECORD, ?, ID> index : indexes) {
+	public Collection<ID> findDuplicates(RECORD rec, ID recId) throws StoreException {
+		Set<ID> candidates = new HashSet<>();
+		for (DySNIndex<RECORD, ?, ID> index : indexes) {
 			candidates.addAll(index.findCandidates(rec));
 		}
 		candidates.remove(recId);
-		for (final ID candidate : candidates) {
+		for (ID candidate : candidates) {
 			if (sim.areSimilar(rec, store.getRecord(candidate))) {
 				uf.union(recId, candidate);
 			}

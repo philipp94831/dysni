@@ -29,11 +29,11 @@ public class UnionFind<T> {
 		private Node<U> parent;
 		private byte rank;
 
-		public Node(final U element) {
+		public Node(U element) {
 			this.element = element;
 		}
 
-		private void addChild(final Node<U> child) {
+		private void addChild(Node<U> child) {
 			children.add(child);
 		}
 
@@ -57,11 +57,11 @@ public class UnionFind<T> {
 			rank++;
 		}
 
-		private void removeChild(final Node<U> child) {
+		private void removeChild(Node<U> child) {
 			children.remove(child);
 		}
 
-		public void setParent(final Node<U> parent) {
+		public void setParent(Node<U> parent) {
 			if (this.parent != null) {
 				this.parent.removeChild(this);
 			} else {
@@ -85,9 +85,9 @@ public class UnionFind<T> {
 	 * @return <tt>true</tt> if the two sites <tt>t</tt> and <tt>u</tt> are in
 	 *         the same component; <tt>false</tt> otherwise
 	 */
-	public boolean connected(final T t, final T u) {
-		final Node<T> nodeT = find(t);
-		final Node<T> nodeU = find(u);
+	public boolean connected(T t, T u) {
+		Node<T> nodeT = find(t);
+		Node<T> nodeU = find(u);
 		return !(nodeT == null || nodeU == null) && nodeT.equals(nodeU);
 	}
 
@@ -109,14 +109,14 @@ public class UnionFind<T> {
 	 * @return the component identifier for the component containing site
 	 *         <tt>t</tt>
 	 */
-	private Node<T> find(final T t) {
+	private Node<T> find(T t) {
 		Node<T> node = nodes.get(t);
 		if (node == null) {
 			return null;
 		}
 		while (node.getParent() != null) {
 			// path compression by halving
-			final Node<T> pp = node.getParent().getParent();
+			Node<T> pp = node.getParent().getParent();
 			if (pp != null) {
 				node.setParent(pp);
 			}
@@ -125,16 +125,16 @@ public class UnionFind<T> {
 		return node;
 	}
 
-	public Collection<T> getComponent(final T t) {
-		final Collection<T> component = new HashSet<>();
-		final Stack<Node<T>> todo = new Stack<>();
-		final Node<T> node = find(t);
+	public Collection<T> getComponent(T t) {
+		Collection<T> component = new HashSet<>();
+		Stack<Node<T>> todo = new Stack<>();
+		Node<T> node = find(t);
 		if (node == null) {
 			return component;
 		}
 		todo.add(node);
 		while (!todo.isEmpty()) {
-			final Node<T> elem = todo.pop();
+			Node<T> elem = todo.pop();
 			component.add(elem.getElement());
 			todo.addAll(elem.getChildren());
 		}
@@ -146,8 +146,8 @@ public class UnionFind<T> {
 		return roots.stream().map(Node::getElement).collect(Collectors.toSet());
 	}
 
-	private void insert(final T t) {
-		final Node<T> node = new Node<>(t);
+	private void insert(T t) {
+		Node<T> node = new Node<>(t);
 		roots.add(node);
 		nodes.put(t, node);
 	}
@@ -161,15 +161,15 @@ public class UnionFind<T> {
 	 * @param u
 	 *            the element representing the other site
 	 */
-	public void union(final T t, final T u) {
+	public void union(T t, T u) {
 		if (!nodes.containsKey(t)) {
 			insert(t);
 		}
 		if (!nodes.containsKey(u)) {
 			insert(u);
 		}
-		final Node<T> rootT = find(t);
-		final Node<T> rootU = find(u);
+		Node<T> rootT = find(t);
+		Node<T> rootU = find(u);
 		if (rootT.equals(rootU)) {
 			return;
 		}

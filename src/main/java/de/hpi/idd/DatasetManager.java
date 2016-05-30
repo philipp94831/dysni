@@ -13,7 +13,7 @@ import de.hpi.idd.dysni.KeyHandler;
 
 public class DatasetManager {
 
-	public static String getFileName(final Dataset dataset) {
+	public static String getFileName(Dataset dataset) {
 		switch (dataset) {
 		case CD:
 			return "cd_dataset.csv";
@@ -28,7 +28,7 @@ public class DatasetManager {
 		}
 	}
 
-	public static String getGroundThruth(final Dataset dataset) {
+	public static String getGroundThruth(Dataset dataset) {
 		switch (dataset) {
 		case CD:
 			return "cd_dataset_duplicates.csv";
@@ -43,7 +43,7 @@ public class DatasetManager {
 		}
 	}
 
-	public static String getIdField(final Dataset dataset) {
+	public static String getIdField(Dataset dataset) {
 		switch (dataset) {
 		case CD:
 			return "did";
@@ -56,7 +56,7 @@ public class DatasetManager {
 		}
 	}
 
-	public static Collection<KeyHandler<Map<String, String>, ?>> getKeyHandlers(final Dataset dataset) {
+	public static Collection<KeyHandler<Map<String, String>, ?>> getKeyHandlers(Dataset dataset) {
 		switch (dataset) {
 		case CD:
 			return CDKeyHandler.keyHandler();
@@ -71,7 +71,7 @@ public class DatasetManager {
 		}
 	}
 
-	public static SimilarityMeasure getSimilarityMeasure(final Dataset dataset) {
+	public static SimilarityMeasure getSimilarityMeasure(Dataset dataset) {
 		switch (dataset) {
 		case CD:
 			return new CDSimilarityMeasure();

@@ -10,25 +10,25 @@ import de.hpi.idd.dysni.sim.LevenshteinMetric;
 import de.hpi.idd.dysni.sim.SimilarityAssessor;
 import de.hpi.idd.dysni.sim.SimilarityMeasure;
 
-public class DisnyIndexTest {
+public class DySNIndexTest {
 
 	private static class StringKeyHandler implements KeyHandler<String, String> {
 
 		@Override
-		public String computeKey(final String s) {
+		public String computeKey(String s) {
 			return s;
 		}
 
 		@Override
 		public SimilarityAssessor<String> getSimilarityMeasure() {
-			return new DefaultAssessor<>(DisnyIndexTest.LEVENSHTEIN, 0.5);
+			return new DefaultAssessor<>(DySNIndexTest.LEVENSHTEIN, 0.5);
 		}
 	}
 
 	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinMetric();
-	private final DysniIndex<String, String, String> index = new DysniIndex<>(new StringKeyHandler());
+	private final DySNIndex<String, String, String> index = new DySNIndex<>(new StringKeyHandler());
 
-	private void insert(final String s) {
+	private void insert(String s) {
 		index.insert(s, s.toLowerCase());
 	}
 
@@ -40,7 +40,7 @@ public class DisnyIndexTest {
 		insert("B");
 		insert("E");
 		insert("DE");
-		final Collection<String> candidates = index.findCandidates("DE");
+		Collection<String> candidates = index.findCandidates("DE");
 		Assert.assertTrue(candidates.contains("d"));
 		Assert.assertTrue(candidates.contains("e"));
 		Assert.assertTrue(candidates.contains("de"));

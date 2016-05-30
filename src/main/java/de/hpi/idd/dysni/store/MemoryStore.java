@@ -12,12 +12,12 @@ public class MemoryStore<K, V> implements RecordStore<K, V> {
 	}
 
 	@Override
-	public V getRecord(final K id) {
+	public V getRecord(K id) {
 		return store.get(id);
 	}
 
 	@Override
-	public void storeRecord(final K id, final V record) {
+	public void storeRecord(K id, V record) {
 		store.put(id, record);
 	}
 }

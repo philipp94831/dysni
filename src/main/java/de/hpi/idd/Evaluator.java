@@ -22,24 +22,23 @@ public class Evaluator {
 	private static final boolean VERBOSE = false;
 	private final UnionFind<String> duplicates;
 
-	public Evaluator(final String groundThruthFile) {
+	public Evaluator(String groundThruthFile) {
 		duplicates = new UnionFind<>();
 		try {
-			final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
-					.parse(new FileReader(groundThruthFile));
-			for (final CSVRecord rec : parser) {
+			CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new FileReader(groundThruthFile));
+			for (CSVRecord rec : parser) {
 				duplicates.union(rec.get(0), rec.get(1));
 			}
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void evaluate(final SymmetricTable<String, Boolean> duplicatesToCheck) {
+	public void evaluate(SymmetricTable<String, Boolean> duplicatesToCheck) {
 		int fp = 0;
 		int tp = 0;
 		int fn = 0;
-		for (final Cell<String, String, Boolean> cell : duplicatesToCheck.cellSet()) {
+		for (Cell<String, String, Boolean> cell : duplicatesToCheck.cellSet()) {
 			if (duplicates.connected(cell.getRowKey(), cell.getColumnKey())) {
 				tp++;
 			} else {
@@ -50,8 +49,8 @@ public class Evaluator {
 			}
 		}
 		int t = 0;
-		for (final String root : duplicates.getRoots()) {
-			final List<String> elems = new ArrayList<>(duplicates.getComponent(root));
+		for (String root : duplicates.getRoots()) {
+			List<String> elems = new ArrayList<>(duplicates.getComponent(root));
 			elems.add(root);
 			for (int i = 0; i < elems.size(); i++) {
 				for (int j = i + 1; j < elems.size(); j++) {
@@ -65,10 +64,10 @@ public class Evaluator {
 				}
 			}
 		}
-		final int p = tp + fp;
-		final double recall = (double) tp / t;
-		final double precision = (double) tp / p;
-		final double fmeasure = 2 * (precision * recall) / (precision + recall);
+		int p = tp + fp;
+		double recall = (double) tp / t;
+		double precision = (double) tp / p;
+		double fmeasure = 2 * (precision * recall) / (precision + recall);
 		System.out.println("Found " + p + " duplicates. Of the " + t + " true duplicates " + tp + " were found and "
 				+ fn + " were missed. " + fp + " found duplicates are wrong.");
 		System.out.println("Precision is " + precision);

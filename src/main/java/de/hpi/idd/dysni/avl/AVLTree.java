@@ -58,7 +58,7 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 
 		private Node<K, V> next;
 
-		public AVLTreeIterator(final Node<K, V> smallest) {
+		public AVLTreeIterator(Node<K, V> smallest) {
 			next = smallest;
 		}
 
@@ -72,7 +72,7 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 			if (next == null) {
 				throw new IllegalStateException("There is no next element");
 			}
-			final Node<K, V> ret = next;
+			Node<K, V> ret = next;
 			next = next.getNext();
 			return ret;
 		}
@@ -96,9 +96,9 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 	 *            element to delete (silently ignored if null)
 	 * @return true if the element was deleted from the tree
 	 */
-	public boolean delete(final K key, final V element) {
+	public boolean delete(K key, V element) {
 		if (element != null) {
-			final Node<K, V> node = find(key);
+			Node<K, V> node = find(key);
 			if (node == null) {
 				return false;
 			}
@@ -113,7 +113,7 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 		return false;
 	}
 
-	public Node<K, V> find(final K key) {
+	public Node<K, V> find(K key) {
 		for (Node<K, V> node = top; node != null;) {
 			if (node.getKey().compareTo(key) < 0) {
 				if (node.getRight() == null) {
@@ -168,7 +168,7 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 	 * @param element
 	 *            element to insert (silently ignored if null)
 	 */
-	public void insert(final K key, final V element) {
+	public void insert(K key, V element) {
 		if (element != null) {
 			if (top == null) {
 				top = new Node<>(key, element);

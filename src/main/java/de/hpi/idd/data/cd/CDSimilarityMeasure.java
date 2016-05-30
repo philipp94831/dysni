@@ -31,8 +31,8 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 		public CDRecord() {
 		}
 
-		public CDRecord(final String dId, final String artist, final String dTitle, final String category,
-				final String genre, final String cdExtra, final short year, final List<String> tracks) {
+		public CDRecord(String dId, String artist, String dTitle, String category, String genre, String cdExtra,
+				short year, List<String> tracks) {
 			this.dId = dId;
 			this.artist = artist;
 			this.dTitle = dTitle;
@@ -75,35 +75,35 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 			return year;
 		}
 
-		public void setArtist(final String artist) {
+		public void setArtist(String artist) {
 			this.artist = artist;
 		}
 
-		public void setCategory(final String category) {
+		public void setCategory(String category) {
 			this.category = category;
 		}
 
-		public void setCdExtra(final String cdExtra) {
+		public void setCdExtra(String cdExtra) {
 			this.cdExtra = cdExtra;
 		}
 
-		public void setdId(final String dId) {
+		public void setdId(String dId) {
 			this.dId = dId;
 		}
 
-		public void setdTitle(final String dTitle) {
+		public void setdTitle(String dTitle) {
 			this.dTitle = dTitle;
 		}
 
-		public void setGenre(final String genre) {
+		public void setGenre(String genre) {
 			this.genre = genre;
 		}
 
-		public void setTracks(final List<String> tracks) {
+		public void setTracks(List<String> tracks) {
 			this.tracks = tracks;
 		}
 
-		public void setYear(final short year) {
+		public void setYear(short year) {
 			this.year = year;
 		}
 
@@ -115,13 +115,13 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 
 	private static class CDRecordParser {
 
-		public static CDRecord parse(final Map<String, String> record) {
-			final CDRecord cd = new CDRecord();
+		public static CDRecord parse(Map<String, String> record) {
+			CDRecord cd = new CDRecord();
 			cd.setdId(record.get("did"));
 			cd.setArtist(record.get("artist"));
 			cd.setdTitle(record.get("dtitle"));
 			cd.setCategory(record.get("category"));
-			final String year = record.get("year");
+			String year = record.get("year");
 			if (!year.isEmpty()) {
 				cd.setYear(Short.parseShort(year));
 			}
@@ -143,7 +143,7 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 			this(1);
 		}
 
-		CDSimilarity(final double weight) {
+		CDSimilarity(double weight) {
 			this.weight = weight;
 		}
 
@@ -154,17 +154,16 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 
 	private static final double THRESHOLD = 0.7;
 
-	private static int getNthDigit(final int number, final int n) {
+	private static int getNthDigit(int number, int n) {
 		return (int) (Math.abs(number) / Math.pow(10, n) % 10);
 	}
 
-	private static int getNumberOfDigits(final int number) {
+	private static int getNumberOfDigits(int number) {
 		return (int) (Math.log10(Math.abs(number)) + 1);
 	}
 
-	public static Map<CDSimilarity, Double> getSimilarityOfRecords(final CDRecord firstRecord,
-			final CDRecord secondRecord) {
-		final Map<CDSimilarity, Double> similarityMap = new HashMap<>();
+	public static Map<CDSimilarity, Double> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
+		Map<CDSimilarity, Double> similarityMap = new HashMap<>();
 		similarityMap.put(CDSimilarity.ARTIST,
 				CDSimilarityMeasure.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
 		similarityMap.put(CDSimilarity.DTITLE,
@@ -182,11 +181,11 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 		return similarityMap;
 	}
 
-	private static double getSimilarityOfTracks(final List<String> firstTracklist, final List<String> secondTracklist) {
-		final HashSet<String> set = new HashSet<>(firstTracklist);
+	private static double getSimilarityOfTracks(List<String> firstTracklist, List<String> secondTracklist) {
+		HashSet<String> set = new HashSet<>(firstTracklist);
 		set.retainAll(secondTracklist);
-		final int shared = set.size();
-		final Set<String> mergedTrackset = new HashSet<>();
+		int shared = set.size();
+		Set<String> mergedTrackset = new HashSet<>();
 		mergedTrackset.addAll(firstTracklist);
 		mergedTrackset.addAll(secondTracklist);
 		if (mergedTrackset.isEmpty()) {
@@ -195,22 +194,21 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 		return (double) shared / mergedTrackset.size();
 	}
 
-	private static double levenshteinDistance(final String a, final String b) {
+	private static double levenshteinDistance(String a, String b) {
 		return 1.0 - (double) StringUtils.getLevenshteinDistance(a.toLowerCase(), b.toLowerCase())
 				/ Math.max(a.length(), b.length());
 	}
 
-	public static double similarity(final CDRecord firstRecord, final CDRecord secondRecord) {
-		final Map<CDSimilarity, Double> similarityMap = CDSimilarityMeasure.getSimilarityOfRecords(firstRecord,
-				secondRecord);
+	public static double similarity(CDRecord firstRecord, CDRecord secondRecord) {
+		Map<CDSimilarity, Double> similarityMap = CDSimilarityMeasure.getSimilarityOfRecords(firstRecord, secondRecord);
 		double result = 0.0;
-		for (final Entry<CDSimilarity, Double> entry : similarityMap.entrySet()) {
+		for (Entry<CDSimilarity, Double> entry : similarityMap.entrySet()) {
 			result += entry.getKey().weight() * entry.getValue();
 		}
 		return result / CDSimilarity.TOTAL_WEIGHT;
 	}
 
-	private static Double yearDistance(final Short year, final Short year2) {
+	private static Double yearDistance(Short year, Short year2) {
 		// TODO default?
 		if (year == null && year2 == null) {
 			return 1.0;
@@ -220,10 +218,9 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 		}
 		int diff = 0;
 		int max = 0;
-		final int n = Math.max(CDSimilarityMeasure.getNumberOfDigits(year),
-				CDSimilarityMeasure.getNumberOfDigits(year2));
+		int n = Math.max(CDSimilarityMeasure.getNumberOfDigits(year), CDSimilarityMeasure.getNumberOfDigits(year2));
 		for (int i = 0; i < n; i++) {
-			final int weight = i + 1;
+			int weight = i + 1;
 			max += weight * 9;
 			diff += weight
 					* Math.abs(CDSimilarityMeasure.getNthDigit(year, i) - CDSimilarityMeasure.getNthDigit(year2, i));
@@ -232,8 +229,8 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 	}
 
 	@Override
-	public Double calculateSimilarity(final Map<String, String> firstRecord, final Map<String, String> secondRecord,
-			final HashMap<String, String> parameters) {
+	public Double calculateSimilarity(Map<String, String> firstRecord, Map<String, String> secondRecord,
+			HashMap<String, String> parameters) {
 		return CDSimilarityMeasure.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
 	}
 

@@ -2,8 +2,10 @@ package de.hpi.idd.dysni;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -15,6 +17,7 @@ import de.hpi.idd.Evaluator;
 import de.hpi.idd.SimilarityMeasure;
 import de.hpi.idd.dysni.sim.IDDSimilarityAssessor;
 import de.hpi.idd.dysni.store.MemoryStore;
+import de.hpi.idd.dysni.store.RecordStore;
 import de.hpi.idd.dysni.store.StoreException;
 import de.hpi.idd.dysni.util.SymmetricTable;
 
@@ -22,37 +25,42 @@ public class App {
 
 	private static final String DATA_DIR = "data/";
 	private static final String DATASET_NAME = "cd";
+	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
+	private static final Logger LOGGER = Logger.getLogger(App.class.getName());
 
-	public static void main(final String[] args) {
-		final long start = System.nanoTime();
+	public static void main(String[] args) {
+		long start = System.nanoTime();
 		int i = 0;
-		final Dataset dataset = Dataset.getForName(App.DATASET_NAME);
-		final Collection<KeyHandler<Map<String, String>, ?>> keyHandlers = DatasetManager.getKeyHandlers(dataset);
-		final SimilarityMeasure similarityMeasure = DatasetManager.getSimilarityMeasure(dataset);
-		final DynamicSortedNeighborhoodIndexer<Map<String, String>, String> dysni = new DynamicSortedNeighborhoodIndexer<>(
-				new MemoryStore<>(), new IDDSimilarityAssessor(similarityMeasure), keyHandlers);
-		final SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
-		try (final CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader()
-				.parse(new FileReader(App.DATA_DIR + DatasetManager.getFileName(dataset)))) {
-			for (final CSVRecord record : parser) {
-				final Map<String, String> rec = record.toMap();
-				final String id = rec.get(DatasetManager.getIdField(dataset));
+		Dataset dataset = Dataset.getForName(App.DATASET_NAME);
+		Collection<KeyHandler<Map<String, String>, ?>> keyHandlers = DatasetManager.getKeyHandlers(dataset);
+		SimilarityMeasure similarityMeasure = DatasetManager.getSimilarityMeasure(dataset);
+		SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
+		try (Reader in = new FileReader(App.DATA_DIR + DatasetManager.getFileName(dataset));
+				CSVParser parser = App.FORMAT.parse(in);
+				RecordStore<String, Map<String, String>> store = new MemoryStore<>()) {
+			DynamicSortedNeighborhoodIndexer<Map<String, String>, String> dysni = new DynamicSortedNeighborhoodIndexer<>(
+					store, new IDDSimilarityAssessor(similarityMeasure), keyHandlers);
+			for (CSVRecord record : parser) {
+				Map<String, String> rec = record.toMap();
+				String id = rec.get(DatasetManager.getIdField(dataset));
 				dysni.add(rec, id);
-				final Collection<String> duplicates = dysni.findDuplicates(rec, id);
-				for (final String duplicate : duplicates) {
+				Collection<String> duplicates = dysni.findDuplicates(rec, id);
+				for (String duplicate : duplicates) {
 					duplicatesToCheck.put(id, duplicate, true);
 				}
 				System.out.println("Duplicates for " + id + ": " + duplicates);
 				i++;
 			}
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException("Error parsing CSV", e);
-		} catch (final StoreException e) {
+		} catch (StoreException e) {
 			throw new RuntimeException("Error accessing storage", e);
+		} catch (Exception e) {
+			App.LOGGER.warning("Exception when closing store: " + e.getMessage());
 		}
-		final long time = System.nanoTime() - start;
+		long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
-		final Evaluator evaluator = new Evaluator("data/" + DatasetManager.getGroundThruth(dataset));
+		Evaluator evaluator = new Evaluator("data/" + DatasetManager.getGroundThruth(dataset));
 		evaluator.evaluate(duplicatesToCheck);
 	}
 }

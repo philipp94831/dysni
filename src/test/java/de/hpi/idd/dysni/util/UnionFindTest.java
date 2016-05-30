@@ -7,7 +7,7 @@ public class UnionFindTest {
 
 	@Test
 	public void test() {
-		final UnionFind<Integer> uf = new UnionFind<>();
+		UnionFind<Integer> uf = new UnionFind<>();
 		Assert.assertFalse(uf.connected(1, 4));
 		Assert.assertEquals(0, uf.count());
 		uf.union(1, 2);

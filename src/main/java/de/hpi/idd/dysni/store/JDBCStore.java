@@ -9,7 +9,7 @@ public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 
 	protected final Connection conn;
 
-	public JDBCStore() {
+	protected JDBCStore() {
 		this.conn = establishConnection();
 	}
 
@@ -23,11 +23,11 @@ public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 	protected abstract Connection establishConnection();
 
 	@Override
-	public V getRecord(final K id) throws StoreException {
+	public V getRecord(K id) throws StoreException {
 		try {
-			final ResultSet rs = prepareSelect(id).executeQuery();
+			ResultSet rs = prepareSelect(id).executeQuery();
 			return deserialize(rs);
-		} catch (final SQLException e) {
+		} catch (SQLException e) {
 			throw new StoreException("Error retrieving record from database", e);
 		}
 	}
@@ -37,10 +37,10 @@ public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 	protected abstract PreparedStatement prepareSelect(K id);
 
 	@Override
-	public void storeRecord(final K id, final V record) throws StoreException {
+	public void storeRecord(K id, V record) throws StoreException {
 		try {
 			prepareInsert(id, record).executeQuery();
-		} catch (final SQLException e) {
+		} catch (SQLException e) {
 			throw new StoreException("Error storing record in database", e);
 		}
 	}
