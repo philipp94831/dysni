@@ -32,7 +32,7 @@ for disc in root:
 	csvLine = ",".join(map(lambda x: '"' + x.replace("\"", "\"\"") + '"', values))
 	csvLines.append(csvLine)
 
-headline = "did,artist,dtitle,category,genre,year,cdextra,tracks"
+headline = "id,artist,dtitle,category,genre,year,cdextra,tracks"
 
 with codecs.open("cd_dataset.csv", 'w', 'utf-8') as csvFile:
 	csvFile.write(headline + "\n")

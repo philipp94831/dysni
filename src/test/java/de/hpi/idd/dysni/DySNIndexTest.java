@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.idd.dysni.sim.LevenshteinMetric;
+import de.hpi.idd.dysni.sim.LevenshteinSimilarity;
 import de.hpi.idd.dysni.sim.SimilarityMeasure;
 import de.hpi.idd.dysni.window.AdaptiveKeySimilarityWindowBuilder;
 
@@ -19,7 +19,7 @@ public class DySNIndexTest {
 		}
 	}
 
-	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinMetric();
+	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinSimilarity();
 	private final DySNIndex<String, String, String> index = new DySNIndex<>(
 			new DySNIndexConfiguration<>(new StringKeyHandler(),
 					new AdaptiveKeySimilarityWindowBuilder<>(DySNIndexTest.LEVENSHTEIN.asAssessor(0.5))));

@@ -6,9 +6,9 @@ import java.util.Map;
 
 import de.hpi.idd.dysni.DySNIndexConfiguration;
 
-public class MoviesKeyHandler {
+public class MoviesConfig {
 
-	public static Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> keyHandler() {
+	public static Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> config() {
 		return Arrays.asList();
 	}
 

@@ -2,7 +2,7 @@ package de.hpi.idd.dysni.sim;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class LevenshteinMetric implements SimilarityMeasure<String> {
+public class LevenshteinSimilarity implements SimilarityMeasure<String> {
 
 	@Override
 	public double calculateSimilarity(String e1, String e2) {

@@ -6,15 +6,15 @@ import java.util.Map;
 
 import de.hpi.idd.dysni.DySNIndexConfiguration;
 import de.hpi.idd.dysni.KeyHandler;
-import de.hpi.idd.dysni.sim.LevenshteinMetric;
+import de.hpi.idd.dysni.sim.LevenshteinSimilarity;
 import de.hpi.idd.dysni.sim.SimilarityMeasure;
 import de.hpi.idd.dysni.window.AdaptiveKeySimilarityWindowBuilder;
 
-public class CDKeyHandler {
+public class CDConfig {
 
-	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinMetric();
+	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinSimilarity();
 
-	public static Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> keyHandler() {
+	public static Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> config() {
 		return Arrays.asList(new DySNIndexConfiguration<>(new KeyHandler<Map<String, String>, String>() {
 
 			@Override
@@ -24,7 +24,7 @@ public class CDKeyHandler {
 				return artist.substring(0, Math.min(3, artist.length()))
 						+ title.substring(0, Math.min(3, title.length()));
 			}
-		}, new AdaptiveKeySimilarityWindowBuilder<>(CDKeyHandler.LEVENSHTEIN.asAssessor(0.8))),
+		}, new AdaptiveKeySimilarityWindowBuilder<>(CDConfig.LEVENSHTEIN.asAssessor(0.8))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, String>, String>() {
 
 					@Override
@@ -34,6 +34,6 @@ public class CDKeyHandler {
 						return title.substring(0, Math.min(3, title.length()))
 								+ artist.substring(0, Math.min(3, artist.length()));
 					}
-				}, new AdaptiveKeySimilarityWindowBuilder<>(CDKeyHandler.LEVENSHTEIN.asAssessor(0.6))));
+				}, new AdaptiveKeySimilarityWindowBuilder<>(CDConfig.LEVENSHTEIN.asAssessor(0.6))));
 	}
 }

@@ -5,12 +5,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.hpi.idd.EntityResolver;
 import de.hpi.idd.dysni.sim.SimilarityAssessor;
 import de.hpi.idd.dysni.store.RecordStore;
 import de.hpi.idd.dysni.store.StoreException;
 import de.hpi.idd.dysni.util.UnionFind;
 
-public class DynamicSortedNeighborhoodIndexer<RECORD, ID> {
+public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResolver<RECORD, ID> {
 
 	private final Collection<DySNIndex<RECORD, ?, ID>> indexes = new ArrayList<>();
 	private final SimilarityAssessor<RECORD> sim;
@@ -26,6 +27,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> {
 		}
 	}
 
+	@Override
 	public void add(RECORD rec, ID recId) throws StoreException {
 		store.storeRecord(recId, rec);
 		for (DySNIndex<RECORD, ?, ID> index : indexes) {
@@ -33,6 +35,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> {
 		}
 	}
 
+	@Override
 	public Collection<ID> findDuplicates(RECORD rec, ID recId) throws StoreException {
 		Set<ID> candidates = new HashSet<>();
 		for (DySNIndex<RECORD, ?, ID> index : indexes) {
