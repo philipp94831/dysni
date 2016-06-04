@@ -19,8 +19,8 @@ public class CDConfig {
 
 			@Override
 			public String computeKey(Map<String, String> obj) {
-				String title = obj.get("dtitle");
-				String artist = obj.get("artist");
+				String title = obj.get("dtitle").toLowerCase();
+				String artist = obj.get("artist").toLowerCase();
 				return artist.substring(0, Math.min(3, artist.length()))
 						+ title.substring(0, Math.min(3, title.length()));
 			}
@@ -29,8 +29,8 @@ public class CDConfig {
 
 					@Override
 					public String computeKey(Map<String, String> obj) {
-						String title = obj.get("dtitle");
-						String artist = obj.get("artist");
+						String title = obj.get("dtitle").toLowerCase();
+						String artist = obj.get("artist").toLowerCase();
 						return title.substring(0, Math.min(3, title.length()))
 								+ artist.substring(0, Math.min(3, artist.length()));
 					}

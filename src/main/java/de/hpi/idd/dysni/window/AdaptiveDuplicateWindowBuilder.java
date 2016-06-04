@@ -40,8 +40,7 @@ public class AdaptiveDuplicateWindowBuilder<RECORD, KEY extends Comparable<KEY>,
 		Collection<ID> candidates = new ArrayList<>();
 		int added = 0;
 		int matches = 0;
-		for (node = f.apply(node); node != null
-				&& (added == 0 || (double) matches / added >= threshold); node = f.apply(node)) {
+		for (node = f.apply(node); node != null && isAboveThreshold(added, matches); node = f.apply(node)) {
 			for (ID id : node.getElements()) {
 				try {
 					if (simAssessor.areSimilar(rec, store.getRecord(id))) {
@@ -50,12 +49,15 @@ public class AdaptiveDuplicateWindowBuilder<RECORD, KEY extends Comparable<KEY>,
 					candidates.add(id);
 					added++;
 				} catch (StoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new RuntimeException("Error accessing storage", e);
 				}
 			}
 		}
 		return candidates;
+	}
+
+	private boolean isAboveThreshold(int added, int matches) {
+		return added == 0 || (double) matches / added >= threshold;
 	}
 
 }

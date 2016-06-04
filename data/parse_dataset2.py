@@ -14,6 +14,7 @@ indexLookup = {
 	'cdextra' : 6,
 }
 
+wrongKeys = [line.rstrip('\n') for line in open('wrong_keys.txt')]
 xmlTree = ET.parse(fileName)
 root = xmlTree.getroot()
 for disc in root:
@@ -29,8 +30,9 @@ for disc in root:
 		elif child.text is not None:
 			values[indexLookup[child.tag]] += child.text
 		
-	csvLine = ",".join(map(lambda x: '"' + x.replace("\"", "\"\"") + '"', values))
-	csvLines.append(csvLine)
+	if values[0] not in wrongKeys:
+		csvLine = ",".join(map(lambda x: '"' + x.replace("\"", "\"\"") + '"', values))
+		csvLines.append(csvLine)
 
 headline = "id,artist,dtitle,category,genre,year,cdextra,tracks"
 

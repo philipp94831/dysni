@@ -19,7 +19,7 @@ import de.hpi.idd.dysni.util.UnionFind;
  */
 public class Evaluator {
 
-	private static final boolean VERBOSE = false;
+	private static final boolean VERBOSE = true;
 	private final UnionFind<String> duplicates;
 
 	public Evaluator(String groundThruthFile) {

@@ -2,7 +2,8 @@ package de.hpi.idd;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map.Entry;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import de.hpi.idd.dysni.sim.SimilarityAssessor;
 import de.hpi.idd.dysni.store.RecordStore;
@@ -26,11 +27,11 @@ public class BruteForce<RECORD, ID> implements EntityResolver<RECORD, ID> {
 
 	@Override
 	public Collection<ID> findDuplicates(RECORD rec, ID recId) throws Exception {
-		Iterator<Entry<ID, RECORD>> it = store.all();
+		Iterator<Pair<ID, RECORD>> it = store.all();
 		while (it.hasNext()) {
-			Entry<ID, RECORD> entry = it.next();
-			if (sim.areSimilar(rec, entry.getValue()) && !recId.equals(entry.getKey())) {
-				uf.union(recId, entry.getKey());
+			Pair<ID, RECORD> entry = it.next();
+			if (sim.areSimilar(rec, entry.getRight()) && !recId.equals(entry.getLeft())) {
+				uf.union(recId, entry.getLeft());
 			}
 		}
 		return uf.getComponent(recId);

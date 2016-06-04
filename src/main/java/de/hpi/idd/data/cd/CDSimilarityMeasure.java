@@ -1,5 +1,6 @@
 package de.hpi.idd.data.cd;
 
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -115,25 +117,34 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 
 	private static class CDRecordParser {
 
+		private static final Map<String, CDRecord> CACHE = new HashMap<>();
+
 		public static CDRecord parse(Map<String, String> record) {
-			CDRecord cd = new CDRecord();
-			cd.setdId(record.get("did"));
-			cd.setArtist(record.get("artist"));
-			cd.setdTitle(record.get("dtitle"));
-			cd.setCategory(record.get("category"));
-			String year = record.get("year");
-			if (!year.isEmpty()) {
-				cd.setYear(Short.parseShort(year));
+			String id = record.get("id");
+			CDRecord cd = CACHE.get(id);
+			if (cd == null) {
+				cd = new CDRecord();
+				cd.setdId(id);
+				cd.setArtist(record.get("artist"));
+				cd.setdTitle(record.get("dtitle"));
+				cd.setCategory(record.get("category"));
+				String year = record.get("year");
+				if (!year.isEmpty()) {
+					cd.setYear(Short.parseShort(year));
+				}
+				cd.setGenre(record.get("genre"));
+				cd.setCdExtra(record.get("cdextra"));
+				cd.setTracks(
+						Arrays.asList(record.get("tracks").split("\\|")).stream().map(CDSimilarityMeasure::trimNumbers)
+								.map(CDSimilarityMeasure::normalize).collect(Collectors.toList()));
+				CACHE.put(id, cd);
 			}
-			cd.setGenre(record.get("genre"));
-			cd.setCdExtra(record.get("cdextra"));
-			cd.setTracks(Arrays.asList(record.get("tracks").split("\\|")));
 			return cd;
 		}
 	}
 
 	public enum CDSimilarity {
-		ARTIST(5), CATEGORY, CDEXTRA, DTITLE(3), GENRE, TRACK(2), YEAR;
+		ARTIST(5), CATEGORY, CDEXTRA(0), DTITLE(4), GENRE, TRACK(3), YEAR;
 
 		private static final double TOTAL_WEIGHT = Arrays.stream(CDSimilarity.values())
 				.mapToDouble(CDSimilarity::weight).sum();
@@ -195,8 +206,19 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 	}
 
 	private static double levenshteinDistance(String a, String b) {
+		if (a.isEmpty() || b.isEmpty()) {
+			return THRESHOLD;
+		}
 		return 1.0 - (double) StringUtils.getLevenshteinDistance(a.toLowerCase(), b.toLowerCase())
 				/ Math.max(a.length(), b.length());
+	}
+
+	private static String normalize(String s) {
+		s = s.toLowerCase();
+		s = Normalizer.normalize(s, Normalizer.Form.NFD);
+		s = s.replaceAll("\\p{M}", "");
+		s = s.trim();
+		return s;
 	}
 
 	public static double similarity(CDRecord firstRecord, CDRecord secondRecord) {
@@ -208,13 +230,14 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 		return result / CDSimilarity.TOTAL_WEIGHT;
 	}
 
+	private static String trimNumbers(String s) {
+		s = s.replaceAll("^\\d+\\s+", "");
+		return s;
+	}
+
 	private static Double yearDistance(Short year, Short year2) {
-		// TODO default?
-		if (year == null && year2 == null) {
-			return 1.0;
-		}
 		if (year == null || year2 == null) {
-			return 0.0;
+			return THRESHOLD;
 		}
 		int diff = 0;
 		int max = 0;

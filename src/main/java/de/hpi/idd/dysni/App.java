@@ -31,7 +31,7 @@ public class App {
 
 	private static final String DATA_DIR = "data/";
 	private static final String DATASET_NAME = "cd";
-	private static final ERType ER_TYPE = ERType.DYSNI;
+	private static final ERType ER_TYPE = ERType.BRUTE_FORCE;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 
 	private static final Logger LOGGER = Logger.getLogger(App.class.getName());
