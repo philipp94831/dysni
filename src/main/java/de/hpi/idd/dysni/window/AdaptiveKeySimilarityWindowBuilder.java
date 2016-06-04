@@ -6,17 +6,17 @@ import java.util.Collections;
 import java.util.function.Function;
 
 import de.hpi.idd.dysni.avl.Node;
-import de.hpi.idd.dysni.sim.SimilarityAssessor;
+import de.hpi.idd.dysni.sim.SimilarityClassifier;
 import de.hpi.idd.dysni.util.SymmetricTable;
 
 public class AdaptiveKeySimilarityWindowBuilder<RECORD, KEY extends Comparable<KEY>, ID>
 		implements WindowBuilder<RECORD, KEY, ID> {
 
-	private final SimilarityAssessor<KEY> simAssessor;
+	private final SimilarityClassifier<KEY> classifier;
 	private final SymmetricTable<KEY, Double> similarities = new SymmetricTable<>();
 
-	public AdaptiveKeySimilarityWindowBuilder(SimilarityAssessor<KEY> simAssessor) {
-		this.simAssessor = simAssessor;
+	public AdaptiveKeySimilarityWindowBuilder(SimilarityClassifier<KEY> classifier) {
+		this.classifier = classifier;
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class AdaptiveKeySimilarityWindowBuilder<RECORD, KEY extends Comparable<K
 	private Collection<ID> expand(Node<KEY, ID> initial, Function<Node<KEY, ID>, Node<KEY, ID>> f) {
 		Collection<ID> candidates = new ArrayList<>();
 		for (Node<KEY, ID> node = f.apply(initial); node != null; node = f.apply(node)) {
-			if (simAssessor.isSimilarity(getSimilarity(node, initial))) {
+			if (classifier.isSimilarity(getSimilarity(node, initial))) {
 				candidates.addAll(node.getElements());
 			} else {
 				break;
@@ -46,7 +46,7 @@ public class AdaptiveKeySimilarityWindowBuilder<RECORD, KEY extends Comparable<K
 	private double getSimilarity(Node<KEY, ID> node1, Node<KEY, ID> node2) {
 		Double sim = similarities.get(node1.getKey(), node2.getKey());
 		if (sim == null) {
-			sim = simAssessor.calculateSimilarity(node1.getKey(), node2.getKey());
+			sim = classifier.calculateCheckedSimilarity(node1.getKey(), node2.getKey());
 			similarities.put(node1.getKey(), node2.getKey(), sim);
 		}
 		return sim;

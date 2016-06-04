@@ -24,7 +24,7 @@ public class CDConfig {
 				return artist.substring(0, Math.min(3, artist.length()))
 						+ title.substring(0, Math.min(3, title.length()));
 			}
-		}, new AdaptiveKeySimilarityWindowBuilder<>(CDConfig.LEVENSHTEIN.asAssessor(0.8))),
+		}, new AdaptiveKeySimilarityWindowBuilder<>(CDConfig.LEVENSHTEIN.asClassifier(0.8))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, String>, String>() {
 
 					@Override
@@ -34,6 +34,6 @@ public class CDConfig {
 						return title.substring(0, Math.min(3, title.length()))
 								+ artist.substring(0, Math.min(3, artist.length()));
 					}
-				}, new AdaptiveKeySimilarityWindowBuilder<>(CDConfig.LEVENSHTEIN.asAssessor(0.6))));
+				}, new AdaptiveKeySimilarityWindowBuilder<>(CDConfig.LEVENSHTEIN.asClassifier(0.6))));
 	}
 }

@@ -2,13 +2,13 @@ package de.hpi.idd.dysni;
 
 import java.util.Collection;
 
-import de.hpi.idd.dysni.avl.AVLTree;
+import de.hpi.idd.dysni.avl.BraidedAVLTree;
 import de.hpi.idd.dysni.window.WindowBuilder;
 
 public class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 
 	private final KeyHandler<RECORD, KEY> keyHandler;
-	private final AVLTree<KEY, ID> tree = new AVLTree<>();
+	private final BraidedAVLTree<KEY, ID> tree = new BraidedAVLTree<>();
 	private final WindowBuilder<RECORD, KEY, ID> windowBuilder;
 
 	public DySNIndex(DySNIndexConfiguration<RECORD, KEY, ID> conf) {

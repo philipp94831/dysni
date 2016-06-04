@@ -22,7 +22,7 @@ public class DySNIndexTest {
 	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinSimilarity();
 	private final DySNIndex<String, String, String> index = new DySNIndex<>(
 			new DySNIndexConfiguration<>(new StringKeyHandler(),
-					new AdaptiveKeySimilarityWindowBuilder<>(DySNIndexTest.LEVENSHTEIN.asAssessor(0.5))));
+					new AdaptiveKeySimilarityWindowBuilder<>(DySNIndexTest.LEVENSHTEIN.asClassifier(0.5))));
 
 	private void insert(String s) {
 		index.insert(s, s.toLowerCase());

@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class AVLTreeTest {
 
-	private final AVLTree<String, String> tree = new AVLTree<>();
+	private final BraidedAVLTree<String, String> tree = new BraidedAVLTree<>();
 
 	private void insert(String s) {
 		tree.insert(s, s.toLowerCase());

@@ -11,6 +11,10 @@ import de.hpi.idd.data.movies.MoviesConfig;
 import de.hpi.idd.data.ncvoters.NCVotersConfig;
 import de.hpi.idd.dysni.DySNIndexConfiguration;
 
+/**
+ * Utility class to access the properties of each data set used in this course
+ *
+ */
 public enum Dataset {
 	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", "id", new CDSimilarityMeasure()), CORA(
 			CoraConfig.config(), "cora.csv", "cora_ground_truth.csv", "id", null), MOVIES(MoviesConfig.config(),

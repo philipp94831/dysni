@@ -6,21 +6,21 @@ import java.util.Collections;
 import java.util.function.Function;
 
 import de.hpi.idd.dysni.avl.Node;
-import de.hpi.idd.dysni.sim.SimilarityAssessor;
+import de.hpi.idd.dysni.sim.SimilarityClassifier;
 import de.hpi.idd.dysni.store.RecordStore;
 import de.hpi.idd.dysni.store.StoreException;
 
 public class AdaptiveDuplicateWindowBuilder<RECORD, KEY extends Comparable<KEY>, ID>
 		implements WindowBuilder<RECORD, KEY, ID> {
 
-	private final SimilarityAssessor<RECORD> simAssessor;
+	private final SimilarityClassifier<RECORD> classifier;
 	private final RecordStore<ID, RECORD> store;
 	private final double threshold;
 
-	public AdaptiveDuplicateWindowBuilder(double threshold, SimilarityAssessor<RECORD> simAssessor,
+	public AdaptiveDuplicateWindowBuilder(double threshold, SimilarityClassifier<RECORD> classifier,
 			RecordStore<ID, RECORD> store) {
 		this.threshold = threshold;
-		this.simAssessor = simAssessor;
+		this.classifier = classifier;
 		this.store = store;
 	}
 
@@ -43,7 +43,7 @@ public class AdaptiveDuplicateWindowBuilder<RECORD, KEY extends Comparable<KEY>,
 		for (node = f.apply(node); node != null && isAboveThreshold(added, matches); node = f.apply(node)) {
 			for (ID id : node.getElements()) {
 				try {
-					if (simAssessor.areSimilar(rec, store.getRecord(id))) {
+					if (classifier.areSimilar(rec, store.getRecord(id))) {
 						matches++;
 					}
 					candidates.add(id);

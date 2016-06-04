@@ -5,17 +5,17 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import de.hpi.idd.dysni.sim.SimilarityAssessor;
+import de.hpi.idd.dysni.sim.SimilarityClassifier;
 import de.hpi.idd.dysni.store.RecordStore;
 import de.hpi.idd.dysni.util.UnionFind;
 
 public class BruteForce<RECORD, ID> implements EntityResolver<RECORD, ID> {
 
-	private final SimilarityAssessor<RECORD> sim;
+	private final SimilarityClassifier<RECORD> sim;
 	private final RecordStore<ID, RECORD> store;
 	private final UnionFind<ID> uf = new UnionFind<>();
 
-	public BruteForce(RecordStore<ID, RECORD> store, SimilarityAssessor<RECORD> sim) {
+	public BruteForce(RecordStore<ID, RECORD> store, SimilarityClassifier<RECORD> sim) {
 		this.store = store;
 		this.sim = sim;
 	}

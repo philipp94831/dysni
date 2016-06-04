@@ -5,11 +5,21 @@ import java.util.Map;
 
 import de.hpi.idd.SimilarityMeasure;
 
-public class IDDSimilarityAssessor implements SimilarityAssessor<Map<String, String>> {
+/**
+ * Wrapper class to standardize the provided {@link SimilarityMeasure} and make
+ * it generic
+ *
+ */
+public class IDDSimilarityClassifier implements SimilarityClassifier<Map<String, String>> {
 
 	private final SimilarityMeasure sim;
 
-	public IDDSimilarityAssessor(SimilarityMeasure sim) {
+	/**
+	 * 
+	 * @param sim
+	 *            {@link SimilarityMeasure} to be wrapped
+	 */
+	public IDDSimilarityClassifier(SimilarityMeasure sim) {
 		this.sim = sim;
 	}
 

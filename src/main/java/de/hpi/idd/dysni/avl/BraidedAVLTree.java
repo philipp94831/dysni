@@ -22,37 +22,31 @@ import java.util.Iterator;
  * This class implements AVL trees.
  *
  * <p>
- * The purpose of this class is to sort elements while allowing duplicate
- * elements (i.e. such that {@code a.equals(b)} is true). The {@code SortedSet}
- * interface does not allow this, so a specific class is needed. Null elements
- * are not allowed.
+ * Based on the implementation by <a href=
+ * "https://commons.apache.org/proper/commons-math/jacoco/org.apache.commons.math3.geometry.partitioning.utilities/AVLTree.java.html">
+ * Apache</a>
  * </p>
  *
  * <p>
- * Since the {@code equals} method is not sufficient to differentiate elements,
- * the {@link #delete delete} method is implemented using the equality operator.
+ * This data structure is basically an AVL Tree where nodes have pointers to
+ * their in-order neighbors such that neighbor access is possible in constant
+ * time. Furthermore, this tree allows only one node per key but stores the
+ * elements per node in a list such that multiple elements can be associated
+ * with a node.
  * </p>
  *
  * <p>
- * In order to clearly mark the methods provided here do not have the same
- * semantics as the ones specified in the {@code SortedSet} interface, different
- * names are used ({@code add} has been replaced by {@link #insert insert} and
- * {@code remove} has been replaced by {@link #delete delete}).
+ * The idea for this data structure is based on the
+ * <a href="http://www.stephenvrice.com/images/AVL_SCS.pdf">work</a> of Stephen
+ * V. Rice
  * </p>
  *
- * <p>
- * This class is based on the C implementation Georg Kraml has put in the public
- * domain. Unfortunately, his
- * <a href="www.purists.org/georg/avltree/index.html">page</a> seems not to
- * exist any more.
- * </p>
- *
+ * @param <K>
+ *            the type of the key of the elements
  * @param <V>
  *            the type of the elements
- * @param <K>
- *            the type of the skv of the elements
  */
-public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>> {
+public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>> {
 
 	private static class AVLTreeIterator<K extends Comparable<K>, V> implements Iterator<Node<K, V>> {
 
@@ -86,10 +80,9 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 	 * <p>
 	 * The element is deleted only if there is a node {@code n} containing
 	 * exactly the element instance specified, i.e. for which
-	 * {@code n.getElements().contains(element)}. This is purposely
-	 * <em>different</em> from the specification of the {@code java.util.Set}
-	 * {@code remove} method (in fact, this is the reason why a specific class
-	 * has been developed).
+	 * {@code n.contains(element)}. This is purposely <em>different</em> from
+	 * the specification of the {@code java.util.Set} {@code remove} method (in
+	 * fact, this is the reason why a specific class has been developed).
 	 * </p>
 	 *
 	 * @param element
@@ -113,6 +106,13 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 		return false;
 	}
 
+	/**
+	 * Find the node with the specified key
+	 *
+	 * @param key
+	 *            the key which's node should be retrieved
+	 * @return node with the specified key, null if no node is found
+	 */
 	public Node<K, V> find(K key) {
 		for (Node<K, V> node = top; node != null;) {
 			if (node.getKey().compareTo(key) < 0) {
@@ -133,10 +133,10 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 	}
 
 	/**
-	 * Get the node whose element is the largest one in the tree.
+	 * Get the node whose key is the largest one in the tree.
 	 *
-	 * @return the tree node containing the largest element in the tree or null
-	 *         if the tree is empty
+	 * @return the tree node having the largest key in the tree or null if the
+	 *         tree is empty
 	 * @see #getSmallest
 	 * @see Node#getPrevious
 	 * @see Node#getNext
@@ -150,10 +150,10 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 	}
 
 	/**
-	 * Get the node whose element is the smallest one in the tree.
+	 * Get the node whose key is the smallest one in the tree.
 	 *
-	 * @return the tree node containing the smallest element in the tree or null
-	 *         if the tree is empty
+	 * @return the tree node having the smallest key in the tree or null if the
+	 *         tree is empty
 	 * @see #getLargest
 	 * @see Node#getPrevious
 	 * @see Node#getNext
@@ -165,11 +165,13 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 	/**
 	 * Insert an element in the tree.
 	 *
+	 * @param key
+	 *            the element's sorting key (silently ignored if null)
 	 * @param element
 	 *            element to insert (silently ignored if null)
 	 */
 	public void insert(K key, V element) {
-		if (element != null) {
+		if (key != null || element != null) {
 			if (top == null) {
 				top = new Node<>(key, element);
 			} else {
@@ -187,6 +189,9 @@ public class AVLTree<K extends Comparable<K>, V> implements Iterable<Node<K, V>>
 		return top == null;
 	}
 
+	/**
+	 * @return iterator to iterate over the tree's nodes in-order.
+	 */
 	@Override
 	public Iterator<Node<K, V>> iterator() {
 		return new AVLTreeIterator<>(getSmallest());

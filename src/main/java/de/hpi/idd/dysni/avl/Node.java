@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * this class implements AVL trees nodes.
+ * this class implements Braided AVL trees nodes.
  * <p>
- * AVL tree nodes implement all the logical structure of the tree. Nodes are
- * created by the {@link AVLTree AVLTree} class.
+ * Braided AVL tree nodes implement all the logical structure of the tree. Nodes
+ * are created by the {@link BraidedAVLTree} class.
  * </p>
  * <p>
  * The nodes are not independent from each other but must obey specific
@@ -17,7 +17,7 @@ import java.util.Collection;
  * order-related navigation, reading and delete methods are public.
  * </p>
  *
- * @see AVLTree
+ * @see BraidedAVLTree
  */
 public class Node<K extends Comparable<K>, V> {
 
@@ -36,9 +36,11 @@ public class Node<K extends Comparable<K>, V> {
 	private K key;
 	/** Left sub-tree. */
 	private Node<K, V> left;
+	/** Next node */
 	private Node<K, V> next;
 	/** Parent tree. */
 	private Node<K, V> parent;
+	/** Previous node */
 	private Node<K, V> prev;
 	/** Right sub-tree. */
 	private Node<K, V> right;
@@ -48,10 +50,15 @@ public class Node<K extends Comparable<K>, V> {
 	/**
 	 * Build a node for a specified element.
 	 *
+	 * @param key
+	 *            key
 	 * @param element
 	 *            element
 	 */
 	Node(K key, V element) {
+		if (key == null || element == null) {
+			throw new NullPointerException("Key and element must not be null");
+		}
 		elements = new ArrayList<>();
 		this.key = key;
 		elements.add(element);
@@ -63,7 +70,14 @@ public class Node<K extends Comparable<K>, V> {
 		next = null;
 	}
 
-	boolean contains(V element) {
+	/**
+	 * Checks whether a node contains an element.
+	 *
+	 * @param element
+	 *            to look for
+	 * @return true if node contains element
+	 */
+	public boolean contains(V element) {
 		return elements.contains(element);
 	}
 
@@ -124,20 +138,30 @@ public class Node<K extends Comparable<K>, V> {
 		return false;
 	}
 
+	/**
+	 * Retrieve the elements stored in the node.
+	 *
+	 * @return all elements contained by the node
+	 */
 	public Collection<V> getElements() {
 		return elements;
 	}
 
+	/**
+	 * Get the key of the node.
+	 *
+	 * @return key
+	 */
 	public K getKey() {
 		return key;
 	}
 
 	/**
-	 * Get the node whose element is the largest one in the tree rooted at this
+	 * Get the node whose key is the largest one in the tree rooted at this
 	 * node.
 	 *
-	 * @return the tree node containing the largest element in the tree rooted
-	 *         at this node or null if the tree is empty
+	 * @return the tree node having the largest key in the tree rooted at this
+	 *         node or null if the tree is empty
 	 * @see #getSmallest
 	 */
 	Node<K, V> getLargest() {
@@ -148,28 +172,48 @@ public class Node<K extends Comparable<K>, V> {
 		return node;
 	}
 
+	/**
+	 * Get the left sub-tree of this node
+	 *
+	 * @return left sub-tree
+	 */
 	public Node<K, V> getLeft() {
 		return left;
 	}
 
+	/**
+	 * Get the in-order next node
+	 *
+	 * @return next element of this node
+	 */
 	public Node<K, V> getNext() {
 		return next;
 	}
 
+	/**
+	 * Get the in-order previous node
+	 *
+	 * @return previous element of this node
+	 */
 	public Node<K, V> getPrevious() {
 		return prev;
 	}
 
+	/**
+	 * Get the right sub-tree of this node
+	 *
+	 * @return right sub-tree
+	 */
 	public Node<K, V> getRight() {
 		return right;
 	}
 
 	/**
-	 * Get the node whose element is the smallest one in the tree rooted at this
+	 * Get the node whose key is the smallest one in the tree rooted at this
 	 * node.
 	 *
-	 * @return the tree node containing the smallest element in the tree rooted
-	 *         at this node or null if the tree is empty
+	 * @return the tree node having the smallest key in the tree rooted at this
+	 *         node or null if the tree is empty
 	 * @see #getLargest
 	 */
 	Node<K, V> getSmallest() {
@@ -183,33 +227,35 @@ public class Node<K extends Comparable<K>, V> {
 	/**
 	 * Insert an element in a sub-tree.
 	 *
-	 * @param newElement
+	 * @param key
+	 *            sorting key of the element
+	 * @param element
 	 *            element to insert
 	 * @return true if the parent tree should be re-Skew.BALANCED
 	 */
-	boolean insert(K key, V newElement) {
+	boolean insert(K key, V element) {
 		if (key.compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				setLeft(new Node<>(key, newElement));
+				setLeft(new Node<>(key, element));
 				left.setPrev(prev);
 				setPrev(left);
 				return rebalanceLeftGrown();
 			}
-			return left.insert(key, newElement) && rebalanceLeftGrown();
+			return left.insert(key, element) && rebalanceLeftGrown();
 		}
 		if (key.compareTo(this.key) == 0) {
-			elements.add(newElement);
+			elements.add(element);
 			return false;
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			setRight(new Node<>(key, newElement));
+			setRight(new Node<>(key, element));
 			right.setNext(next);
 			setNext(right);
 			return rebalanceRightGrown();
 		}
-		return right.insert(key, newElement) && rebalanceRightGrown();
+		return right.insert(key, element) && rebalanceRightGrown();
 	}
 
 	/**
@@ -446,13 +492,25 @@ public class Node<K extends Comparable<K>, V> {
 		setRight(tmpNode);
 	}
 
-	private void setLeft(Node<K, V> child) {
-		left = child;
-		if (child != null) {
-			child.parent = this;
+	/**
+	 * Set the left child of this node and update the new child's parent
+	 *
+	 * @param left
+	 *            new child node
+	 */
+	private void setLeft(Node<K, V> left) {
+		this.left = left;
+		if (left != null) {
+			left.parent = this;
 		}
 	}
 
+	/**
+	 * Set the next in-order node and update the pointers accordingly
+	 *
+	 * @param next
+	 *            next in-order node
+	 */
 	private void setNext(Node<K, V> next) {
 		this.next = next;
 		if (this.next != null) {
@@ -460,6 +518,12 @@ public class Node<K extends Comparable<K>, V> {
 		}
 	}
 
+	/**
+	 * Set the previous in-order node and update the pointers accordingly
+	 *
+	 * @param prev
+	 *            previous in-order node
+	 */
 	private void setPrev(Node<K, V> prev) {
 		this.prev = prev;
 		if (this.prev != null) {
@@ -467,10 +531,16 @@ public class Node<K extends Comparable<K>, V> {
 		}
 	}
 
-	private void setRight(Node<K, V> child) {
-		right = child;
-		if (child != null) {
-			child.parent = this;
+	/**
+	 * Set the right child of this node and update the new child's parent
+	 *
+	 * @param right
+	 *            new child node
+	 */
+	private void setRight(Node<K, V> right) {
+		this.right = right;
+		if (right != null) {
+			right.parent = this;
 		}
 	}
 
@@ -480,7 +550,7 @@ public class Node<K extends Comparable<K>, V> {
 	 * @return number of elements contained in the tree rooted at node
 	 */
 	int size() {
-		return 1 + (left == null ? 0 : left.size()) + (right == null ? 0 : right.size());
+		return elements.size() + (left == null ? 0 : left.size()) + (right == null ? 0 : right.size());
 	}
 
 	@Override
