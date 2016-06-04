@@ -12,10 +12,10 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import de.hpi.idd.BruteForce;
-import de.hpi.idd.Dataset;
 import de.hpi.idd.EntityResolver;
 import de.hpi.idd.Evaluator;
 import de.hpi.idd.SimilarityMeasure;
+import de.hpi.idd.data.Dataset;
 import de.hpi.idd.dysni.sim.IDDSimilarityAssessor;
 import de.hpi.idd.dysni.sim.SimilarityAssessor;
 import de.hpi.idd.dysni.store.MemoryStore;

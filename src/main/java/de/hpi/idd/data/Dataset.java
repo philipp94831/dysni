@@ -1,8 +1,9 @@
-package de.hpi.idd;
+package de.hpi.idd.data;
 
 import java.util.Collection;
 import java.util.Map;
 
+import de.hpi.idd.SimilarityMeasure;
 import de.hpi.idd.data.cd.CDConfig;
 import de.hpi.idd.data.cd.CDSimilarityMeasure;
 import de.hpi.idd.data.cora.CoraConfig;

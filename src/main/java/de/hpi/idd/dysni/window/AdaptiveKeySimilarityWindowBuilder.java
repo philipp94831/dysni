@@ -3,6 +3,7 @@ package de.hpi.idd.dysni.window;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Function;
 
 import de.hpi.idd.dysni.avl.Node;
 import de.hpi.idd.dysni.sim.SimilarityAssessor;
@@ -14,8 +15,8 @@ public class AdaptiveKeySimilarityWindowBuilder<RECORD, KEY extends Comparable<K
 	private final SimilarityAssessor<KEY> simAssessor;
 	private final SymmetricTable<KEY, Double> similarities = new SymmetricTable<>();
 
-	public AdaptiveKeySimilarityWindowBuilder(SimilarityAssessor<KEY> sim) {
-		this.simAssessor = sim;
+	public AdaptiveKeySimilarityWindowBuilder(SimilarityAssessor<KEY> simAssessor) {
+		this.simAssessor = simAssessor;
 	}
 
 	@Override
@@ -25,16 +26,16 @@ public class AdaptiveKeySimilarityWindowBuilder<RECORD, KEY extends Comparable<K
 		}
 		Collection<ID> candidates = new ArrayList<>();
 		candidates.addAll(node.getElements());
-		for (Node<KEY, ID> prevNode = node.getPrevious(); prevNode != null; prevNode = prevNode.getPrevious()) {
-			if (simAssessor.isSimilarity(getSimilarity(prevNode, node))) {
-				candidates.addAll(prevNode.getElements());
-			} else {
-				break;
-			}
-		}
-		for (Node<KEY, ID> nextNode = node.getNext(); nextNode != null; nextNode = nextNode.getNext()) {
-			if (simAssessor.isSimilarity(getSimilarity(nextNode, node))) {
-				candidates.addAll(nextNode.getElements());
+		candidates.addAll(expand(node, Node::getPrevious));
+		candidates.addAll(expand(node, Node::getNext));
+		return candidates;
+	}
+
+	private Collection<ID> expand(Node<KEY, ID> initial, Function<Node<KEY, ID>, Node<KEY, ID>> f) {
+		Collection<ID> candidates = new ArrayList<>();
+		for (Node<KEY, ID> node = f.apply(initial); node != null; node = f.apply(node)) {
+			if (simAssessor.isSimilarity(getSimilarity(node, initial))) {
+				candidates.addAll(node.getElements());
 			} else {
 				break;
 			}
@@ -42,11 +43,11 @@ public class AdaptiveKeySimilarityWindowBuilder<RECORD, KEY extends Comparable<K
 		return candidates;
 	}
 
-	private double getSimilarity(Node<KEY, ID> node2, Node<KEY, ID> node) {
-		Double sim = similarities.get(node2.getKey(), node.getKey());
+	private double getSimilarity(Node<KEY, ID> node1, Node<KEY, ID> node2) {
+		Double sim = similarities.get(node1.getKey(), node2.getKey());
 		if (sim == null) {
-			sim = simAssessor.calculateSimilarity(node.getKey(), node2.getKey());
-			similarities.put(node2.getKey(), node.getKey(), sim);
+			sim = simAssessor.calculateSimilarity(node1.getKey(), node2.getKey());
+			similarities.put(node1.getKey(), node2.getKey(), sim);
 		}
 		return sim;
 	}
