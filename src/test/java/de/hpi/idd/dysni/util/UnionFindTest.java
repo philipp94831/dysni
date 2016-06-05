@@ -3,6 +3,7 @@ package de.hpi.idd.dysni.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -32,5 +33,16 @@ public class UnionFindTest {
 		assertEquals(3, uf.getComponent(3).size());
 		assertEquals(3, uf.getComponent(4).size());
 		assertEquals(0, uf.getComponent(5).size());
+	}
+
+	@Test
+	public void testNullInsertion() {
+		UnionFind<Integer> uf = new UnionFind<>();
+		try {
+			uf.union(null, null);
+			fail("NullPointerException should be thrown");
+		} catch (NullPointerException e) {
+			assertEquals(e.getMessage(), "Element must not be null");
+		}
 	}
 }
