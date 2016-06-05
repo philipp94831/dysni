@@ -1,6 +1,9 @@
 package de.hpi.idd.dysni.util;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 public class UnionFindTest {
@@ -8,26 +11,26 @@ public class UnionFindTest {
 	@Test
 	public void test() {
 		UnionFind<Integer> uf = new UnionFind<>();
-		Assert.assertFalse(uf.connected(1, 4));
-		Assert.assertEquals(0, uf.count());
+		assertFalse(uf.connected(1, 4));
+		assertEquals(0, uf.count());
 		uf.union(1, 2);
-		Assert.assertTrue(uf.connected(1, 2));
-		Assert.assertFalse(uf.connected(1, 4));
-		Assert.assertEquals(1, uf.count());
+		assertTrue(uf.connected(1, 2));
+		assertFalse(uf.connected(1, 4));
+		assertEquals(1, uf.count());
 		uf.union(3, 4);
-		Assert.assertTrue(uf.connected(3, 4));
-		Assert.assertFalse(uf.connected(1, 4));
-		Assert.assertEquals(2, uf.count());
+		assertTrue(uf.connected(3, 4));
+		assertFalse(uf.connected(1, 4));
+		assertEquals(2, uf.count());
 		uf.union(2, 4);
-		Assert.assertTrue(uf.connected(2, 4));
-		Assert.assertTrue(uf.connected(1, 4));
+		assertTrue(uf.connected(2, 4));
+		assertTrue(uf.connected(1, 4));
 		uf.union(5, 5);
 		uf.union(5, 5);
-		Assert.assertEquals(2, uf.count());
-		Assert.assertEquals(3, uf.getComponent(1).size());
-		Assert.assertEquals(3, uf.getComponent(2).size());
-		Assert.assertEquals(3, uf.getComponent(3).size());
-		Assert.assertEquals(3, uf.getComponent(4).size());
-		Assert.assertEquals(0, uf.getComponent(5).size());
+		assertEquals(2, uf.count());
+		assertEquals(3, uf.getComponent(1).size());
+		assertEquals(3, uf.getComponent(2).size());
+		assertEquals(3, uf.getComponent(3).size());
+		assertEquals(3, uf.getComponent(4).size());
+		assertEquals(0, uf.getComponent(5).size());
 	}
 }

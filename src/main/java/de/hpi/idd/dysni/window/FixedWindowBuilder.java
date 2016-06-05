@@ -7,10 +7,28 @@ import java.util.function.Function;
 
 import de.hpi.idd.dysni.avl.Node;
 
+/**
+ * {@link WindowBuilder Window builder} that expands the window with a fixed
+ * number of nodes in both directions.
+ *
+ * @param <RECORD>
+ *            type of elements associated with the index
+ * @param <KEY>
+ *            type of keys which the index is sorted by
+ * @param <ID>
+ *            type of ids representing the elements
+ */
 public class FixedWindowBuilder<RECORD, KEY extends Comparable<KEY>, ID> implements WindowBuilder<RECORD, KEY, ID> {
 
+	/** size of window in each direction */
 	private final int size;
 
+	/**
+	 * Construct a new window builder
+	 *
+	 * @param size
+	 *            size of window in each direction
+	 */
 	public FixedWindowBuilder(int size) {
 		this.size = size;
 	}
@@ -27,6 +45,15 @@ public class FixedWindowBuilder<RECORD, KEY extends Comparable<KEY>, ID> impleme
 		return candidates;
 	}
 
+	/**
+	 * Expand window with a fixed number of nodes in each direction
+	 *
+	 * @param node
+	 *            node where expansion starts
+	 * @param f
+	 *            function to retrieve the next node
+	 * @return ids contained in the built window
+	 */
 	private Collection<ID> expand(Node<KEY, ID> node, Function<Node<KEY, ID>, Node<KEY, ID>> f) {
 		Collection<ID> candidates = new ArrayList<>();
 		node = f.apply(node);

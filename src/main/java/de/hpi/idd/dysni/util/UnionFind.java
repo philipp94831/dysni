@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  * </p>
  *
- * @param T
+ * @param <T>
  *            type of the elements
  */
 public class UnionFind<T> {
@@ -39,7 +39,7 @@ public class UnionFind<T> {
 		/**
 		 * Constructs a new node containing the specified element.
 		 *
-		 * @param element
+		 * @param element element associated with this node
 		 */
 		public Node(T element) {
 			this.element = element;
@@ -48,7 +48,7 @@ public class UnionFind<T> {
 		/**
 		 * Adds a new child node to this node.
 		 *
-		 * @param child
+		 * @param child new child node
 		 */
 		private void addChild(Node child) {
 			children.add(child);
@@ -57,7 +57,7 @@ public class UnionFind<T> {
 		/**
 		 * Get all child nodes contained by this node.
 		 *
-		 * @return
+		 * @return collection of child nodes
 		 */
 		public Collection<Node> getChildren() {
 			return children;

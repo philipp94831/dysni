@@ -16,14 +16,14 @@ public interface RecordStore<K, V> extends AutoCloseable {
 
 	/**
 	 * Get access to all objects stored
-	 * 
+	 *
 	 * @return iterator to iterate over all objects stored
 	 */
 	Iterator<Pair<K, V>> all();
 
 	/**
 	 * Retrieve record based on its id
-	 * 
+	 *
 	 * @param id
 	 *            id of the record to be retrieved
 	 * @return record associated with the id
@@ -33,7 +33,7 @@ public interface RecordStore<K, V> extends AutoCloseable {
 
 	/**
 	 * Store a record based on its id
-	 * 
+	 *
 	 * @param id
 	 *            id of the record to be stored
 	 * @param record

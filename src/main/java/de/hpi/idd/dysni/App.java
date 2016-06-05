@@ -11,7 +11,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import de.hpi.idd.BruteForce;
+import de.hpi.idd.BruteForceEntityResolver;
 import de.hpi.idd.EntityResolver;
 import de.hpi.idd.Evaluator;
 import de.hpi.idd.SimilarityMeasure;
@@ -33,7 +33,6 @@ public class App {
 	private static final String DATASET_NAME = "cd";
 	private static final ERType ER_TYPE = ERType.DYSNI;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
-
 	private static final Logger LOGGER = Logger.getLogger(App.class.getName());
 
 	private static EntityResolver<Map<String, String>, String> getEntityResolver(Dataset dataset,
@@ -44,7 +43,7 @@ public class App {
 			Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> configs = dataset.getConfigs();
 			return new DynamicSortedNeighborhoodIndexer<>(store, similarityMeasure, configs);
 		case BRUTE_FORCE:
-			return new BruteForce<>(store, similarityMeasure);
+			return new BruteForceEntityResolver<>(store, similarityMeasure);
 		default:
 			return null;
 		}
@@ -53,11 +52,11 @@ public class App {
 	public static void main(String[] args) {
 		long start = System.nanoTime();
 		int i = 0;
-		Dataset dataset = Dataset.getForName(App.DATASET_NAME);
+		Dataset dataset = Dataset.getForName(DATASET_NAME);
 		SimilarityMeasure similarityMeasure = dataset.getSimilarityMeasure();
 		SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
-		try (Reader in = new FileReader(App.DATA_DIR + dataset.getFileName());
-				CSVParser parser = App.FORMAT.parse(in);
+		try (Reader in = new FileReader(DATA_DIR + dataset.getFileName());
+				CSVParser parser = FORMAT.parse(in);
 				RecordStore<String, Map<String, String>> store = new MemoryStore<>()) {
 			EntityResolver<Map<String, String>, String> er = App.getEntityResolver(dataset,
 					new IDDSimilarityClassifier(similarityMeasure), store);
@@ -77,7 +76,7 @@ public class App {
 		} catch (StoreException e) {
 			throw new RuntimeException("Error accessing storage", e);
 		} catch (Exception e) {
-			App.LOGGER.warning("Exception when closing store: " + e.getMessage());
+			LOGGER.warning("Exception when closing store: " + e.getMessage());
 		}
 		long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");

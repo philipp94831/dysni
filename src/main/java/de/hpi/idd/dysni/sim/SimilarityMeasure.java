@@ -11,7 +11,7 @@ public interface SimilarityMeasure<T> {
 	/**
 	 * Get a classifier based on this similarity measure which classifies the
 	 * similarity of objects binary
-	 * 
+	 *
 	 * @param threshold
 	 *            threshold to decide similarity. Similarity is assumed when the
 	 *            similarity is above the threshold
@@ -23,7 +23,7 @@ public interface SimilarityMeasure<T> {
 
 	/**
 	 * Verifies that the similarity of two objects fulfills certain constraints
-	 * 
+	 *
 	 * @param e1
 	 *            first object
 	 * @param e2
@@ -31,7 +31,7 @@ public interface SimilarityMeasure<T> {
 	 * @return similarity of the two objects on a scale from 0.0 to 1.0
 	 * @throws ArithmeticException
 	 *             if the similarity value violates the constraints
-	 * 
+	 *
 	 * @see #calculateSimilarity(Object, Object)
 	 */
 	default double calculateCheckedSimilarity(T e1, T e2) throws ArithmeticException {
@@ -47,7 +47,7 @@ public interface SimilarityMeasure<T> {
 
 	/**
 	 * Compute the similarity of two objects, usually on a scale from 0.0 to 1.0
-	 * 
+	 *
 	 * @param e1
 	 *            first object
 	 * @param e2

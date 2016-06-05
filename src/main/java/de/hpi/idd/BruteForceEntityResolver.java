@@ -9,13 +9,21 @@ import de.hpi.idd.dysni.sim.SimilarityClassifier;
 import de.hpi.idd.dysni.store.RecordStore;
 import de.hpi.idd.dysni.util.UnionFind;
 
-public class BruteForce<RECORD, ID> implements EntityResolver<RECORD, ID> {
+/**
+ * Brute force entity resolver which compares every record to every other
+ *
+ * @param <RECORD>
+ *            the type of records to be resolved
+ * @param <ID>
+ *            the type of ids representing each record
+ */
+public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECORD, ID> {
 
 	private final SimilarityClassifier<RECORD> sim;
 	private final RecordStore<ID, RECORD> store;
 	private final UnionFind<ID> uf = new UnionFind<>();
 
-	public BruteForce(RecordStore<ID, RECORD> store, SimilarityClassifier<RECORD> sim) {
+	public BruteForceEntityResolver(RecordStore<ID, RECORD> store, SimilarityClassifier<RECORD> sim) {
 		this.store = store;
 		this.sim = sim;
 	}

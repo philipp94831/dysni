@@ -10,7 +10,7 @@ public class LevenshteinSimilarity implements SimilarityMeasure<String> {
 
 	/**
 	 * Normalized Levenshtein distance of two strings.
-	 * 
+	 *
 	 * @return Levenshtein distanced normalized to the maximum length of the
 	 *         strings
 	 */

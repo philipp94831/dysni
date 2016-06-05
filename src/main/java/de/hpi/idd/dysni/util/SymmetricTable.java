@@ -21,7 +21,7 @@ public class SymmetricTable<K, V> {
 
 	/**
 	 * Get all stored key-key-value triplets
-	 * 
+	 *
 	 * @return set of key-key-value triplets
 	 */
 	public Set<Cell<K, K, V>> cellSet() {
@@ -30,7 +30,7 @@ public class SymmetricTable<K, V> {
 
 	/**
 	 * Check whether a value is associated with the two keys
-	 * 
+	 *
 	 * @param key1
 	 *            first key
 	 * @param key2
@@ -43,7 +43,7 @@ public class SymmetricTable<K, V> {
 
 	/**
 	 * Retrieve the value associated with the two keys
-	 * 
+	 *
 	 * @param key1
 	 *            first key
 	 * @param key2
@@ -57,7 +57,7 @@ public class SymmetricTable<K, V> {
 
 	/**
 	 * Store a value with the specified keys
-	 * 
+	 *
 	 * @param key1
 	 *            first key
 	 * @param key2

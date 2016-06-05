@@ -13,7 +13,7 @@ class DefaultSimilarityClassifier<T> implements SimilarityClassifier<T> {
 	private final double threshold;
 
 	/**
-	 * 
+	 *
 	 * @param sim
 	 *            similarity measure to be used
 	 * @param threshold

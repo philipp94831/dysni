@@ -15,7 +15,8 @@ import de.hpi.idd.dysni.util.SymmetricTable;
 import de.hpi.idd.dysni.util.UnionFind;
 
 /**
- * Created by dennis on 26.05.16.
+ * Utility class to evaluate the results of entity resolution using a given
+ * ground truth
  */
 public class Evaluator {
 
@@ -43,7 +44,7 @@ public class Evaluator {
 				tp++;
 			} else {
 				fp++;
-				if (Evaluator.VERBOSE) {
+				if (VERBOSE) {
 					System.out.println("INCORRECT resolution: " + cell.getRowKey() + " " + cell.getColumnKey());
 				}
 			}
@@ -57,7 +58,7 @@ public class Evaluator {
 					t++;
 					if (!duplicatesToCheck.contains(elems.get(i), elems.get(j))) {
 						fn++;
-						if (Evaluator.VERBOSE) {
+						if (VERBOSE) {
 							System.out.println("MISSED resolution: " + elems.get(i) + " " + elems.get(j));
 						}
 					}

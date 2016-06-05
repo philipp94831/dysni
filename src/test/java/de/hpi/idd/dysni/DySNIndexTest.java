@@ -1,8 +1,10 @@
 package de.hpi.idd.dysni;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import de.hpi.idd.dysni.sim.LevenshteinSimilarity;
@@ -37,9 +39,9 @@ public class DySNIndexTest {
 		insert("E");
 		insert("DE");
 		Collection<String> candidates = index.findCandidates("DE");
-		Assert.assertTrue(candidates.contains("d"));
-		Assert.assertTrue(candidates.contains("e"));
-		Assert.assertTrue(candidates.contains("de"));
-		Assert.assertEquals(3, candidates.size());
+		assertTrue(candidates.contains("d"));
+		assertTrue(candidates.contains("e"));
+		assertTrue(candidates.contains("de"));
+		assertEquals(3, candidates.size());
 	}
 }

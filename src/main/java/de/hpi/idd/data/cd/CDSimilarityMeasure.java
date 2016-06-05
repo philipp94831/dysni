@@ -14,9 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.hpi.idd.SimilarityMeasure;
 
-/**
- * Created by dennis on 08.05.16.
- */
 public class CDSimilarityMeasure implements SimilarityMeasure {
 
 	static class CDRecord {
@@ -259,6 +256,6 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 
 	@Override
 	public double getThreshold() {
-		return CDSimilarityMeasure.THRESHOLD;
+		return THRESHOLD;
 	}
 }

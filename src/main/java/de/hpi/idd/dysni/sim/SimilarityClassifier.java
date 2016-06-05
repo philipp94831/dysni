@@ -11,7 +11,7 @@ public interface SimilarityClassifier<T> extends SimilarityMeasure<T> {
 
 	/**
 	 * classify the equality of two objects based on their similarity
-	 * 
+	 *
 	 * @param record
 	 *            first object
 	 * @param record2
@@ -27,14 +27,14 @@ public interface SimilarityClassifier<T> extends SimilarityMeasure<T> {
 
 	/**
 	 * Threshold for which equality is indicated if exceeded
-	 * 
+	 *
 	 * @return threshold
 	 */
 	double getThreshold();
 
 	/**
 	 * classify the equality of two unknown objects based on their similarity
-	 * 
+	 *
 	 * @param sim
 	 *            similarity of two unknown objects
 	 * @return true if the objects are regarded equal considering the specified

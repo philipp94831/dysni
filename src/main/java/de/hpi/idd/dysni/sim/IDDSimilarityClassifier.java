@@ -15,7 +15,7 @@ public class IDDSimilarityClassifier implements SimilarityClassifier<Map<String,
 	private final SimilarityMeasure sim;
 
 	/**
-	 * 
+	 *
 	 * @param sim
 	 *            {@link SimilarityMeasure} to be wrapped
 	 */
