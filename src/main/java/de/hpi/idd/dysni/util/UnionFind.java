@@ -26,29 +26,15 @@ public class UnionFind<T> {
 
 	/**
 	 * This class represents a node in the Union Find tree having a parent,
-	 * multiple children and containing an element of type {@code U}
-	 *
-	 * @param <T>
-	 *            type of elements contained
+	 * multiple children and containing an element of type {@code T}
 	 *
 	 */
-	private static class Node<T> {
+	private class Node {
 
-		private static <T> Node<T> constructTopNode() {
-			return new Node<T>();
-		}
-
-		private final Collection<Node<T>> children = new HashSet<>();
+		private final Collection<Node> children = new HashSet<>();
 		private final T element;
-		private Node<T> parent;
+		private Node parent;
 		private byte rank;
-
-		/**
-		 * Constructs top node
-		 */
-		private Node() {
-			this.element = null;
-		}
 
 		/**
 		 * Constructs a new node containing the specified element.
@@ -57,9 +43,6 @@ public class UnionFind<T> {
 		 *            element associated with this node
 		 */
 		public Node(T element) {
-			if (element == null) {
-				throw new NullPointerException("Element must not be null");
-			}
 			this.element = element;
 		}
 
@@ -69,7 +52,7 @@ public class UnionFind<T> {
 		 * @param child
 		 *            new child node
 		 */
-		private void addChild(Node<T> child) {
+		private void addChild(Node child) {
 			children.add(child);
 		}
 
@@ -78,7 +61,7 @@ public class UnionFind<T> {
 		 *
 		 * @return collection of child nodes
 		 */
-		public Collection<Node<T>> getChildren() {
+		public Collection<Node> getChildren() {
 			return children;
 		}
 
@@ -96,7 +79,7 @@ public class UnionFind<T> {
 		 *
 		 * @return parent node of this node
 		 */
-		public Node<T> getParent() {
+		public Node getParent() {
 			return parent;
 		}
 
@@ -121,32 +104,12 @@ public class UnionFind<T> {
 		}
 
 		/**
-		 * Node is considered root if its parent is a top node
-		 *
-		 * @return true if node's parent is top node, false otherwise
-		 *
-		 * @see #isTopNode()
-		 */
-		public boolean isRoot() {
-			return !isTopNode() && parent.isTopNode();
-		}
-
-		/**
-		 * Node is considered top node if its element is null
-		 *
-		 * @return true if node's element is null, false otherwise
-		 */
-		private boolean isTopNode() {
-			return element == null;
-		}
-
-		/**
 		 * Removes the specified child from this node.
 		 *
 		 * @param child
 		 *            the child to be removed
 		 */
-		public void removeChild(Node<T> child) {
+		public void removeChild(Node child) {
 			children.remove(child);
 		}
 
@@ -157,19 +120,21 @@ public class UnionFind<T> {
 		 * @param parent
 		 *            the new parent node
 		 */
-		public void setParent(Node<T> parent) {
+		public void setParent(Node parent) {
 			if (this.parent != null) {
 				this.parent.removeChild(this);
+			} else {
+				roots.remove(this);
 			}
 			this.parent = parent;
 			parent.addChild(this);
 		}
 	}
 
-	/** Element-node mapping to retrieve the node for an element */
-	private final Map<T, Node<T>> nodes = new HashMap<>();
-	/** Virtual root node of the tree, practically ignored */
-	private final Node<T> top = Node.constructTopNode();
+	/** Element-node mapping to retrieve the node */
+	private final Map<T, Node> nodes = new HashMap<>();
+	/** Nodes rooting a tree */
+	private final Set<Node> roots = new HashSet<>();
 
 	/**
 	 * Returns true if the the two sites are in the same component.
@@ -182,8 +147,8 @@ public class UnionFind<T> {
 	 *         the same component; <tt>false</tt> otherwise
 	 */
 	public boolean connected(T t, T u) {
-		Node<T> nodeT = find(t);
-		Node<T> nodeU = find(u);
+		Node nodeT = find(t);
+		Node nodeU = find(u);
 		return !(nodeT == null || nodeU == null) && nodeT.equals(nodeU);
 	}
 
@@ -193,7 +158,7 @@ public class UnionFind<T> {
 	 * @return the number of components
 	 */
 	public int count() {
-		return top.getChildren().size();
+		return roots.size();
 	}
 
 	/**
@@ -205,16 +170,19 @@ public class UnionFind<T> {
 	 * @return the component identifier for the component containing site
 	 *         <tt>t</tt>
 	 */
-	private Node<T> find(T t) {
-		Node<T> node = nodes.get(t);
+	private Node find(T t) {
+		if (t == null) {
+			throw new NullPointerException("Element must not be null");
+		}
+		Node node = nodes.get(t);
 		if (node == null) {
 			return null;
 		}
-		while (!node.isRoot()) {
+		while (node.getParent() != null) {
 			// path compression by halving
-			Node<T> p = node.getParent();
-			if (!p.isRoot()) {
-				node.setParent(p.getParent());
+			Node pp = node.getParent().getParent();
+			if (pp != null) {
+				node.setParent(pp);
 			}
 			node = node.getParent();
 		}
@@ -231,14 +199,14 @@ public class UnionFind<T> {
 	 */
 	public Collection<T> getComponent(T t) {
 		Collection<T> component = new HashSet<>();
-		Stack<Node<T>> todo = new Stack<>();
-		Node<T> node = find(t);
+		Stack<Node> todo = new Stack<>();
+		Node node = find(t);
 		if (node == null) {
 			return component;
 		}
 		todo.add(node);
 		while (!todo.isEmpty()) {
-			Node<T> elem = todo.pop();
+			Node elem = todo.pop();
 			component.add(elem.getElement());
 			todo.addAll(elem.getChildren());
 		}
@@ -252,7 +220,7 @@ public class UnionFind<T> {
 	 * @return nodes rooting a tree
 	 */
 	public Set<T> getRoots() {
-		return top.getChildren().stream().map(Node::getElement).collect(Collectors.toSet());
+		return roots.stream().map(Node::getElement).collect(Collectors.toSet());
 	}
 
 	/**
@@ -263,8 +231,11 @@ public class UnionFind<T> {
 	 *            element to be inserted
 	 */
 	private void insert(T t) {
-		Node<T> node = new Node<>(t);
-		node.setParent(top);
+		if (t == null) {
+			throw new NullPointerException("Element must not be null");
+		}
+		Node node = new Node(t);
+		roots.add(node);
 		nodes.put(t, node);
 	}
 
@@ -284,8 +255,8 @@ public class UnionFind<T> {
 		if (!nodes.containsKey(u)) {
 			insert(u);
 		}
-		Node<T> rootT = find(t);
-		Node<T> rootU = find(u);
+		Node rootT = find(t);
+		Node rootU = find(u);
 		if (rootT.equals(rootU)) {
 			return;
 		}

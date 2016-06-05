@@ -45,4 +45,15 @@ public class UnionFindTest {
 			assertEquals(e.getMessage(), "Element must not be null");
 		}
 	}
+
+	@Test
+	public void testNullQuery() {
+		UnionFind<Integer> uf = new UnionFind<>();
+		try {
+			uf.connected(null, null);
+			fail("NullPointerException should be thrown");
+		} catch (NullPointerException e) {
+			assertEquals(e.getMessage(), "Element must not be null");
+		}
+	}
 }
