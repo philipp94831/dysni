@@ -9,57 +9,116 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
- * Based on the implementation by Robert Sedgewick and Kevin Wayne from
- * Princeton University
+ * Based on the implementation by
+ * <a href="http://algs4.cs.princeton.edu/15uf/UF.java.html">Robert Sedgewick
+ * and Kevin Wayne</a> from Princeton University
  *
  * <p>
  * For additional documentation, see
  * <a href="http://algs4.cs.princeton.edu/15uf">Section 1.5</a> of
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  * </p>
+ *
+ * @param T
+ *            type of the elements
  */
 public class UnionFind<T> {
 
-	private class Node<U> {
+	/**
+	 * This class represents a node in the Union Find tree having a parent,
+	 * multiple children and containing an element of type {@code T}
+	 *
+	 */
+	private class Node {
 
-		private final Collection<Node<U>> children = new HashSet<>();
-		private final U element;
-		private Node<U> parent;
+		private final Collection<Node> children = new HashSet<>();
+		private final T element;
+		private Node parent;
 		private byte rank;
 
-		public Node(U element) {
+		/**
+		 * Constructs a new node containing the specified element.
+		 *
+		 * @param element
+		 */
+		public Node(T element) {
 			this.element = element;
 		}
 
-		private void addChild(Node<U> child) {
+		/**
+		 * Adds a new child node to this node.
+		 *
+		 * @param child
+		 */
+		private void addChild(Node child) {
 			children.add(child);
 		}
 
-		public Collection<Node<U>> getChildren() {
+		/**
+		 * Get all child nodes contained by this node.
+		 *
+		 * @return
+		 */
+		public Collection<Node> getChildren() {
 			return children;
 		}
 
-		public U getElement() {
+		/**
+		 * Get the element contained by this node.
+		 *
+		 * @return element contained by this node
+		 */
+		public T getElement() {
 			return element;
 		}
 
-		public Node<U> getParent() {
+		/**
+		 * Get the parent node of this node.
+		 *
+		 * @return parent node of this node
+		 */
+		public Node getParent() {
 			return parent;
 		}
 
+		/**
+		 * Get the rank of this node. The rank is increased whenever two nodes
+		 * of same rank are unified. Hence, the rank grows logarithmic and
+		 * should never exceed 31.
+		 *
+		 * @return rank of this node in the tree
+		 */
 		public byte getRank() {
 			return rank;
 		}
 
+		/**
+		 * Increases rank of this node. The rank is increased whenever two nodes
+		 * of same rank are unified. Hence, the rank grows logarithmic and
+		 * should never exceed 31.
+		 */
 		public void increaseRank() {
 			rank++;
 		}
 
-		private void removeChild(Node<U> child) {
+		/**
+		 * Removes the specified child from this node.
+		 *
+		 * @param child
+		 *            the child to be removed
+		 */
+		public void removeChild(Node child) {
 			children.remove(child);
 		}
 
-		public void setParent(Node<U> parent) {
+		/**
+		 * Sets the parent node of this node and updates the child relations
+		 * accordingly.
+		 *
+		 * @param parent
+		 *            the new parent node
+		 */
+		public void setParent(Node parent) {
 			if (this.parent != null) {
 				this.parent.removeChild(this);
 			} else {
@@ -70,8 +129,10 @@ public class UnionFind<T> {
 		}
 	}
 
-	private final Map<T, Node<T>> nodes = new HashMap<>();
-	private final Set<Node<T>> roots = new HashSet<>();
+	/** Element-node mapping to retrieve the node */
+	private final Map<T, Node> nodes = new HashMap<>();
+	/** Nodes rooting a tree */
+	private final Set<Node> roots = new HashSet<>();
 
 	/**
 	 * Returns true if the the two sites are in the same component.
@@ -84,13 +145,13 @@ public class UnionFind<T> {
 	 *         the same component; <tt>false</tt> otherwise
 	 */
 	public boolean connected(T t, T u) {
-		Node<T> nodeT = find(t);
-		Node<T> nodeU = find(u);
+		Node nodeT = find(t);
+		Node nodeU = find(u);
 		return !(nodeT == null || nodeU == null) && nodeT.equals(nodeU);
 	}
 
 	/**
-	 * Returns the number of components.
+	 * Returns the number of disjoint components.
 	 *
 	 * @return the number of components
 	 */
@@ -103,18 +164,18 @@ public class UnionFind<T> {
 	 * <tt>t</tt>.
 	 *
 	 * @param t
-	 *            the integer representing one site
+	 *            the element representing one site
 	 * @return the component identifier for the component containing site
 	 *         <tt>t</tt>
 	 */
-	private Node<T> find(T t) {
-		Node<T> node = nodes.get(t);
+	private Node find(T t) {
+		Node node = nodes.get(t);
 		if (node == null) {
 			return null;
 		}
 		while (node.getParent() != null) {
 			// path compression by halving
-			Node<T> pp = node.getParent().getParent();
+			Node pp = node.getParent().getParent();
 			if (pp != null) {
 				node.setParent(pp);
 			}
@@ -123,16 +184,24 @@ public class UnionFind<T> {
 		return node;
 	}
 
+	/**
+	 * Returns the elements contained in the same component as <tt>t</tt>
+	 *
+	 * @param t
+	 *            the element representing one site
+	 * @return the elements contained in the same component as <tt>t</tt>
+	 *         excluding <tt>t</tt>
+	 */
 	public Collection<T> getComponent(T t) {
 		Collection<T> component = new HashSet<>();
-		Stack<Node<T>> todo = new Stack<>();
-		Node<T> node = find(t);
+		Stack<Node> todo = new Stack<>();
+		Node node = find(t);
 		if (node == null) {
 			return component;
 		}
 		todo.add(node);
 		while (!todo.isEmpty()) {
-			Node<T> elem = todo.pop();
+			Node elem = todo.pop();
 			component.add(elem.getElement());
 			todo.addAll(elem.getChildren());
 		}
@@ -140,12 +209,24 @@ public class UnionFind<T> {
 		return component;
 	}
 
+	/**
+	 * Get the nodes rooting the trees of the Union Find
+	 *
+	 * @return nodes rooting a tree
+	 */
 	public Set<T> getRoots() {
 		return roots.stream().map(Node::getElement).collect(Collectors.toSet());
 	}
 
+	/**
+	 * Add a new element to the Union find by creating a new tree having exactly
+	 * one node.
+	 *
+	 * @param t
+	 *            element to be inserted
+	 */
 	private void insert(T t) {
-		Node<T> node = new Node<>(t);
+		Node node = new Node(t);
 		roots.add(node);
 		nodes.put(t, node);
 	}
@@ -166,8 +247,8 @@ public class UnionFind<T> {
 		if (!nodes.containsKey(u)) {
 			insert(u);
 		}
-		Node<T> rootT = find(t);
-		Node<T> rootU = find(u);
+		Node rootT = find(t);
+		Node rootU = find(u);
 		if (rootT.equals(rootU)) {
 			return;
 		}
