@@ -10,7 +10,7 @@
 		<module>commons</module>
 		<module>dysni</module>
 		<module>demo</module>
-		<module>util</module>
+		<module>base</module>
 	</modules>
 	<build>
 		<plugins>
