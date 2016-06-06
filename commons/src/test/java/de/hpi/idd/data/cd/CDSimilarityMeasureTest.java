@@ -28,7 +28,7 @@ public class CDSimilarityMeasureTest {
 				(short) 2016, firstTracklist);
 		Map<CDSimilarity, Double> similarityMap = CDDataset.getSimilarityOfRecords(firstRecord, secondRecord);
 		assertEquals(similarityMap.get(CDSimilarity.ARTIST), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(CDSimilarity.DTITLE), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(CDSimilarity.TITLE), 1.0, DOUBLE_TOLERANCE);
 		assertEquals(similarityMap.get(CDSimilarity.CATEGORY), 1.0, DOUBLE_TOLERANCE);
 		assertEquals(similarityMap.get(CDSimilarity.GENRE), 1.0, DOUBLE_TOLERANCE);
 		assertEquals(similarityMap.get(CDSimilarity.CDEXTRA), 1.0, DOUBLE_TOLERANCE);
@@ -44,7 +44,7 @@ public class CDSimilarityMeasureTest {
 				(short) 2017, secondTracklist);
 		similarityMap = CDDataset.getSimilarityOfRecords(firstRecord, secondRecord);
 		assertEquals(similarityMap.get(CDSimilarity.ARTIST), 17.0 / 18, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(CDSimilarity.DTITLE), 17.0 / 18, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(CDSimilarity.TITLE), 17.0 / 18, DOUBLE_TOLERANCE);
 		assertEquals(similarityMap.get(CDSimilarity.CATEGORY), 1.0 / 5, DOUBLE_TOLERANCE);
 		assertEquals(similarityMap.get(CDSimilarity.GENRE), 1.0 / 4, DOUBLE_TOLERANCE);
 		assertEquals(similarityMap.get(CDSimilarity.CDEXTRA), 1.0, DOUBLE_TOLERANCE);
