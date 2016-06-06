@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
 import codecs
+import os
 
 fileName = "cddb_9763_dups.xml"
+targetDir = "../commons/src/main/resources/"
 csvLines = []
 
 wrongKeys = [line.rstrip('\n') for line in open('wrong_keys.txt')]
@@ -23,8 +25,9 @@ for pair in root:
 print(len(csvLines))
 
 
-
-with open('cd_dataset_duplicates.csv', 'w') as csvFile:
+target = targetDir + 'cd_dataset_duplicates.csv'
+os.makedirs(os.path.dirname(target), exist_ok=True)
+with open(target, 'w') as csvFile:
 	csvFile.write("firstId,secondId\n")
 	for line in csvLines:
 		csvFile.write(",".join(map(lambda x: '"' + x.replace("\"", "\"\"") + '"', line)) + "\n")

@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
 import codecs
+import os
 
 fileName = "cddb_ID_nested_10000.xml"
+targetDir = "../commons/src/main/resources/"
 csvLines = []
 
 indexLookup = {
@@ -36,7 +38,9 @@ for disc in root:
 
 headline = "id,artist,dtitle,category,genre,year,cdextra,tracks"
 
-with codecs.open("cd_dataset.csv", 'w', 'utf-8') as csvFile:
+target = targetDir + "cd_dataset.csv"
+os.makedirs(os.path.dirname(target), exist_ok=True)
+with codecs.open(target, 'w', 'utf-8') as csvFile:
 	csvFile.write(headline + "\n")
 	for line in csvLines:
 		csvFile.write(line + "\n")
