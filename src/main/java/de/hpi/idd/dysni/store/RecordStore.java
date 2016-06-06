@@ -1,8 +1,6 @@
 package de.hpi.idd.dysni.store;
 
-import java.util.Iterator;
-
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.Map.Entry;
 
 /**
  * Generic record store to store and retrieve objects based on their id
@@ -12,14 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
  * @param <V>
  *            type of the objects to be stored
  */
-public interface RecordStore<K, V> extends AutoCloseable {
-
-	/**
-	 * Get access to all objects stored
-	 *
-	 * @return iterator to iterate over all objects stored
-	 */
-	Iterator<Pair<K, V>> all();
+public interface RecordStore<K, V> extends AutoCloseable, Iterable<Entry<K, V>> {
 
 	/**
 	 * Retrieve record based on its id

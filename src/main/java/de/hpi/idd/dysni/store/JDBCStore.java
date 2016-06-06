@@ -5,8 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
-
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.Map.Entry;
 
 public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 
@@ -14,11 +13,6 @@ public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 
 	protected JDBCStore() {
 		this.conn = establishConnection();
-	}
-
-	@Override
-	public Iterator<Pair<K, V>> all() {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -38,6 +32,11 @@ public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 		} catch (SQLException e) {
 			throw new StoreException("Error retrieving record from database", e);
 		}
+	}
+
+	@Override
+	public Iterator<Entry<K, V>> iterator() {
+		throw new UnsupportedOperationException();
 	}
 
 	protected abstract PreparedStatement prepareInsert(K id, V record);
