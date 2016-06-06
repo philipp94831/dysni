@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.hpi.idd.SimilarityMeasure;
+import de.hpi.idd.DatasetUtils;
 
-public class CDSimilarityMeasure implements SimilarityMeasure {
+public class CDDataset extends DatasetUtils {
 
 	static class CDRecord {
 
@@ -114,28 +114,20 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 
 	private static class CDRecordParser {
 
-		private static final Map<String, CDRecord> CACHE = new HashMap<>();
-
-		public static CDRecord parse(Map<String, String> record) {
-			String id = record.get("id");
-			CDRecord cd = CACHE.get(id);
-			if (cd == null) {
-				cd = new CDRecord();
-				cd.setdId(id);
-				cd.setArtist(record.get("artist"));
-				cd.setdTitle(record.get("dtitle"));
-				cd.setCategory(record.get("category"));
-				String year = record.get("year");
-				if (!year.isEmpty()) {
-					cd.setYear(Short.parseShort(year));
-				}
-				cd.setGenre(record.get("genre"));
-				cd.setCdExtra(record.get("cdextra"));
-				cd.setTracks(
-						Arrays.asList(record.get("tracks").split("\\|")).stream().map(CDSimilarityMeasure::trimNumbers)
-								.map(CDSimilarityMeasure::normalize).collect(Collectors.toList()));
-				CACHE.put(id, cd);
+		@SuppressWarnings("unchecked")
+		public static CDRecord parse(Map<String, Object> record) {
+			CDRecord cd = new CDRecord();
+			cd.setdId((String) record.get("id"));
+			cd.setArtist((String) record.get("artist"));
+			cd.setdTitle((String) record.get("dtitle"));
+			cd.setCategory((String) record.get("category"));
+			Object year = record.get("year");
+			if (year != null) {
+				cd.setYear((Short) year);
 			}
+			cd.setGenre((String) record.get("genre"));
+			cd.setCdExtra((String) record.get("cdextra"));
+			cd.setTracks((List<String>) record.get("tracks"));
 			return cd;
 		}
 	}
@@ -173,19 +165,18 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 	public static Map<CDSimilarity, Double> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
 		Map<CDSimilarity, Double> similarityMap = new HashMap<>();
 		similarityMap.put(CDSimilarity.ARTIST,
-				CDSimilarityMeasure.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
+				CDDataset.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
 		similarityMap.put(CDSimilarity.DTITLE,
-				CDSimilarityMeasure.levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
+				CDDataset.levenshteinDistance(firstRecord.getdTitle(), secondRecord.getdTitle()));
 		similarityMap.put(CDSimilarity.CATEGORY,
-				CDSimilarityMeasure.levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
+				CDDataset.levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
 		similarityMap.put(CDSimilarity.GENRE,
-				CDSimilarityMeasure.levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
-		similarityMap.put(CDSimilarity.YEAR,
-				CDSimilarityMeasure.yearDistance(firstRecord.getYear(), secondRecord.getYear()));
+				CDDataset.levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
+		similarityMap.put(CDSimilarity.YEAR, CDDataset.yearDistance(firstRecord.getYear(), secondRecord.getYear()));
 		similarityMap.put(CDSimilarity.CDEXTRA,
-				CDSimilarityMeasure.levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
+				CDDataset.levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
 		similarityMap.put(CDSimilarity.TRACK,
-				CDSimilarityMeasure.getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
+				CDDataset.getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
 		return similarityMap;
 	}
 
@@ -219,7 +210,7 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 	}
 
 	public static double similarity(CDRecord firstRecord, CDRecord secondRecord) {
-		Map<CDSimilarity, Double> similarityMap = CDSimilarityMeasure.getSimilarityOfRecords(firstRecord, secondRecord);
+		Map<CDSimilarity, Double> similarityMap = CDDataset.getSimilarityOfRecords(firstRecord, secondRecord);
 		double result = 0.0;
 		for (Entry<CDSimilarity, Double> entry : similarityMap.entrySet()) {
 			result += entry.getKey().weight() * entry.getValue();
@@ -238,24 +229,40 @@ public class CDSimilarityMeasure implements SimilarityMeasure {
 		}
 		int diff = 0;
 		int max = 0;
-		int n = Math.max(CDSimilarityMeasure.getNumberOfDigits(year), CDSimilarityMeasure.getNumberOfDigits(year2));
+		int n = Math.max(CDDataset.getNumberOfDigits(year), CDDataset.getNumberOfDigits(year2));
 		for (int i = 0; i < n; i++) {
 			int weight = i + 1;
 			max += weight * 9;
-			diff += weight
-					* Math.abs(CDSimilarityMeasure.getNthDigit(year, i) - CDSimilarityMeasure.getNthDigit(year2, i));
+			diff += weight * Math.abs(CDDataset.getNthDigit(year, i) - CDDataset.getNthDigit(year2, i));
 		}
 		return 1 - (double) diff / max;
 	}
 
-	@Override
-	public Double calculateSimilarity(Map<String, String> firstRecord, Map<String, String> secondRecord,
-			HashMap<String, String> parameters) {
-		return CDSimilarityMeasure.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
+	public CDDataset() {
+		datasetThreshold = THRESHOLD;
 	}
 
 	@Override
-	public double getThreshold() {
-		return THRESHOLD;
+	public Double calculateSimilarity(Map<String, Object> firstRecord, Map<String, Object> secondRecord,
+			Map<String, String> parameters) {
+		return CDDataset.similarity(CDRecordParser.parse(firstRecord), CDRecordParser.parse(secondRecord));
+	}
+
+	@Override
+	public Map<String, Object> parseRecord(Map<String, String> value) {
+		Map<String, Object> record = new HashMap<>();
+		record.put("id", value.get("id"));
+		record.put("artist", value.get("artist"));
+		record.put("dtitle", value.get("dtitle"));
+		record.put("category", value.get("category"));
+		String year = value.get("year");
+		if (!year.isEmpty()) {
+			record.put("year", Short.parseShort(year));
+		}
+		record.put("genre", value.get("genre"));
+		record.put("cdextra", value.get("cdextra"));
+		record.put("tracks", Arrays.asList(value.get("tracks").split("\\|")).stream().map(CDDataset::trimNumbers)
+				.map(CDDataset::normalize).collect(Collectors.toList()));
+		return record;
 	}
 }

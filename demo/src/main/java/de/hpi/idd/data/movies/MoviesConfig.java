@@ -8,7 +8,7 @@ import de.hpi.idd.dysni.DySNIndexConfiguration;
 
 public class MoviesConfig {
 
-	public static Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> config() {
+	public static Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> config() {
 		return Arrays.asList();
 	}
 

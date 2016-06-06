@@ -18,7 +18,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>commons</artifactId>
-      <version>3</version>
+      <version>4</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

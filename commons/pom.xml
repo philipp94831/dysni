@@ -9,7 +9,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>commons</artifactId>
-  <version>3</version>
+  <version>4</version>
   <name>commons</name>
   <url>http://maven.apache.org</url>
   <dependencies>

@@ -14,23 +14,23 @@ public class CDConfig {
 
 	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinSimilarity();
 
-	public static Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> config() {
-		return Arrays.asList(new DySNIndexConfiguration<>(new KeyHandler<Map<String, String>, String>() {
+	public static Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> config() {
+		return Arrays.asList(new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
 			@Override
-			public String computeKey(Map<String, String> obj) {
-				String title = obj.get("dtitle").toLowerCase();
-				String artist = obj.get("artist").toLowerCase();
+			public String computeKey(Map<String, Object> obj) {
+				String title = ((String) obj.get("dtitle")).toLowerCase();
+				String artist = ((String) obj.get("artist")).toLowerCase();
 				return artist.substring(0, Math.min(3, artist.length()))
 						+ title.substring(0, Math.min(3, title.length()));
 			}
 		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))),
-				new DySNIndexConfiguration<>(new KeyHandler<Map<String, String>, String>() {
+				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
 					@Override
-					public String computeKey(Map<String, String> obj) {
-						String title = obj.get("dtitle").toLowerCase();
-						String artist = obj.get("artist").toLowerCase();
+					public String computeKey(Map<String, Object> obj) {
+						String title = ((String) obj.get("dtitle")).toLowerCase();
+						String artist = ((String) obj.get("artist")).toLowerCase();
 						return title.substring(0, Math.min(3, title.length()))
 								+ artist.substring(0, Math.min(3, artist.length()));
 					}

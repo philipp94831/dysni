@@ -1,7 +1,7 @@
 package de.hpi.idd;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public interface Core {
 
@@ -14,7 +14,7 @@ public interface Core {
 	 * @param parameters:
 	 *            You could pass your parameters in a key, value form.
 	 */
-	public void buildIndex(HashMap<String, String> parameters);
+	public void buildIndex(Map<String, String> parameters);
 
 	/**
 	 *
@@ -24,35 +24,29 @@ public interface Core {
 	 *            You could pass your parameters in a key, value form.
 	 * @return: true if successful, false otherwise
 	 */
-	public boolean destroyIndex(HashMap<String, String> parameters);
+	public boolean destroyIndex(Map<String, String> parameters);
 
-	// /**
-	// *
-	// * Remove the record from the index.
-	// *
-	// * @param recordID: remove the record with this recordID
-	// * @return: true if successful, false otherwise
-	// */
-	// public boolean removeRecord(Integer recordID);
 	/**
 	 *
 	 * Given a duplicate, return all the matching records you could find in your
 	 * index.
 	 *
-	 * // * @param record: A generic, CSV-like type to provide the values of the
-	 * record in a Key-Value style.
-	 *
-	 * @return: The result record IDs in an ArrayList container.
+	 * @param record:
+	 *            A generic, CSV-like type to provide the values of the record
+	 *            in a Key-Value style.
+	 * @param parameters:
+	 *            Same as record.
+	 * @return: The result record IDs in an List container.
 	 */
-	public ArrayList<String> getDuplicates(HashMap<String, String> record, HashMap<String, String> parameters);
+	public List<String> getDuplicates(Map<String, Object> record, Map<String, String> parameters);
 
 	/**
 	 * Get the record with this record ID.
 	 *
 	 * @param recordID
-	 * @return
+	 * @return the record in a key-value format.
 	 */
-	public ArrayList<String> getRecord(String recordID);
+	public Map<String, Object> getRecord(String recordID);
 
 	/**
 	 *
@@ -63,5 +57,5 @@ public interface Core {
 	 *            in a Key-Value style.
 	 * @return: true if successful, false otherwise
 	 */
-	public boolean insertRecord(HashMap<String, String> record, HashMap<String, String> parameters);
+	public boolean insertRecord(Map<String, Object> record, Map<String, String> parameters);
 }

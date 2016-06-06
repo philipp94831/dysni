@@ -31,12 +31,12 @@ public class App {
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 	private static final Logger LOGGER = Logger.getLogger(App.class.getName());
 
-	private static EntityResolver<Map<String, String>, String> getEntityResolver(Dataset dataset,
-			SimilarityClassifier<Map<String, String>> similarityMeasure,
-			RecordStore<String, Map<String, String>> store) {
-		switch (App.ER_TYPE) {
+	private static EntityResolver<Map<String, Object>, String> getEntityResolver(Dataset dataset,
+			SimilarityClassifier<Map<String, Object>> similarityMeasure,
+			RecordStore<String, Map<String, Object>> store) {
+		switch (ER_TYPE) {
 		case DYSNI:
-			Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> configs = dataset.getConfigs();
+			Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs = dataset.getConfigs();
 			return new DynamicSortedNeighborhoodIndexer<>(store, similarityMeasure, configs);
 		case BRUTE_FORCE:
 			return new BruteForceEntityResolver<>(store, similarityMeasure);
@@ -49,16 +49,16 @@ public class App {
 		long start = System.nanoTime();
 		int i = 0;
 		Dataset dataset = Dataset.getForName(DATASET_NAME);
-		SimilarityMeasure similarityMeasure = dataset.getSimilarityMeasure();
+		DatasetUtils du = dataset.getDataset();
 		SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
 		try (Reader in = new InputStreamReader(dataset.getFile());
 				CSVParser parser = FORMAT.parse(in);
-				RecordStore<String, Map<String, String>> store = new MemoryStore<>()) {
-			EntityResolver<Map<String, String>, String> er = App.getEntityResolver(dataset,
-					new IDDSimilarityClassifier(similarityMeasure), store);
+				RecordStore<String, Map<String, Object>> store = new MemoryStore<>()) {
+			EntityResolver<Map<String, Object>, String> er = getEntityResolver(dataset, new IDDSimilarityClassifier(du),
+					store);
 			for (CSVRecord record : parser) {
-				Map<String, String> rec = record.toMap();
-				String id = rec.get(dataset.getIdField());
+				Map<String, Object> rec = du.parseRecord(record.toMap());
+				String id = (String) rec.get(dataset.getIdField());
 				er.add(rec, id);
 				Collection<String> duplicates = er.findDuplicates(rec, id);
 				for (String duplicate : duplicates) {
@@ -72,7 +72,8 @@ public class App {
 		} catch (StoreException e) {
 			throw new RuntimeException("Error accessing storage", e);
 		} catch (Exception e) {
-			LOGGER.warning("Exception when closing store: " + e.getMessage());
+			LOGGER.warning("Error executing App: " + e.getMessage());
+			e.printStackTrace();
 		}
 		long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");

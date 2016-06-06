@@ -4,9 +4,9 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
-import de.hpi.idd.SimilarityMeasure;
+import de.hpi.idd.DatasetUtils;
 import de.hpi.idd.data.cd.CDConfig;
-import de.hpi.idd.data.cd.CDSimilarityMeasure;
+import de.hpi.idd.data.cd.CDDataset;
 import de.hpi.idd.data.cora.CoraConfig;
 import de.hpi.idd.data.movies.MoviesConfig;
 import de.hpi.idd.data.ncvoters.NCVotersConfig;
@@ -17,7 +17,7 @@ import de.hpi.idd.dysni.DySNIndexConfiguration;
  *
  */
 public enum Dataset {
-	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", "id", new CDSimilarityMeasure()),
+	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", "id", new CDDataset()),
 	CORA(CoraConfig.config(), "cora.csv", "cora_ground_truth.csv", "id", null),
 	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", "id", null),
 	NCVOTERS(NCVotersConfig.config(), "ncvoters.csv", "ncvoters_ground_truth.csv", "id", null);
@@ -37,14 +37,14 @@ public enum Dataset {
 		}
 	}
 
-	private final Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> configs;
+	private final Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs;
 	private final String fileName;
 	private final String groundTruth;
 	private final String idField;
-	private final SimilarityMeasure similarityMeasure;
+	private final DatasetUtils similarityMeasure;
 
-	Dataset(Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> configs, String fileName,
-			String groundTruth, String idField, SimilarityMeasure similarityMeasure) {
+	Dataset(Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs, String fileName,
+			String groundTruth, String idField, DatasetUtils similarityMeasure) {
 		this.configs = configs;
 		this.fileName = fileName;
 		this.groundTruth = groundTruth;
@@ -52,8 +52,12 @@ public enum Dataset {
 		this.similarityMeasure = similarityMeasure;
 	}
 
-	public Collection<DySNIndexConfiguration<Map<String, String>, ?, String>> getConfigs() {
+	public Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> getConfigs() {
 		return configs;
+	}
+
+	public DatasetUtils getDataset() {
+		return similarityMeasure;
 	}
 
 	public InputStream getFile() {
@@ -66,9 +70,5 @@ public enum Dataset {
 
 	public String getIdField() {
 		return idField;
-	}
-
-	public SimilarityMeasure getSimilarityMeasure() {
-		return similarityMeasure;
 	}
 }
