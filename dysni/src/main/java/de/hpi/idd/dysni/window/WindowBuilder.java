@@ -2,12 +2,10 @@ package de.hpi.idd.dysni.window;
 
 import java.util.Collection;
 
-import de.hpi.idd.dysni.DySNIndex;
 import de.hpi.idd.dysni.avl.Node;
 
 /**
- * Interface for building windows when retrieving candidates in a
- * {@link DySNIndex}
+ * Interface for building windows when retrieving candidates in a DySNIndex
  *
  * @param <RECORD>
  *            type of elements associated with the index

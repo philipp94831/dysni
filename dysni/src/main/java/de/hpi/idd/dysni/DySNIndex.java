@@ -18,7 +18,7 @@ import de.hpi.idd.dysni.window.WindowBuilder;
  * @param <ID>
  *            type of ids which represent the records
  */
-public class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
+class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 
 	/** used for computation of the key of an element in the tree */
 	private final KeyHandler<RECORD, KEY> keyHandler;

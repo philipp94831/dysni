@@ -33,7 +33,7 @@ public enum Dataset {
 		case "ncvoters":
 			return NCVOTERS;
 		default:
-			return null;
+			throw new RuntimeException("Dataset \"" + name + "\" not available");
 		}
 	}
 

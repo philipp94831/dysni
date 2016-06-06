@@ -19,7 +19,7 @@ import de.hpi.idd.util.UnionFind;
  * Utility class to evaluate the results of entity resolution using a given
  * ground truth
  */
-public class Evaluator {
+class Evaluator {
 
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 	private static final boolean VERBOSE = false;
