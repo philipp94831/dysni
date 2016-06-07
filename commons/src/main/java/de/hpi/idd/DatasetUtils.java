@@ -8,15 +8,15 @@ abstract public class DatasetUtils {
 
 	/**
 	 *
-	 * Given two record IDs, return their similarity in the range of [0,1].
+	 * Given two records, return their similarity in the range of [0,1].
 	 *
-	 * @param recordID1
-	 * @param recordID2
-	 * @param parameters:
+	 * @param record1
+	 * @param record2
+	 * @param parameters
 	 *            You could pass your parameters in a key, value form.
 	 * @return: The similarity in a double value of a range [0,1].
 	 */
-	abstract public Double calculateSimilarity(Map<String, Object> recordID1, Map<String, Object> recordID2,
+	abstract public Double calculateSimilarity(Map<String, Object> record1, Map<String, Object> record2,
 			Map<String, String> parameters);
 
 	public double getDatasetThreshold() {
@@ -25,14 +25,15 @@ abstract public class DatasetUtils {
 
 	/**
 	 *
-	 * @param The
-	 *            record in a String format. For instance: 'record_id, value1,
-	 *            value2,... ,valueN'
+	 * @param values
+	 *            The record in a Key-Value <String, String> format. For
+	 *            instance: <'id', '1'>, <'attribute1', 'value1'>,
+	 *            <'attribute2', 'value2'>, ..., <'attributeN', valueN'>
 	 * @return A dictionary with key-value objects: e.g. <attribute1, value1>
 	 *         Each value can be of any type, thus it is Object (and not
 	 *         String).
 	 */
-	abstract public Map<String, Object> parseRecord(Map<String, String> value);
+	abstract public Map<String, Object> parseRecord(Map<String, String> values);
 
 	public void setDatasetThreshold(double datasetThreshold) {
 		this.datasetThreshold = datasetThreshold;

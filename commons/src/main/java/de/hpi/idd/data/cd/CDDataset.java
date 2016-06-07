@@ -253,7 +253,7 @@ public class CDDataset extends DatasetUtils {
 
 	/**
 	 * Brute-force results:
-	 * 
+	 *
 	 * <ul>
 	 * <li>Recall: 0.8304</li>
 	 * <li>Precision: 0.8451</li>

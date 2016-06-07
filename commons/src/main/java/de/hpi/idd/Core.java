@@ -42,7 +42,7 @@ public interface Core {
 
 	/**
 	 * Get the record with this record ID.
-	 *
+	 * 
 	 * @param recordID
 	 * @return the record in a key-value format.
 	 */
