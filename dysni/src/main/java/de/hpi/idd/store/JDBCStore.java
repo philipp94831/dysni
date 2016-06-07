@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 
+	private static final Logger LOGGER = Logger.getLogger(JDBCStore.class.getName());
 	protected final Connection conn;
 
 	protected JDBCStore() {
@@ -16,8 +18,12 @@ public abstract class JDBCStore<K, V> implements RecordStore<K, V> {
 	}
 
 	@Override
-	public void close() throws SQLException {
-		conn.close();
+	public void close() {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			LOGGER.warning("Error closing connection");
+		}
 	}
 
 	protected abstract V deserialize(ResultSet rs);

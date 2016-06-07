@@ -251,6 +251,15 @@ public class CDDataset extends DatasetUtils {
 		datasetThreshold = THRESHOLD;
 	}
 
+	/**
+	 * Brute-force results:
+	 * 
+	 * <ul>
+	 * <li>Recall: 0.8304</li>
+	 * <li>Precision: 0.8451</li>
+	 * <li>F-Measure: 0.8377</li>
+	 * </ul>
+	 */
 	@Override
 	public Double calculateSimilarity(Map<String, Object> firstRecord, Map<String, Object> secondRecord,
 			Map<String, String> parameters) {

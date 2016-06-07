@@ -65,7 +65,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 * all indexes.
 	 */
 	@Override
-	public void add(RECORD rec, ID recId) throws StoreException {
+	public void insert(RECORD rec, ID recId) throws StoreException {
 		store.storeRecord(recId, rec);
 		for (DySNIndex<RECORD, ?, ID> index : indexes) {
 			index.insert(rec, recId);
@@ -78,7 +78,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 * Similar records are connected in the Union Find data structure.
 	 */
 	@Override
-	public Collection<ID> findDuplicates(RECORD rec, ID recId) throws StoreException {
+	public Collection<ID> resolve(RECORD rec, ID recId) throws StoreException {
 		Set<ID> candidates = new HashSet<>();
 		for (DySNIndex<RECORD, ?, ID> index : indexes) {
 			candidates.addAll(index.findCandidates(rec));

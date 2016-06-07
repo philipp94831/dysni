@@ -1,5 +1,6 @@
 package de.hpi.idd.store;
 
+import java.io.Closeable;
 import java.util.Map.Entry;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Map.Entry;
  * @param <V>
  *            type of the objects to be stored
  */
-public interface RecordStore<K, V> extends AutoCloseable, Iterable<Entry<K, V>> {
+public interface RecordStore<K, V> extends Closeable, Iterable<Entry<K, V>> {
 
 	/**
 	 * Retrieve record based on its id

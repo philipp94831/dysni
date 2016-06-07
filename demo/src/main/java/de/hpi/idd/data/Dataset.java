@@ -17,10 +17,12 @@ import de.hpi.idd.dysni.DySNIndexConfiguration;
  *
  */
 public enum Dataset {
-	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", "id", new CDDataset()),
-	CORA(CoraConfig.config(), "cora.csv", "cora_ground_truth.csv", "id", null),
-	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", "id", null),
-	NCVOTERS(NCVotersConfig.config(), "ncvoters.csv", "ncvoters_ground_truth.csv", "id", null);
+	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", new CDDataset()),
+	CORA(CoraConfig.config(), "cora.csv", "cora_ground_truth.csv", null),
+	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", null),
+	NCVOTERS(NCVotersConfig.config(), "ncvoters.csv", "ncvoters_ground_truth.csv", null);
+
+	public static final String ID = "id";
 
 	public static Dataset getForName(String name) {
 		switch (name.toLowerCase()) {
@@ -40,15 +42,13 @@ public enum Dataset {
 	private final Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs;
 	private final String fileName;
 	private final String groundTruth;
-	private final String idField;
 	private final DatasetUtils similarityMeasure;
 
 	Dataset(Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs, String fileName,
-			String groundTruth, String idField, DatasetUtils similarityMeasure) {
+			String groundTruth, DatasetUtils similarityMeasure) {
 		this.configs = configs;
 		this.fileName = fileName;
 		this.groundTruth = groundTruth;
-		this.idField = idField;
 		this.similarityMeasure = similarityMeasure;
 	}
 
@@ -66,9 +66,5 @@ public enum Dataset {
 
 	public InputStream getGroundThruth() {
 		return this.getClass().getClassLoader().getResourceAsStream(groundTruth);
-	}
-
-	public String getIdField() {
-		return idField;
 	}
 }

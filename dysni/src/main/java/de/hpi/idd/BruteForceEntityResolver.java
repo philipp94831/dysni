@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import de.hpi.idd.sim.SimilarityClassifier;
 import de.hpi.idd.store.RecordStore;
+import de.hpi.idd.store.StoreException;
 import de.hpi.idd.util.UnionFind;
 
 /**
@@ -27,12 +28,12 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 	}
 
 	@Override
-	public void add(RECORD rec, ID recId) throws Exception {
+	public void insert(RECORD rec, ID recId) throws StoreException {
 		store.storeRecord(recId, rec);
 	}
 
 	@Override
-	public Collection<ID> findDuplicates(RECORD rec, ID recId) throws Exception {
+	public Collection<ID> resolve(RECORD rec, ID recId) throws StoreException {
 		for (Entry<ID, RECORD> entry : store) {
 			if (sim.areSimilar(rec, entry.getValue()) && !recId.equals(entry.getKey())) {
 				uf.union(recId, entry.getKey());

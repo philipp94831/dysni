@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -29,7 +28,6 @@ public class App {
 	private static final String DATASET_NAME = "cd";
 	private static final ERType ER_TYPE = ERType.DYSNI;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
-	private static final Logger LOGGER = Logger.getLogger(App.class.getName());
 
 	private static EntityResolver<Map<String, Object>, String> getEntityResolver(Dataset dataset,
 			SimilarityClassifier<Map<String, Object>> similarityMeasure,
@@ -41,7 +39,7 @@ public class App {
 		case BRUTE_FORCE:
 			return new BruteForceEntityResolver<>(store, similarityMeasure);
 		default:
-			return null;
+			throw new IllegalArgumentException("Unknown EntityResolver: " + ER_TYPE);
 		}
 	}
 
@@ -58,9 +56,9 @@ public class App {
 					store);
 			for (CSVRecord record : parser) {
 				Map<String, Object> rec = du.parseRecord(record.toMap());
-				String id = (String) rec.get(dataset.getIdField());
-				er.add(rec, id);
-				Collection<String> duplicates = er.findDuplicates(rec, id);
+				String id = (String) rec.get(Dataset.ID);
+				er.insert(rec, id);
+				Collection<String> duplicates = er.resolve(rec, id);
 				for (String duplicate : duplicates) {
 					duplicatesToCheck.put(id, duplicate, true);
 				}
@@ -71,9 +69,6 @@ public class App {
 			throw new RuntimeException("Error parsing CSV", e);
 		} catch (StoreException e) {
 			throw new RuntimeException("Error accessing storage", e);
-		} catch (Exception e) {
-			LOGGER.warning("Error executing App: " + e.getMessage());
-			e.printStackTrace();
 		}
 		long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");

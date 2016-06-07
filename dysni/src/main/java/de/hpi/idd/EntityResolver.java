@@ -2,6 +2,8 @@ package de.hpi.idd;
 
 import java.util.Collection;
 
+import de.hpi.idd.store.StoreException;
+
 /**
  * Interface for entity resolvers to determine similar or equal entities.
  * Entities are represented by their id.
@@ -22,7 +24,7 @@ public interface EntityResolver<RECORD, ID> {
 	 *            the unique identifier of the record
 	 * @throws Exception
 	 */
-	void add(RECORD rec, ID recId) throws Exception;
+	void insert(RECORD rec, ID recId) throws StoreException;
 
 	/**
 	 * Find duplicates for the specified record
@@ -34,6 +36,6 @@ public interface EntityResolver<RECORD, ID> {
 	 * @return collection of ids of duplicate records
 	 * @throws Exception
 	 */
-	Collection<ID> findDuplicates(RECORD rec, ID recId) throws Exception;
+	Collection<ID> resolve(RECORD rec, ID recId) throws StoreException;
 
 }
