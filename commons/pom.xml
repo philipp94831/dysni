@@ -17,6 +17,8 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.4</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/commons-lang3-3.4.jar</systemPath>
     </dependency>
   </dependencies>
 </project>
