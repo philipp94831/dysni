@@ -14,7 +14,7 @@ abstract public class DatasetUtils {
 	 * @param record2
 	 * @param parameters
 	 *            You could pass your parameters in a key, value form.
-	 * @return: The similarity in a double value of a range [0,1].
+	 * @return The similarity in a double value of a range [0,1].
 	 */
 	abstract public Double calculateSimilarity(Map<String, Object> record1, Map<String, Object> record2,
 			Map<String, String> parameters);
