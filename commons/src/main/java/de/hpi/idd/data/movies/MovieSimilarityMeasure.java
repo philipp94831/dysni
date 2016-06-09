@@ -29,12 +29,12 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 		weightcounter = 0;
 		double sim =  getTitleSimilarity((String)r1.get("title"), (String)r2.get("title"))
 				  +  getYearSimilarity((String)r1.get("year"), (String)r2.get("year"))
-				  +  getGenresSimilarity((String)r1.get("genres"), (String)r2.get("genres"))
+				  +  getGenresSimilarity((String)r1.get("genre"), (String)r2.get("genre"))
 				  +  getUrlSimilarity((String)r1.get("url"), (String)r2.get("url"))
 				  +  getWriterSimilarity((String)r1.get("writer"), (String)r2.get("writer"))
 				  +  getEditorSimilarity((String)r1.get("editor"), (String)r2.get("editor"))
-				  +  getDirectorSimilarity((String)r1.get("director"), (String)r2.get("director"))
-				  +  getActorsSimilarity((String)r1.get("actors"), (String)r2.get("actors"));
+				  +  getDirectorSimilarity((String)r1.get("director name"), (String)r2.get("director name"))
+				  +  getActorsSimilarity((String)r1.get("actor name"), (String)r2.get("actor name"));
 				
 		return sim/weightcounter;		
 	}
@@ -43,11 +43,12 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 	private double getTitleSimilarity(String s1, String s2){
 		int weight = 6;
 		weightcounter+=weight;
-		char last1 = s1.charAt(s1.length()-1); 
-		char last2 = s2.charAt(s2.length()-1); 
-		//if the last char is a diggit, it must be the same for not finding sequals
+		char last1 = s1.length() >= 1 ? s1.charAt(s1.length()-1) : '!';
+		char last2 = s2.length() >= 1 ? s2.charAt(s2.length()-1) : '!';
+		//if the last char is a digit, it must be the same for not finding sequels
 		if((('0' <= last1 && last1 <= '9') || ('0' <= last2 && last2 <= '9')) && last1 != last2) return 0;
 		double result = levenshtein.similarity(s1, s2);
+		if (Double.isNaN(result)) result = 0;
 		if(result > 1.0 ) System.out.println("Title " + result);
 		return weight*result;
 	}

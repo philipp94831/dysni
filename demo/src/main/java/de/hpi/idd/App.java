@@ -25,7 +25,7 @@ public class App {
 		BRUTE_FORCE, DYSNI
 	}
 
-	private static final String DATASET_NAME = "cd";
+	private static final String DATASET_NAME = "movies";
 	private static final ERType ER_TYPE = ERType.DYSNI;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 
