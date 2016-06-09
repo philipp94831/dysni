@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.hpi.idd.dysni.DySNIndexConfiguration;
 import de.hpi.idd.dysni.KeyHandler;
 import de.hpi.idd.dysni.window.AdaptiveKeySimilarityWindowBuilder;
@@ -19,21 +21,19 @@ public class MoviesConfig {
 
 			@Override
 			public String computeKey(Map<String, Object> obj) {
-				String title = ((String) obj.get("writer")).toLowerCase();
+				String writer = ((String) obj.get("writer")).toLowerCase();
 				String artist = ((String) obj.get("title")).toLowerCase();
-				return artist.substring(0, Math.min(3, artist.length()))
-						+ title.substring(0, Math.min(3, title.length()));
+				return StringUtils.substring(artist, 0, 3) + StringUtils.substring(writer, 0, 3);
 			}
-			}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))),
-		new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
+		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))),
+				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
-			@Override
-			public String computeKey(Map<String, Object> obj) {
-				String title = ((String) obj.get("title")).toLowerCase();
-				String artist = ((String) obj.get("writer")).toLowerCase();
-				return title.substring(0, Math.min(3, title.length()))
-						+ artist.substring(0, Math.min(3, artist.length()));
-			}
-		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))));
+					@Override
+					public String computeKey(Map<String, Object> obj) {
+						String title = ((String) obj.get("title")).toLowerCase();
+						String writer = ((String) obj.get("writer")).toLowerCase();
+						return StringUtils.substring(title, 0, 3) + StringUtils.substring(writer, 0, 3);
+					}
+				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))));
 	}
 }

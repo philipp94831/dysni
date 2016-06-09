@@ -1,6 +1,6 @@
 package de.hpi.idd;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import de.hpi.idd.sim.SimilarityClassifier;
@@ -25,7 +25,7 @@ public class IDDSimilarityClassifier implements SimilarityClassifier<Map<String,
 
 	@Override
 	public double calculateSimilarity(Map<String, Object> record, Map<String, Object> record2) {
-		return sim.calculateSimilarity(record, record2, new HashMap<>());
+		return sim.calculateSimilarity(record, record2, Collections.emptyMap());
 	}
 
 	@Override
