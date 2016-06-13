@@ -15,6 +15,11 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 	private NormalizedLevenshtein levenshtein = new NormalizedLevenshtein();
 	private double weightcounter;
 	
+	
+	public MovieSimilarityMeasure() {
+		datasetThreshold = 0.83;
+	}
+	
 	public static double subsetSim(Collection<? extends Object> c1, Collection<? extends Object> c2){
 		HashSet<Object> intersection = new HashSet<Object>(c1);
 		intersection.retainAll(c2);
