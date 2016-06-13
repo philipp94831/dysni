@@ -1,5 +1,6 @@
 package de.hpi.idd.data;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -26,7 +27,7 @@ public enum Dataset {
 	CORA(CoraConfig.config(), "cora_v2.csv", "cora_ground_truth.csv", new Utility()),
 	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", new MovieSimilarityMeasure()),
 	NCVOTERS(NCVotersConfig.config(), "ncvoters.csv", "ncvoters_ground_truth.csv", new NCVotersSimilarity()),
-	PEOPLE(PeopleConfig.config(), null, null, new SimilarityFunctionForPeopleDataset());
+	PEOPLE(PeopleConfig.config(), "parsed3M.csv", "gold_standard_3M.csv", new SimilarityFunctionForPeopleDataset());
 
 	public static final String ID = "id";
 
@@ -69,10 +70,18 @@ public enum Dataset {
 	}
 
 	public InputStream getFile() {
-		return this.getClass().getClassLoader().getResourceAsStream(fileName);
+		try {
+			return Dataset.class.getResource(fileName).openStream();
+		} catch (IOException e) {
+			throw new RuntimeException("Resource not available: " + fileName, e);
+		}
 	}
 
 	public InputStream getGroundThruth() {
-		return this.getClass().getClassLoader().getResourceAsStream(groundTruth);
+		try {
+			return Dataset.class.getResource(groundTruth).openStream();
+		} catch (IOException e) {
+			throw new RuntimeException("Resource not available: " + groundTruth, e);
+		}
 	}
 }
