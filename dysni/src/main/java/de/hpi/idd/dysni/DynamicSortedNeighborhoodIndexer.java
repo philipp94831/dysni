@@ -85,7 +85,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 		}
 		candidates.remove(recId);
 		for (ID candidate : candidates) {
-			if (sim.areSimilar(rec, store.getRecord(candidate))) {
+			if (!uf.connected(recId, candidate) && sim.areSimilar(rec, store.getRecord(candidate))) {
 				uf.union(recId, candidate);
 			}
 		}

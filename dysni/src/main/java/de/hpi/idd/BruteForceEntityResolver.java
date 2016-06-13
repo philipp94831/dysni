@@ -35,7 +35,8 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 	@Override
 	public Collection<ID> resolve(RECORD rec, ID recId) throws StoreException {
 		for (Entry<ID, RECORD> entry : store) {
-			if (sim.areSimilar(rec, entry.getValue()) && !recId.equals(entry.getKey())) {
+			if (!recId.equals(entry.getKey()) && !uf.connected(recId, entry.getKey())
+					&& sim.areSimilar(rec, entry.getValue())) {
 				uf.union(recId, entry.getKey());
 			}
 		}

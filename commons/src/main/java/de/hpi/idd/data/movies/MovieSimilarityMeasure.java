@@ -17,7 +17,7 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 	
 	
 	public MovieSimilarityMeasure() {
-		datasetThreshold = 0.83;
+		datasetThreshold = 0.7;
 	}
 	
 	public static double subsetSim(Collection<? extends Object> c1, Collection<? extends Object> c2){
