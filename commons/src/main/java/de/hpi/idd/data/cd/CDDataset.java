@@ -118,50 +118,71 @@ public class CDDataset extends DatasetUtils {
 		public static CDRecord parse(Map<String, Object> record) {
 			CDRecord cd = new CDRecord();
 			cd.setId((String) record.get(ID));
-			cd.setArtist((String) record.get(ARTIST));
-			cd.setTitle((String) record.get(TITLE));
-			cd.setCategory((String) record.get(CATEGORY));
-			Object year = record.get(YEAR);
+			cd.setArtist((String) record.get(ARTIST_NAME));
+			cd.setTitle((String) record.get(TITLE_NAME));
+			cd.setCategory((String) record.get(CATEGORY_NAME));
+			Object year = record.get(YEAR_NAME);
 			if (year != null) {
 				cd.setYear((Short) year);
 			}
-			cd.setGenre((String) record.get(GENRE));
-			cd.setCdExtra((String) record.get(CDEXTRA));
-			cd.setTracks((List<String>) record.get(TRACKS));
+			cd.setGenre((String) record.get(GENRE_NAME));
+			cd.setCdExtra((String) record.get(CDEXTRA_NAME));
+			cd.setTracks((List<String>) record.get(TRACKS_NAME));
 			return cd;
 		}
 	}
 
-	public enum CDSimilarity {
-		ARTIST(5), CATEGORY, CDEXTRA(0), GENRE, TITLE(4), TRACK(3), YEAR;
+	public enum Attribute {
+		ARTIST(5), CATEGORY(), CDEXTRA(0), GENRE(), TITLE(4), TRACKS(3), YEAR();
 
-		private static final double TOTAL_WEIGHT = Arrays.stream(CDSimilarity.values())
-				.mapToDouble(CDSimilarity::weight).sum();
+		private static final double TOTAL_WEIGHT = Arrays.stream(Attribute.values()).mapToDouble(Attribute::weight)
+				.sum();
 		private final double weight;
 
-		CDSimilarity() {
+		Attribute() {
 			this(1);
 		}
 
-		CDSimilarity(double weight) {
+		Attribute(double weight) {
 			this.weight = weight;
 		}
 
 		public double weight() {
 			return weight;
 		}
+
+		public static Attribute getForName(String attribute) {
+			switch (attribute) {
+			case ARTIST_NAME:
+				return ARTIST;
+			case TITLE_NAME:
+				return TITLE;
+			case CATEGORY_NAME:
+				return CATEGORY;
+			case GENRE_NAME:
+				return GENRE;
+			case YEAR_NAME:
+				return YEAR;
+			case CDEXTRA_NAME:
+				return CDEXTRA;
+			case TRACKS_NAME:
+				return TRACKS;
+			default:
+				throw new IllegalArgumentException("Unknown attribute: " + attribute);
+			}
+		}
 	}
 
-	private static final String ARTIST = "artist";
-	private static final String CATEGORY = "category";
-	private static final String CDEXTRA = "cdextra";
-	private static final String GENRE = "genre";
+	private static final String ARTIST_NAME = "artist";
+	private static final String CATEGORY_NAME = "category";
+	private static final String YEAR_NAME = "year";
+	private static final String TITLE_NAME = "dtitle";
+	private static final String CDEXTRA_NAME = "cdextra";
+	private static final String TRACKS_NAME = "tracks";
+	private static final String GENRE_NAME = "genre";
 	private static final String ID = "id";
 	private static final String SEPERATOR = "\\|";
 	private static final double THRESHOLD = 0.7;
-	private static final String TITLE = "dtitle";
-	private static final String TRACKS = "tracks";
-	private static final String YEAR = "year";
 
 	private static int getNthDigit(int number, int n) {
 		return (int) (Math.abs(number) / Math.pow(10, n) % 10);
@@ -171,21 +192,16 @@ public class CDDataset extends DatasetUtils {
 		return (int) (Math.log10(Math.abs(number)) + 1);
 	}
 
-	public static Map<CDSimilarity, Double> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
-		Map<CDSimilarity, Double> similarityMap = new HashMap<>();
-		similarityMap.put(CDSimilarity.ARTIST,
-				CDDataset.levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
-		similarityMap.put(CDSimilarity.TITLE,
-				CDDataset.levenshteinDistance(firstRecord.getTitle(), secondRecord.getTitle()));
-		similarityMap.put(CDSimilarity.CATEGORY,
-				CDDataset.levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
-		similarityMap.put(CDSimilarity.GENRE,
-				CDDataset.levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
-		similarityMap.put(CDSimilarity.YEAR, CDDataset.yearDistance(firstRecord.getYear(), secondRecord.getYear()));
-		similarityMap.put(CDSimilarity.CDEXTRA,
-				CDDataset.levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
-		similarityMap.put(CDSimilarity.TRACK,
-				CDDataset.getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
+	public static Map<Attribute, Double> getSimilarityOfRecords(CDRecord firstRecord, CDRecord secondRecord) {
+		Map<Attribute, Double> similarityMap = new HashMap<>();
+		similarityMap.put(Attribute.ARTIST, levenshteinDistance(firstRecord.getArtist(), secondRecord.getArtist()));
+		similarityMap.put(Attribute.TITLE, levenshteinDistance(firstRecord.getTitle(), secondRecord.getTitle()));
+		similarityMap.put(Attribute.CATEGORY,
+				levenshteinDistance(firstRecord.getCategory(), secondRecord.getCategory()));
+		similarityMap.put(Attribute.GENRE, levenshteinDistance(firstRecord.getGenre(), secondRecord.getGenre()));
+		similarityMap.put(Attribute.YEAR, yearDistance(firstRecord.getYear(), secondRecord.getYear()));
+		similarityMap.put(Attribute.CDEXTRA, levenshteinDistance(firstRecord.getCdExtra(), secondRecord.getCdExtra()));
+		similarityMap.put(Attribute.TRACKS, getSimilarityOfTracks(firstRecord.getTracks(), secondRecord.getTracks()));
 		return similarityMap;
 	}
 
@@ -219,12 +235,12 @@ public class CDDataset extends DatasetUtils {
 	}
 
 	public static double similarity(CDRecord firstRecord, CDRecord secondRecord) {
-		Map<CDSimilarity, Double> similarityMap = CDDataset.getSimilarityOfRecords(firstRecord, secondRecord);
+		Map<Attribute, Double> similarityMap = CDDataset.getSimilarityOfRecords(firstRecord, secondRecord);
 		double result = 0.0;
-		for (Entry<CDSimilarity, Double> entry : similarityMap.entrySet()) {
+		for (Entry<Attribute, Double> entry : similarityMap.entrySet()) {
 			result += entry.getKey().weight() * entry.getValue();
 		}
-		return result / CDSimilarity.TOTAL_WEIGHT;
+		return result / Attribute.TOTAL_WEIGHT;
 	}
 
 	private static String trimNumbers(String s) {
@@ -270,17 +286,49 @@ public class CDDataset extends DatasetUtils {
 	public Map<String, Object> parseRecord(Map<String, String> value) {
 		Map<String, Object> record = new HashMap<>();
 		record.put(ID, value.get(ID));
-		record.put(ARTIST, value.get(ARTIST));
-		record.put(TITLE, value.get(TITLE));
-		record.put(CATEGORY, value.get(CATEGORY));
-		String year = value.get(YEAR);
+		record.put(ARTIST_NAME, value.get(ARTIST_NAME));
+		record.put(TITLE_NAME, value.get(TITLE_NAME));
+		record.put(CATEGORY_NAME, value.get(CATEGORY_NAME));
+		String year = value.get(YEAR_NAME);
 		if (!year.isEmpty()) {
-			record.put(YEAR, Short.parseShort(year));
+			record.put(YEAR_NAME, Short.parseShort(year));
 		}
-		record.put(GENRE, value.get(GENRE));
-		record.put(CDEXTRA, value.get(CDEXTRA));
-		record.put(TRACKS, Arrays.asList(value.get(TRACKS).split(SEPERATOR)).stream().map(CDDataset::trimNumbers)
-				.map(CDDataset::normalize).collect(Collectors.toList()));
+		record.put(GENRE_NAME, value.get(GENRE_NAME));
+		record.put(CDEXTRA_NAME, value.get(CDEXTRA_NAME));
+		record.put(TRACKS_NAME, Arrays.asList(value.get(TRACKS_NAME).split(SEPERATOR)).stream()
+				.map(CDDataset::trimNumbers).map(CDDataset::normalize).collect(Collectors.toList()));
 		return record;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Double compareAttributeValue(String attribute, Object value1, Object value2) {
+		switch (attribute) {
+		case ARTIST_NAME:
+			return levenshteinDistance((String) value1, (String) value2);
+		case TITLE_NAME:
+			return levenshteinDistance((String) value1, (String) value2);
+		case CATEGORY_NAME:
+			return levenshteinDistance((String) value1, (String) value2);
+		case GENRE_NAME:
+			return levenshteinDistance((String) value1, (String) value2);
+		case YEAR_NAME:
+			return yearDistance((Short) value1, (Short) value2);
+		case CDEXTRA_NAME:
+			return levenshteinDistance((String) value1, (String) value2);
+		case TRACKS_NAME:
+			return getSimilarityOfTracks((List<String>) value1, (List<String>) value2);
+		default:
+			throw new IllegalArgumentException("Unknown attribute: " + attribute);
+		}
+	}
+
+	@Override
+	public Boolean isMatch(Map<String, Double> similarities) {
+		double result = 0.0;
+		for (Entry<String, Double> entry : similarities.entrySet()) {
+			result += Attribute.getForName(entry.getKey()).weight() * entry.getValue();
+		}
+		return THRESHOLD <= result / Attribute.TOTAL_WEIGHT;
 	}
 }

@@ -2,6 +2,7 @@ package de.hpi.idd;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -45,7 +46,7 @@ public class DySNICore implements Core {
 		} catch (StoreException e) {
 			LOGGER.severe("Error resolving record " + id + ": " + e);
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
