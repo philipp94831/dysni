@@ -25,7 +25,7 @@ public class App {
 		BRUTE_FORCE, DYSNI
 	}
 
-	private static final String DATASET_NAME = "movies";
+	private static final Dataset DATASET = Dataset.NCVOTERS;
 	private static final ERType ER_TYPE = ERType.DYSNI;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 
@@ -46,13 +46,12 @@ public class App {
 	public static void main(String[] args) {
 		long start = System.nanoTime();
 		int i = 0;
-		Dataset dataset = Dataset.getForName(DATASET_NAME);
-		DatasetUtils du = dataset.getDataset();
+		DatasetUtils du = DATASET.getDataset();
 		SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
-		try (Reader in = new InputStreamReader(dataset.getFile());
+		try (Reader in = new InputStreamReader(DATASET.getFile());
 				CSVParser parser = FORMAT.parse(in);
 				RecordStore<String, Map<String, Object>> store = new MemoryStore<>()) {
-			EntityResolver<Map<String, Object>, String> er = getEntityResolver(dataset, new IDDSimilarityClassifier(du),
+			EntityResolver<Map<String, Object>, String> er = getEntityResolver(DATASET, new IDDSimilarityClassifier(du),
 					store);
 			for (CSVRecord record : parser) {
 				Map<String, Object> rec = du.parseRecord(record.toMap());
@@ -72,7 +71,7 @@ public class App {
 		}
 		long time = System.nanoTime() - start;
 		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
-		Evaluator evaluator = new Evaluator(dataset.getGroundThruth());
+		Evaluator evaluator = new Evaluator(DATASET.getGroundThruth());
 		evaluator.evaluate(duplicatesToCheck);
 	}
 }

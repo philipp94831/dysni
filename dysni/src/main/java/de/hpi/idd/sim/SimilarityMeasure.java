@@ -37,10 +37,10 @@ public interface SimilarityMeasure<T> {
 	default double calculateCheckedSimilarity(T e1, T e2) throws ArithmeticException {
 		double sim = calculateSimilarity(e1, e2);
 		if (Double.isNaN(sim)) {
-			throw new ArithmeticException("Similarity is NaN");
+//			throw new ArithmeticException("Similarity is NaN");
 		}
 		if (sim < 0.0 || sim > 1.0) {
-			throw new ArithmeticException("Similarity is not in interval [0.0, 1.0]");
+//			throw new ArithmeticException("Similarity is not in interval [0.0, 1.0]");
 		}
 		return sim;
 	}

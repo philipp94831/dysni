@@ -26,8 +26,8 @@ public enum Dataset {
 	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", new CDDataset()),
 	CORA(CoraConfig.config(), "cora_v2.csv", "cora_ground_truth.csv", new Utility()),
 	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", new MovieSimilarityMeasure()),
-	NCVOTERS(NCVotersConfig.config(), "ncvoters.csv", "ncvoters_ground_truth.csv", new NCVotersSimilarity()),
-	PEOPLE(PeopleConfig.config(), "parsed3M.csv", "gold_standard_3M.csv", new SimilarityFunctionForPeopleDataset());
+	NCVOTERS(NCVotersConfig.config(), "ncvoters1M.csv", "ncvoters1M_ground_truth.csv", new NCVotersSimilarity()),
+	PEOPLE(PeopleConfig.config(), "parsed1M.csv", "gold_standard_1M.csv", new SimilarityFunctionForPeopleDataset());
 
 	public static final String ID = "id";
 

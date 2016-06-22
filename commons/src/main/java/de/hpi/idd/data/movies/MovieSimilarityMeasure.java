@@ -15,9 +15,8 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 	private NormalizedLevenshtein levenshtein = new NormalizedLevenshtein();
 	private double weightcounter;
 	
-	
-	public MovieSimilarityMeasure() {
-		datasetThreshold = 0.7;
+	public MovieSimilarityMeasure(){
+		this.datasetThreshold = 0.8;
 	}
 	
 	public static double subsetSim(Collection<? extends Object> c1, Collection<? extends Object> c2){
@@ -26,7 +25,6 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 		int minsize = c1.size() < c2.size() ? c1.size() : c2.size();
 				
 		return (double)intersection.size()/(double)minsize;		
-		
 	}
 	
 	@Override
@@ -34,12 +32,12 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 		weightcounter = 0;
 		double sim =  getTitleSimilarity((String)r1.get("title"), (String)r2.get("title"))
 				  +  getYearSimilarity((String)r1.get("year"), (String)r2.get("year"))
-				  +  getGenresSimilarity((String)r1.get("genre"), (String)r2.get("genre"))
+				  +  getGenresSimilarity((String)r1.get("genres"), (String)r2.get("genres"))
 				  +  getUrlSimilarity((String)r1.get("url"), (String)r2.get("url"))
 				  +  getWriterSimilarity((String)r1.get("writer"), (String)r2.get("writer"))
 				  +  getEditorSimilarity((String)r1.get("editor"), (String)r2.get("editor"))
-				  +  getDirectorSimilarity((String)r1.get("director name"), (String)r2.get("director name"))
-				  +  getActorsSimilarity((String)r1.get("actor name"), (String)r2.get("actor name"));
+				  +  getDirectorSimilarity((String)r1.get("director"), (String)r2.get("director"))
+				  +  getActorsSimilarity((String)r1.get("actors"), (String)r2.get("actors"));
 				
 		return sim/weightcounter;		
 	}
@@ -48,12 +46,11 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 	private double getTitleSimilarity(String s1, String s2){
 		int weight = 6;
 		weightcounter+=weight;
-		char last1 = s1.length() >= 1 ? s1.charAt(s1.length()-1) : '!';
-		char last2 = s2.length() >= 1 ? s2.charAt(s2.length()-1) : '!';
+		char last1 = s1.charAt(s1.length()-1); 
+		char last2 = s2.charAt(s2.length()-1); 
 		//if the last char is a digit, it must be the same for not finding sequels
 		if((('0' <= last1 && last1 <= '9') || ('0' <= last2 && last2 <= '9')) && last1 != last2) return 0;
 		double result = levenshtein.similarity(s1, s2);
-		if (Double.isNaN(result)) result = 0;
 		if(result > 1.0 ) System.out.println("Title " + result);
 		return weight*result;
 	}
@@ -158,7 +155,6 @@ public class MovieSimilarityMeasure extends DatasetUtils{
 		String [] genres1 = s1.split("\\|");
 		String [] genres2 = s2.split("\\|");
 		return weight*subsetSim(Arrays.asList(genres1), Arrays.asList(genres2));
-
 	
 	}
 
