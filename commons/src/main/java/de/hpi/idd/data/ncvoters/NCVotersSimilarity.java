@@ -160,7 +160,7 @@ public class NCVotersSimilarity extends DatasetUtils {
 			attribute_count += address_attributes;
 		}
 		
-		return distances / attribute_count;
+		return Double.max(distances / attribute_count, 0.0);
 	}
 	
 	public Map<String, Object> parseRecord(Map<String, String> values) {
@@ -180,6 +180,37 @@ public class NCVotersSimilarity extends DatasetUtils {
 				result.put(key, value);	
 		}
 		return result;
+	}
+
+	@Override
+	public Double compareAttributeValue(String attribute, Object value1, Object value2) {
+		if (value1 instanceof String)
+			return jw.distance((String) value1, (String) value2);
+		else if (value1 instanceof Integer)
+			return nums.distance(((Integer) value1).toString(), ((Integer) value2).toString());
+		else
+			return jw.distance(value1.toString(), value2.toString());
+	}
+
+	@Override
+	public Boolean isMatch(Map<String, Double> similarities) {
+		double similarity = 0.0;
+		int attributeCount = 0;
+		for (String key: similarities.keySet()) {
+			attributeCount++;
+			if (key.equals(FIRST_NAME)) {
+				similarity += 2 * similarities.get(key);
+				attributeCount++;
+			}
+			// age is always identical for duplicate records in the dataset
+			else if (key.equals(AGE)) {
+				if (similarities.get(key) != 1.0)
+					return false;
+			}
+			else
+				similarity += similarities.get(key);
+		}
+		return (similarity / attributeCount) >= datasetThreshold;
 	};
 
 }

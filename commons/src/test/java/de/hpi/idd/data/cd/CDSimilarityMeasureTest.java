@@ -26,15 +26,16 @@ public class CDSimilarityMeasureTest {
 				(short) 2016, firstTracklist);
 		CDRecord secondRecord = new CDRecord("1", "The Rolling Stones", "Overpriced Test CD", "data", "Rock", "None",
 				(short) 2016, firstTracklist);
-		Map<Attribute, Double> similarityMap = CDDataset.getSimilarityOfRecords(firstRecord, secondRecord);
-		assertEquals(similarityMap.get(Attribute.ARTIST), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.TITLE), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.CATEGORY), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.GENRE), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.CDEXTRA), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.YEAR), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.TRACKS), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(CDDataset.similarity(firstRecord, secondRecord), 1.0, DOUBLE_TOLERANCE);
+		CDDataset cd = new CDDataset();
+		Map<String, Double> similarityMap = cd.getSimilarityOfRecords(firstRecord, secondRecord);
+		assertEquals(similarityMap.get(Attribute.ARTIST.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.TITLE.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.CATEGORY.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.GENRE.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.CDEXTRA.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.YEAR.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.TRACKS.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(cd.similarity(firstRecord, secondRecord), 1.0, DOUBLE_TOLERANCE);
 		List<String> secondTracklist = new LinkedList<>();
 		secondTracklist.add("Track 3");
 		secondTracklist.add("Track 4");
@@ -42,15 +43,15 @@ public class CDSimilarityMeasureTest {
 		secondTracklist.add("Track 6");
 		secondRecord = new CDRecord("1", "The Rolling Tones", "Overpriced Best CD", "trash", "Pop", "None",
 				(short) 2017, secondTracklist);
-		similarityMap = CDDataset.getSimilarityOfRecords(firstRecord, secondRecord);
-		assertEquals(similarityMap.get(Attribute.ARTIST), 17.0 / 18, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.TITLE), 17.0 / 18, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.CATEGORY), 1.0 / 5, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.GENRE), 1.0 / 4, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.CDEXTRA), 1.0, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.YEAR), 89.0 / 90, DOUBLE_TOLERANCE);
-		assertEquals(similarityMap.get(Attribute.TRACKS), 1.0 / 6, DOUBLE_TOLERANCE);
-		double sim = CDDataset.similarity(firstRecord, secondRecord);
+		similarityMap = cd.getSimilarityOfRecords(firstRecord, secondRecord);
+		assertEquals(similarityMap.get(Attribute.ARTIST.getName()), 17.0 / 18, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.TITLE.getName()), 17.0 / 18, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.CATEGORY.getName()), 1.0 / 5, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.GENRE.getName()), 1.0 / 4, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.CDEXTRA.getName()), 1.0, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.YEAR.getName()), 89.0 / 90, DOUBLE_TOLERANCE);
+		assertEquals(similarityMap.get(Attribute.TRACKS.getName()), 1.0 / 6, DOUBLE_TOLERANCE);
+		double sim = cd.similarity(firstRecord, secondRecord);
 		assertTrue(0.0 <= sim);
 		assertTrue(sim <= 1.0);
 	}

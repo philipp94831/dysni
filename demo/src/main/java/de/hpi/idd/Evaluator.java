@@ -21,7 +21,7 @@ import de.hpi.idd.util.UnionFind;
  */
 class Evaluator {
 
-	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
+	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(';');
 	private static final boolean VERBOSE = false;
 	private final UnionFind<String> duplicates;
 

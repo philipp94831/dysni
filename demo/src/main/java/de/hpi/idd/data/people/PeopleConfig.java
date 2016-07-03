@@ -21,18 +21,18 @@ public class PeopleConfig {
 
 			@Override
 			public String computeKey(Map<String, Object> obj) {
-				String title = ((String) obj.get("FNAME")).toLowerCase();
-				String artist = ((String) obj.get("LNAME")).toLowerCase();
-				return StringUtils.substring(artist, 0, 7) + StringUtils.substring(title, 0, 7);
+				String title = ((String) obj.get("given_name")).toLowerCase();
+				String artist = ((String) obj.get("surname")).toLowerCase();
+				return StringUtils.substring(artist, 0, 5) + StringUtils.substring(title, 0, 5);
 			}
 		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
 					@Override
 					public String computeKey(Map<String, Object> obj) {
-						String title = ((String) obj.get("LNAME")).toLowerCase();
-						String artist = ((String) obj.get("FNAME")).toLowerCase();
-						return StringUtils.substring(title, 0, 7) + StringUtils.substring(artist, 0, 7);
+						String title = ((String) obj.get("surname")).toLowerCase();
+						String artist = ((String) obj.get("given_name")).toLowerCase();
+						return StringUtils.substring(title, 0, 5) + StringUtils.substring(artist, 0, 5);
 					}
 				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))));
 	}

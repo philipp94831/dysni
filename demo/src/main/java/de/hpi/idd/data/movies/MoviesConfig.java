@@ -21,19 +21,9 @@ public class MoviesConfig {
 
 			@Override
 			public String computeKey(Map<String, Object> obj) {
-				String writer = ((String) obj.get("writer")).toLowerCase();
-				String artist = ((String) obj.get("title")).toLowerCase();
-				return StringUtils.substring(artist, 0, 3) + StringUtils.substring(writer, 0, 3);
+				String title = ((String) obj.get("title")).toLowerCase();
+				return StringUtils.substring(title, 0, 3);
 			}
-		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))),
-				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
-
-					@Override
-					public String computeKey(Map<String, Object> obj) {
-						String title = ((String) obj.get("title")).toLowerCase();
-						String writer = ((String) obj.get("writer")).toLowerCase();
-						return StringUtils.substring(title, 0, 3) + StringUtils.substring(writer, 0, 3);
-					}
-				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))));
+		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))));
 	}
 }

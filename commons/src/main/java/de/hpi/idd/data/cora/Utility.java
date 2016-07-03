@@ -227,4 +227,16 @@ public class Utility extends DatasetUtils{
         return dups;
     }
 
+	@Override
+	public Double compareAttributeValue(String attribute, Object value1, Object value2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean isMatch(Map<String, Double> similarities) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
