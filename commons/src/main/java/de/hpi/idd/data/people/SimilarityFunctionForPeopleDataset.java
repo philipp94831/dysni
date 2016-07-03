@@ -30,7 +30,7 @@ public class SimilarityFunctionForPeopleDataset extends DatasetUtils {
     private final HashMap<String, Attribute> attributeMapping;
     private final List<List<String>> blockingKeys;
     public SimilarityFunctionForPeopleDataset() {
-        datasetThreshold = 0.7;
+        datasetThreshold = 0.8;
         attributeMapping = new HashMap<>();
         blockingKeys = new ArrayList<>();
         Gson gson = new Gson();
