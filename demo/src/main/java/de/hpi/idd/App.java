@@ -25,7 +25,7 @@ public class App {
 		BRUTE_FORCE, DYSNI
 	}
 
-	private static final Dataset DATASET = Dataset.PEOPLE;
+	private static final Dataset DATASET = Dataset.NCVOTERS;
 	private static final ERType ER_TYPE = ERType.DYSNI;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 
@@ -35,7 +35,8 @@ public class App {
 		switch (ER_TYPE) {
 		case DYSNI:
 			Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs = dataset.getConfigs();
-			return new DynamicSortedNeighborhoodIndexer<>(store, similarityMeasure, configs);
+			return new DynamicSortedNeighborhoodIndexer<>(store, similarityMeasure, configs)
+					.setParallelizable(dataset.isParallelizable());
 		case BRUTE_FORCE:
 			return new BruteForceEntityResolver<>(store, similarityMeasure);
 		default:
@@ -44,7 +45,6 @@ public class App {
 	}
 
 	public static void main(String[] args) {
-		long start = System.nanoTime();
 		int i = 0;
 		DatasetUtils du = DATASET.getDataset();
 		SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
@@ -53,6 +53,7 @@ public class App {
 				RecordStore<String, Map<String, Object>> store = new MemoryStore<>()) {
 			EntityResolver<Map<String, Object>, String> er = getEntityResolver(DATASET, new IDDSimilarityClassifier(du),
 					store);
+			long start = System.nanoTime();
 			for (CSVRecord record : parser) {
 				Map<String, Object> rec = du.parseRecord(record.toMap());
 				String id = (String) rec.get(Dataset.ID);
@@ -62,15 +63,16 @@ public class App {
 					duplicatesToCheck.put(id, duplicate, true);
 				}
 				i++;
-				System.out.println(i + " Duplicates for " + id + ": " + duplicates);
+				// System.out.println(i + " Duplicates for " + id + ": " +
+				// duplicates);
 			}
+			long time = System.nanoTime() - start;
+			System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
 		} catch (IOException e) {
 			throw new RuntimeException("Error parsing CSV", e);
 		} catch (StoreException e) {
 			throw new RuntimeException("Error accessing storage", e);
 		}
-		long time = System.nanoTime() - start;
-		System.out.println("Resolved " + i + " records in " + time / 1_000_000 + "ms");
 		Evaluator evaluator = new Evaluator(DATASET.getGroundThruth());
 		evaluator.evaluate(duplicatesToCheck);
 	}

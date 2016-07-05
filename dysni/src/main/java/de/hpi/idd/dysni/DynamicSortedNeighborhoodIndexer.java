@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import de.hpi.idd.EntityResolver;
 import de.hpi.idd.sim.SimilarityClassifier;
@@ -26,7 +28,6 @@ import de.hpi.idd.util.UnionFind;
  *            type of identifiers for the records
  */
 public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResolver<RECORD, ID> {
-
 	/**
 	 * the different indexes, each with a specific key function and window
 	 * builder
@@ -38,6 +39,11 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	private final RecordStore<ID, RECORD> store;
 	/** Union find data structure to ensure transitivity of similarity */
 	private final UnionFind<ID> uf = new UnionFind<>();
+	/**
+	 * Indicates wheteher parallel execution of the similarity function is
+	 * possible
+	 */
+	private boolean parallelizable = true;
 
 	/**
 	 * Construct a new DySNIndexer with the specified store, similarity measure
@@ -78,17 +84,53 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 * Similar records are connected in the Union Find data structure.
 	 */
 	@Override
-	public Collection<ID> resolve(RECORD rec, ID recId) throws StoreException {
+	public Collection<ID> resolve(RECORD rec, ID recId) {
 		Set<ID> candidates = new HashSet<>();
 		for (DySNIndex<RECORD, ?, ID> index : indexes) {
 			candidates.addAll(index.findCandidates(rec));
 		}
 		candidates.remove(recId);
-		for (ID candidate : candidates) {
-			if (!uf.connected(recId, candidate) && sim.areSimilar(rec, store.getRecord(candidate))) {
-				uf.union(recId, candidate);
+		Set<ID> matches = streamCandidates(candidates).filter(candidate -> {
+			try {
+				RECORD candidateRec = store.getRecord(candidate);
+				return sim.areSimilar(rec, candidateRec);
+			} catch (StoreException e) {
+				throw new RuntimeException("Error retrieving element from store", e);
 			}
+		}).collect(Collectors.toSet());
+		for (ID match : matches) {
+			uf.union(recId, match);
 		}
 		return uf.getComponent(recId);
+	}
+
+	/**
+	 * Stream candidates based on the parallelization configuration
+	 * 
+	 * @param candidates
+	 *            candidates to stream
+	 * @return stream of candidates, parallel if {@link #parallelizable} true
+	 */
+	private Stream<ID> streamCandidates(Set<ID> candidates) {
+		if (parallelizable) {
+			return candidates.parallelStream();
+		} else {
+			return candidates.stream();
+		}
+	}
+
+	/**
+	 * Set whether similarity function can be executed in parallel or not.
+	 * Parallelization usually results in great speed up but is not always
+	 * possible.
+	 * 
+	 * @param parallelizable
+	 *            whether parallel execution of similarity function should be
+	 *            used
+	 * @return this
+	 */
+	public DynamicSortedNeighborhoodIndexer<RECORD, ID> setParallelizable(boolean parallelizable) {
+		this.parallelizable = parallelizable;
+		return this;
 	}
 }

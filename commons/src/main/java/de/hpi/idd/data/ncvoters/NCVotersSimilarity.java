@@ -34,12 +34,6 @@ public class NCVotersSimilarity extends DatasetUtils {
 	NormalizedLevenshtein nl = new NormalizedLevenshtein();
 	NumberSimilarity nums = new NumberSimilarity();
 	
-	// sum of distances for all attributes
-	double distances;
-	
-	// attributes that are considered for similarity
-	int attribute_count;
-	
 	public NCVotersSimilarity() {
 		datasetThreshold = 0.75;
 	}
@@ -89,7 +83,6 @@ public class NCVotersSimilarity extends DatasetUtils {
 		if (o1.equals(def) && o2.equals(def))
 			return 1.0;
 		else if (o1.equals(def) || o2.equals(def)) {
-			attribute_count--;
 			return 0.0;
 		} else {
 			if (o1 instanceof Integer)
@@ -99,14 +92,25 @@ public class NCVotersSimilarity extends DatasetUtils {
 		}
 	}
 	
+	private boolean onlyOneDefault(Object o1, Object o2) {
+		return onlyOneDefault(o1, o2, "");
+	}
+	
+	private boolean onlyOneDefault(Object o1, Object o2, Object def) {
+		return o1.equals(def) ^ o2.equals(def);
+	}
+	
 	public Double calculateSimilarity(Map<String, Object> record1, Map<String, Object> record2, Map<String, String> parameters) {	
 		Double specialCases = treatSpecialCases(record1, record2);
 		if (specialCases >= 0)
 			return specialCases;
 
-		distances = 0;
-		attribute_count = 5;
+		double distances = 0;
+		int attribute_count = 5;
 					
+		if(onlyOneDefault(record1.get(BIRTH_PLACE), record2.get(BIRTH_PLACE))) {
+			attribute_count--;
+		}
 		distances += objectSimilarity(record1.get(BIRTH_PLACE), record2.get(BIRTH_PLACE));
 		distances += (record1.get(PARTY).equals(record2.get(PARTY)) ? 1.0 : 0.0);
 		
@@ -126,17 +130,32 @@ public class NCVotersSimilarity extends DatasetUtils {
 	        if (dms < 2) 
 	        	return 0.0;
 	        
+	        if(onlyOneDefault(record1.get(MIDDLE_NAME), record2.get(MIDDLE_NAME))) {
+				attribute_count--;
+			}
 	        distances += objectSimilarity(record1.get(MIDDLE_NAME), record2.get(MIDDLE_NAME));
+	        if(onlyOneDefault(record1.get(LAST_NAME), record2.get(LAST_NAME))) {
+				attribute_count--;
+			}
 	        distances += objectSimilarity(record1.get(LAST_NAME), record2.get(LAST_NAME));
 		}
 		   
 		// calculate difference of addresses
 		double address_distance = 0.0, street_distance = 0.0;
 		int address_attributes = 3, old_attribute_count = attribute_count;
+        if(onlyOneDefault(record1.get(STREET), record2.get(STREET), "UNKNOWN")) {
+			attribute_count--;
+		}
 		street_distance += objectSimilarity(record1.get(STREET), record2.get(STREET), "UNKNOWN");
 		address_distance += street_distance;
 		if (old_attribute_count != attribute_count) street_distance = 1.0;
+        if(onlyOneDefault(record1.get(ZIP_CODE), record2.get(ZIP_CODE), 0)) {
+			attribute_count--;
+		}
 		address_distance += objectSimilarity(record1.get(ZIP_CODE), record2.get(ZIP_CODE), 0) * street_distance;
+        if(onlyOneDefault(record1.get(HOUSE_NUM), record2.get(HOUSE_NUM), 0)) {
+			attribute_count--;
+		}
 		address_distance += objectSimilarity(record1.get(HOUSE_NUM), record2.get(HOUSE_NUM), 0) * street_distance;
 		address_attributes += old_attribute_count - attribute_count;
 		attribute_count = old_attribute_count;

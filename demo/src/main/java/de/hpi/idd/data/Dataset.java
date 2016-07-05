@@ -23,13 +23,13 @@ import de.hpi.idd.dysni.DySNIndexConfiguration;
  *
  */
 public enum Dataset {
-	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", new CDDataset()),
-	CORA(CoraConfig.config(), "cora_v2.csv", "cora_ground_truth.csv", new Utility()),
-	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", new MovieSimilarityMeasure()),
+	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", new CDDataset(), true),
+	CORA(CoraConfig.config(), "cora_v2.csv", "cora_ground_truth.csv", new Utility(), true),
+	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", new MovieSimilarityMeasure(), true),
 	NCVOTERS(NCVotersConfig.config(), "ncvoters_1000000.csv", "ncvoters_ground_truth_1000000.csv",
-			new NCVotersSimilarity()),
+			new NCVotersSimilarity(), false),
 	PEOPLE(PeopleConfig.config(), "febrl_300k_relevant.csv", "gold_standard_febrl_300k.csv",
-			new SimilarityFunctionForPeopleDataset());
+			new SimilarityFunctionForPeopleDataset(), true);
 
 	public static final String ID = "id";
 
@@ -53,14 +53,16 @@ public enum Dataset {
 	private final Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs;
 	private final String fileName;
 	private final String groundTruth;
+	private final boolean parallelizable;
 	private final DatasetUtils similarityMeasure;
 
 	Dataset(Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> configs, String fileName,
-			String groundTruth, DatasetUtils similarityMeasure) {
+			String groundTruth, DatasetUtils similarityMeasure, boolean parallelizable) {
 		this.configs = configs;
 		this.fileName = fileName;
 		this.groundTruth = groundTruth;
 		this.similarityMeasure = similarityMeasure;
+		this.parallelizable = parallelizable;
 	}
 
 	public Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> getConfigs() {
@@ -85,5 +87,9 @@ public enum Dataset {
 		} catch (IOException e) {
 			throw new RuntimeException("Resource not available: " + groundTruth, e);
 		}
+	}
+
+	public boolean isParallelizable() {
+		return parallelizable;
 	}
 }
