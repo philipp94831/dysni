@@ -13,6 +13,9 @@ import java.util.Map.Entry;
  */
 public interface RecordStore<K, V> extends Closeable, Iterable<Entry<K, V>> {
 
+	@Override
+	void close() throws StoreException;
+
 	/**
 	 * Retrieve record based on its id
 	 *

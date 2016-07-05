@@ -28,42 +28,69 @@ import de.hpi.idd.util.UnionFind;
  *            type of identifiers for the records
  */
 public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResolver<RECORD, ID> {
+
 	/**
 	 * the different indexes, each with a specific key function and window
 	 * builder
 	 */
 	private final Collection<DySNIndex<RECORD, ?, ID>> indexes = new ArrayList<>();
+	/**
+	 * indicates whether parallel execution of the similarity function should be
+	 * used
+	 */
+	private boolean parallelizable = true;
 	/** similarity classifier to determine duplicates */
 	private final SimilarityClassifier<RECORD> sim;
 	/** external store to retrieve records by their id */
 	private final RecordStore<ID, RECORD> store;
 	/** Union find data structure to ensure transitivity of similarity */
 	private final UnionFind<ID> uf = new UnionFind<>();
-	/**
-	 * Indicates wheteher parallel execution of the similarity function is
-	 * possible
-	 */
-	private boolean parallelizable = true;
 
 	/**
-	 * Construct a new DySNIndexer with the specified store, similarity measure
-	 * and the configuration for the different indexes to be used.
+	 * Construct a new DySNIndexer with the specified store and similarity
+	 * measure to be used.
 	 *
 	 * @param store
 	 *            the external store where records should be put
 	 * @param sim
 	 *            the similarity classifier to determine duplicates
-	 * @param configs
-	 *            the configurations for the different indexes. For each
-	 *            configuration, <b>exactly one</b> index is created.
 	 */
-	public DynamicSortedNeighborhoodIndexer(RecordStore<ID, RECORD> store, SimilarityClassifier<RECORD> sim,
-			Collection<DySNIndexConfiguration<RECORD, ?, ID>> configs) {
+	public DynamicSortedNeighborhoodIndexer(RecordStore<ID, RECORD> store, SimilarityClassifier<RECORD> sim) {
 		this.store = store;
 		this.sim = sim;
-		for (DySNIndexConfiguration<RECORD, ?, ID> conf : configs) {
-			indexes.add(new DySNIndex<>(conf));
+	}
+
+	/**
+	 * Add an index to the tree using the specified configuration.
+	 *
+	 * @param config
+	 *            the configuration specifying the index configuration
+	 * @return this
+	 */
+	public DynamicSortedNeighborhoodIndexer<RECORD, ID> addIndex(DySNIndexConfiguration<RECORD, ?, ID> config) {
+		indexes.add(new DySNIndex<>(config));
+		return this;
+	}
+
+	/**
+	 * Add multiple indexes to the tree using the specified configurations.
+	 *
+	 * @param configs
+	 *            The configurations for the indexes to be added. For each
+	 *            configuration <b> exactly </b> one index will be created.
+	 * @return this
+	 */
+	public DynamicSortedNeighborhoodIndexer<RECORD, ID> addIndexes(
+			Collection<DySNIndexConfiguration<RECORD, ?, ID>> configs) {
+		for (DySNIndexConfiguration<RECORD, ?, ID> config : configs) {
+			addIndex(config);
 		}
+		return this;
+	}
+
+	@Override
+	public void close() throws StoreException {
+		store.close();
 	}
 
 	/**
@@ -105,8 +132,23 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	}
 
 	/**
+	 * Set whether similarity function can be executed in parallel or not.
+	 * Parallelization usually results in great speed up but is not always
+	 * possible.
+	 *
+	 * @param parallelizable
+	 *            whether parallel execution of similarity function should be
+	 *            used
+	 * @return this
+	 */
+	public DynamicSortedNeighborhoodIndexer<RECORD, ID> setParallelizable(boolean parallelizable) {
+		this.parallelizable = parallelizable;
+		return this;
+	}
+
+	/**
 	 * Stream candidates based on the parallelization configuration
-	 * 
+	 *
 	 * @param candidates
 	 *            candidates to stream
 	 * @return stream of candidates, parallel if {@link #parallelizable} true
@@ -117,20 +159,5 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 		} else {
 			return candidates.stream();
 		}
-	}
-
-	/**
-	 * Set whether similarity function can be executed in parallel or not.
-	 * Parallelization usually results in great speed up but is not always
-	 * possible.
-	 * 
-	 * @param parallelizable
-	 *            whether parallel execution of similarity function should be
-	 *            used
-	 * @return this
-	 */
-	public DynamicSortedNeighborhoodIndexer<RECORD, ID> setParallelizable(boolean parallelizable) {
-		this.parallelizable = parallelizable;
-		return this;
 	}
 }

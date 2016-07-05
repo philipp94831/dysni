@@ -1,5 +1,6 @@
 package de.hpi.idd;
 
+import java.io.Closeable;
 import java.util.Collection;
 
 import de.hpi.idd.store.StoreException;
@@ -13,7 +14,7 @@ import de.hpi.idd.store.StoreException;
  * @param <ID>
  *            the type
  */
-public interface EntityResolver<RECORD, ID> {
+public interface EntityResolver<RECORD, ID> extends Closeable {
 
 	/**
 	 * Add a record to the entity resolver

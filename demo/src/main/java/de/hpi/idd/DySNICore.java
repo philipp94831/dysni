@@ -2,7 +2,6 @@ package de.hpi.idd;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -16,21 +15,21 @@ import de.hpi.idd.store.StoreException;
 public class DySNICore implements Core {
 
 	private static final Logger LOGGER = Logger.getLogger(DySNICore.class.getName());
-	private EntityResolver<Map<String, Object>, String> er;
+	private DynamicSortedNeighborhoodIndexer<Map<String, Object>, String> er;
 	private RecordStore<String, Map<String, Object>> store;
 
 	@Override
 	public void buildIndex(Map<String, String> parameters) {
 		Dataset dataset = Dataset.getForName(parameters.get("dataset"));
 		store = new MemoryStore<>();
-		er = new DynamicSortedNeighborhoodIndexer<>(store, new IDDSimilarityClassifier(dataset.getDataset()),
-				dataset.getConfigs());
+		er = new DynamicSortedNeighborhoodIndexer<>(store, new IDDSimilarityClassifier(dataset.getDataset()));
+		er.addIndexes(dataset.getConfigs()).setParallelizable(dataset.isParallelizable());
 	}
 
 	@Override
 	public boolean destroyIndex(Map<String, String> parameters) {
 		try {
-			store.close();
+			er.close();
 			return true;
 		} catch (IOException e) {
 			LOGGER.warning("Error closing store: " + e.getMessage());
@@ -41,12 +40,7 @@ public class DySNICore implements Core {
 	@Override
 	public List<String> getDuplicates(Map<String, Object> record, Map<String, String> parameters) {
 		String id = (String) record.get(Dataset.ID);
-		try {
-			return new ArrayList<>(er.resolve(record, id));
-		} catch (StoreException e) {
-			LOGGER.severe("Error resolving record " + id + ": " + e);
-		}
-		return Collections.emptyList();
+		return new ArrayList<>(er.resolve(record, id));
 	}
 
 	@Override

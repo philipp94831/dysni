@@ -28,6 +28,11 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 	}
 
 	@Override
+	public void close() throws StoreException {
+		store.close();
+	}
+
+	@Override
 	public void insert(RECORD rec, ID recId) throws StoreException {
 		store.storeRecord(recId, rec);
 	}

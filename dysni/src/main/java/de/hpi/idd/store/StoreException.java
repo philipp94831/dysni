@@ -1,6 +1,8 @@
 package de.hpi.idd.store;
 
-public class StoreException extends Exception {
+import java.io.IOException;
+
+public class StoreException extends IOException {
 
 	private static final long serialVersionUID = -2689744478775670177L;
 
