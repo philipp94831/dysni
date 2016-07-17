@@ -24,7 +24,7 @@ public class CoraConfig {
 				String title = ((String) obj.get("Authors")).trim().toLowerCase();
 				return StringUtils.substring(title, 0, 3);
 			}
-		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))),
+		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.4))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
 					@Override
@@ -32,7 +32,7 @@ public class CoraConfig {
 						String title = ((String) obj.get("title")).trim().toLowerCase();
 						return StringUtils.substring(title, 0, 3);
 					}
-				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))));
+				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.4))));
 	}
 
 }

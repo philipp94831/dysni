@@ -25,7 +25,7 @@ public class CDConfig {
 				String artist = ((String) obj.get("artist")).toLowerCase();
 				return StringUtils.substring(artist, 0, 3) + StringUtils.substring(title, 0, 3);
 			}
-		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))),
+		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.5))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
 					@Override
@@ -34,6 +34,6 @@ public class CDConfig {
 						String artist = ((String) obj.get("artist")).toLowerCase();
 						return StringUtils.substring(title, 0, 3) + StringUtils.substring(artist, 0, 3);
 					}
-				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))));
+				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.5))));
 	}
 }

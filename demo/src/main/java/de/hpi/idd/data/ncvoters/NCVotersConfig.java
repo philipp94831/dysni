@@ -21,20 +21,20 @@ public class NCVotersConfig {
 
 			@Override
 			public String computeKey(Map<String, Object> obj) {
-				String writer = ((String) obj.get("last_name")).toLowerCase();
-				String artist = ((String) obj.get("first_name")).toLowerCase();
-				return StringUtils.substring(artist, 0, 7) + StringUtils.substring(writer, 0, 7);
+				String lastName = ((String) obj.get("last_name")).toLowerCase();
+				String firstName = ((String) obj.get("first_name")).toLowerCase();
+				return StringUtils.substring(firstName, 0, 7) + StringUtils.substring(lastName, 0, 7);
 			}
-		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))),
+		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
 					@Override
 					public String computeKey(Map<String, Object> obj) {
-						String title = ((String) obj.get("first_name")).toLowerCase();
-						String writer = ((String) obj.get("last_name")).toLowerCase();
-						return StringUtils.substring(title, 0, 7) + StringUtils.substring(writer, 0, 7);
+						String firstName = ((String) obj.get("first_name")).toLowerCase();
+						String lastName = ((String) obj.get("last_name")).toLowerCase();
+						return StringUtils.substring(lastName, 0, 7) + StringUtils.substring(firstName, 0, 7);
 					}
-				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))));
+				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))));
 	}
 
 }

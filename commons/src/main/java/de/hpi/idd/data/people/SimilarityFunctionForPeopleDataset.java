@@ -15,17 +15,10 @@ import static org.simmetrics.builders.StringMetricBuilder.with;
 
 public class SimilarityFunctionForPeopleDataset extends DatasetUtils {
     private final static String identifierJSON =
-            "[[{\"attribute\":\"given_name\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.2}," +
-            "{\"attribute\":\"surname\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.3}, " +
+            "[[{\"attribute\":\"given_name\",\"similarityFunction\":\"JaroWinkler\",\"weight\":0.2}," +
+            "{\"attribute\":\"surname\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.4}, " +
             "{\"attribute\":\"soc_sec_id\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.3}," +
-            "{\"attribute\":\"age\",\"similarityFunction\":\"Equal\",\"weight\":0.2}]," +
-            "[{\"attribute\":\"given_name\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.2}," +
-            "{\"attribute\":\"surname\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.3}," +
-            "{\"attribute\":\"address_1\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.5}," +
-            "{\"attribute\":\"suburb\",\"similarityFunction\":\"Levenshtein\",\"weight\":0.5}," +
-            "{\"attribute\":\"state\",\"similarityFunction\":\"Equal\",\"weight\":0.3}]]";
-
-
+            "{\"attribute\":\"age\",\"similarityFunction\":\"Equal\",\"weight\":0.1}]]";
 
     private final HashMap<String, Attribute> attributeMapping;
     private final List<List<String>> blockingKeys;
@@ -48,8 +41,6 @@ public class SimilarityFunctionForPeopleDataset extends DatasetUtils {
         });
 
     }
-
-    //TODO: Return a real value between 0 and 1 (Linear Combination)
 
     /**
      * Given two records, return their similarity in the range of [0,1].
@@ -126,6 +117,10 @@ public class SimilarityFunctionForPeopleDataset extends DatasetUtils {
 
     public List<List<String>> getBlockingKeys() {
         return blockingKeys;
+    }
+
+    public Object parseAttribute(final String attribute, final String value) {
+        return value;
     }
 
     /**

@@ -23,7 +23,7 @@ public class App {
 		BRUTE_FORCE, DYSNI
 	}
 
-	private static final Dataset DATASET = Dataset.NCVOTERS;
+	private static final Dataset DATASET = Dataset.CD;
 	private static final ERType ER_TYPE = ERType.DYSNI;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 

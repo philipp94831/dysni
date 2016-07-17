@@ -32,7 +32,7 @@ public class PeopleConfig {
 					public String computeKey(Map<String, Object> obj) {
 						String surname = ((String) obj.get("surname")).toLowerCase();
 						String givenName = ((String) obj.get("given_name")).toLowerCase();
-						return StringUtils.substring(surname, 0, 4) + StringUtils.substring(givenName, 0, 4);
+						return StringUtils.substring(givenName, 0, 4) + StringUtils.substring(surname, 0, 4);
 					}
 				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.6))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {

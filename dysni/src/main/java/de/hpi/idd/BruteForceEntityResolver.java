@@ -1,7 +1,10 @@
 package de.hpi.idd;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import de.hpi.idd.sim.SimilarityClassifier;
 import de.hpi.idd.store.RecordStore;
@@ -39,11 +42,11 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 
 	@Override
 	public Collection<ID> resolve(RECORD rec, ID recId) throws StoreException {
-		for (Entry<ID, RECORD> entry : store) {
-			if (!recId.equals(entry.getKey()) && !uf.connected(recId, entry.getKey())
-					&& sim.areSimilar(rec, entry.getValue())) {
-				uf.union(recId, entry.getKey());
-			}
+		List<ID> matches = StreamSupport.stream(store.spliterator(), true)
+				.filter(candidate -> !recId.equals(candidate.getKey()) && sim.areSimilar(rec, candidate.getValue()))
+				.map(Entry::getKey).collect(Collectors.toList());
+		for (ID match : matches) {
+			uf.union(recId, match);
 		}
 		return uf.getComponent(recId);
 	}

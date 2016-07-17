@@ -21,8 +21,9 @@ public class MoviesConfig {
 
 			@Override
 			public String computeKey(Map<String, Object> obj) {
-				String title = ((String) obj.get("title")).toLowerCase();
-				return StringUtils.substring(title, 0, 3);
+				String title = ((String) obj.get("title")).toLowerCase().trim();
+				title = title.replaceAll("^the", "").trim();
+				return StringUtils.substring(title, 0, 4);
 			}
 		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.8))));
 	}

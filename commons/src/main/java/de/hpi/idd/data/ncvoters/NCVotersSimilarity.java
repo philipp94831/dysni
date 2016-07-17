@@ -12,6 +12,10 @@ import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
 
 public class NCVotersSimilarity extends DatasetUtils {
+	
+	private class ObjectComparison { 
+		public int successful;
+	}
 
 	static final String ID = "id";
 	static final String FIRST_NAME = "first_name";
@@ -69,20 +73,22 @@ public class NCVotersSimilarity extends DatasetUtils {
 			return 0.0;
 		
 		// age has to be the same
-		if (record1.get(AGE) != record2.get(AGE))
+		if (!record1.get(AGE).equals(record2.get(AGE)))
 			return 0.0;
 		
 		return -1.0;
 	}
 	
-	private double objectSimilarity(Object o1, Object o2) {
-		return objectSimilarity(o1, o2, "");
+	private double objectSimilarity(Object o1, Object o2, ObjectComparison comp) {
+		return objectSimilarity(o1, o2, "", comp);
 	}
 	
-	private double objectSimilarity(Object o1, Object o2, Object def) {
+	private double objectSimilarity(Object o1, Object o2, Object def, ObjectComparison comp) {
+		comp.successful++;
 		if (o1.equals(def) && o2.equals(def))
 			return 1.0;
 		else if (o1.equals(def) || o2.equals(def)) {
+			comp.successful--;
 			return 0.0;
 		} else {
 			if (o1 instanceof Integer)
@@ -92,26 +98,18 @@ public class NCVotersSimilarity extends DatasetUtils {
 		}
 	}
 	
-	private boolean onlyOneDefault(Object o1, Object o2) {
-		return onlyOneDefault(o1, o2, "");
-	}
-	
-	private boolean onlyOneDefault(Object o1, Object o2, Object def) {
-		return o1.equals(def) ^ o2.equals(def);
-	}
-	
 	public Double calculateSimilarity(Map<String, Object> record1, Map<String, Object> record2, Map<String, String> parameters) {	
+		double distances;
+	
 		Double specialCases = treatSpecialCases(record1, record2);
 		if (specialCases >= 0)
 			return specialCases;
 
-		double distances = 0;
-		int attribute_count = 5;
+		distances = 0;
+		ObjectComparison comp = new ObjectComparison();
+		comp.successful = 2;
 					
-		if(onlyOneDefault(record1.get(BIRTH_PLACE), record2.get(BIRTH_PLACE))) {
-			attribute_count--;
-		}
-		distances += objectSimilarity(record1.get(BIRTH_PLACE), record2.get(BIRTH_PLACE));
+		distances += objectSimilarity(record1.get(BIRTH_PLACE), record2.get(BIRTH_PLACE), comp);
 		distances += (record1.get(PARTY).equals(record2.get(PARTY)) ? 1.0 : 0.0);
 		
 		// first name rarely changes by much, so large differences influence negatively
@@ -119,9 +117,7 @@ public class NCVotersSimilarity extends DatasetUtils {
 			
 		// when marrying, old last name often moves to middle name
 		// if this happens, ignore middle and last name, and only consider the rest
-		if (record1.get(MIDDLE_NAME).equals(record2.get(LAST_NAME)) || record2.get(MIDDLE_NAME).equals(record1.get(LAST_NAME)))
-			attribute_count -= 2;
-		else {
+		if (!record1.get(MIDDLE_NAME).equals(record2.get(LAST_NAME)) && !record2.get(MIDDLE_NAME).equals(record1.get(LAST_NAME))) {
 			// at least two of the three attributes have to have the same DoubleMetaphone-Encoding
 			int dms = 0;
 			if (dm.isDoubleMetaphoneEqual((String) record1.get(FIRST_NAME), (String) record2.get(FIRST_NAME))) dms++;  
@@ -130,35 +126,19 @@ public class NCVotersSimilarity extends DatasetUtils {
 	        if (dms < 2) 
 	        	return 0.0;
 	        
-	        if(onlyOneDefault(record1.get(MIDDLE_NAME), record2.get(MIDDLE_NAME))) {
-				attribute_count--;
-			}
-	        distances += objectSimilarity(record1.get(MIDDLE_NAME), record2.get(MIDDLE_NAME));
-	        if(onlyOneDefault(record1.get(LAST_NAME), record2.get(LAST_NAME))) {
-				attribute_count--;
-			}
-	        distances += objectSimilarity(record1.get(LAST_NAME), record2.get(LAST_NAME));
+	        distances += objectSimilarity(record1.get(MIDDLE_NAME), record2.get(MIDDLE_NAME), comp);
+	        distances += objectSimilarity(record1.get(LAST_NAME), record2.get(LAST_NAME), comp);
 		}
 		   
 		// calculate difference of addresses
 		double address_distance = 0.0, street_distance = 0.0;
-		int address_attributes = 3, old_attribute_count = attribute_count;
-        if(onlyOneDefault(record1.get(STREET), record2.get(STREET), "UNKNOWN")) {
-			attribute_count--;
-		}
-		street_distance += objectSimilarity(record1.get(STREET), record2.get(STREET), "UNKNOWN");
+		ObjectComparison addressComp = new ObjectComparison();
+		street_distance += objectSimilarity(record1.get(STREET), record2.get(STREET), "UNKNOWN", addressComp);
 		address_distance += street_distance;
-		if (old_attribute_count != attribute_count) street_distance = 1.0;
-        if(onlyOneDefault(record1.get(ZIP_CODE), record2.get(ZIP_CODE), 0)) {
-			attribute_count--;
-		}
-		address_distance += objectSimilarity(record1.get(ZIP_CODE), record2.get(ZIP_CODE), 0) * street_distance;
-        if(onlyOneDefault(record1.get(HOUSE_NUM), record2.get(HOUSE_NUM), 0)) {
-			attribute_count--;
-		}
-		address_distance += objectSimilarity(record1.get(HOUSE_NUM), record2.get(HOUSE_NUM), 0) * street_distance;
-		address_attributes += old_attribute_count - attribute_count;
-		attribute_count = old_attribute_count;
+		if (addressComp.successful != 1) street_distance = 1.0;
+		address_distance += objectSimilarity(record1.get(ZIP_CODE), record2.get(ZIP_CODE), 0, addressComp) * street_distance;
+		address_distance += objectSimilarity(record1.get(HOUSE_NUM), record2.get(HOUSE_NUM), 0, addressComp) * street_distance;
+		addressComp.successful += (3 - addressComp.successful);
 		
 		String s1, s2, mc, mw;
 		Integer c1, c2;
@@ -172,14 +152,14 @@ public class NCVotersSimilarity extends DatasetUtils {
 		// if moved from county, and counties are different, or moved within state
 		// consider address information less heavily
 		if (((s1.equals(mc) || s2.equals(mc)) && (!c1.equals(c2))) || (s1.equals(mw) || s2.equals(mw)))	{
-			distances += (address_distance / address_attributes);
-			attribute_count += 1;
+			distances += (address_distance / addressComp.successful);
+			comp.successful += 1;
 		} else {
 			distances += address_distance;
-			attribute_count += address_attributes;
+			comp.successful += addressComp.successful;
 		}
 		
-		return Double.max(distances / attribute_count, 0.0);
+		return Double.max(distances / comp.successful, 0.0);
 	}
 	
 	public Map<String, Object> parseRecord(Map<String, String> values) {
@@ -211,8 +191,7 @@ public class NCVotersSimilarity extends DatasetUtils {
 			return jw.distance(value1.toString(), value2.toString());
 	}
 
-	@Override
-	public Boolean isMatch(Map<String, Double> similarities) {
+	public Double calculateAttributeSimilarity(Map<String, Double> similarities) {
 		double similarity = 0.0;
 		int attributeCount = 0;
 		for (String key: similarities.keySet()) {
@@ -224,12 +203,18 @@ public class NCVotersSimilarity extends DatasetUtils {
 			// age is always identical for duplicate records in the dataset
 			else if (key.equals(AGE)) {
 				if (similarities.get(key) != 1.0)
-					return false;
+					return 0.0;
 			}
 			else
 				similarity += similarities.get(key);
 		}
-		return (similarity / attributeCount) >= datasetThreshold;
+		return similarity / attributeCount;
+	}
+
+	@Override
+	public Boolean isMatch(Map<String, Double> similarities) {
+		// TODO Auto-generated method stub
+		return null;
 	};
 
 }

@@ -9,7 +9,7 @@ import de.hpi.idd.DatasetUtils;
 import de.hpi.idd.data.cd.CDConfig;
 import de.hpi.idd.data.cd.CDDataset;
 import de.hpi.idd.data.cora.CoraConfig;
-import de.hpi.idd.data.cora.Utility;
+import de.hpi.idd.data.cora.CoraUtility;
 import de.hpi.idd.data.movies.MovieSimilarityMeasure;
 import de.hpi.idd.data.movies.MoviesConfig;
 import de.hpi.idd.data.ncvoters.NCVotersConfig;
@@ -24,10 +24,10 @@ import de.hpi.idd.dysni.DySNIndexConfiguration;
  */
 public enum Dataset {
 	CD(CDConfig.config(), "cd_dataset.csv", "cd_dataset_duplicates.csv", new CDDataset(), true),
-	CORA(CoraConfig.config(), "cora_v2.csv", "cora_ground_truth.csv", new Utility(), true),
+	CORA(CoraConfig.config(), "cora_v3.csv", "cora_ground_truth.csv", new CoraUtility(), true),
 	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", new MovieSimilarityMeasure(), true),
 	NCVOTERS(NCVotersConfig.config(), "ncvoters_1000000.csv", "ncvoters_ground_truth_1000000.csv",
-			new NCVotersSimilarity(), false),
+			new NCVotersSimilarity(), true),
 	PEOPLE(PeopleConfig.config(), "febrl_300k_relevant.csv", "gold_standard_febrl_300k.csv",
 			new SimilarityFunctionForPeopleDataset(), true);
 
