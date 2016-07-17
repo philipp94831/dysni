@@ -36,7 +36,8 @@ public class App {
 			return new DynamicSortedNeighborhoodIndexer<>(store, similarityMeasure).addIndexes(configs)
 					.setParallelizable(dataset.isParallelizable());
 		case BRUTE_FORCE:
-			return new BruteForceEntityResolver<>(store, similarityMeasure);
+			return new BruteForceEntityResolver<>(store, similarityMeasure)
+					.setParallelizable(dataset.isParallelizable());
 		default:
 			throw new IllegalArgumentException("Unknown EntityResolver: " + ER_TYPE);
 		}

@@ -14,11 +14,11 @@ import de.hpi.idd.data.Dataset;
 
 public class DySNIExecuteInstructions implements ExecuteInstructions {
 
-	private final Core core;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
+	private final Core core;
 
 	public DySNIExecuteInstructions() {
-		this.core = new DySNICore();
+		core = new DySNICore();
 	}
 
 	@Override

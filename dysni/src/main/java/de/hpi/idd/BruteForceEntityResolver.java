@@ -21,6 +21,7 @@ import de.hpi.idd.util.UnionFind;
  */
 public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECORD, ID> {
 
+	private boolean parallelizable = true;
 	private final SimilarityClassifier<RECORD> sim;
 	private final RecordStore<ID, RECORD> store;
 	private final UnionFind<ID> uf = new UnionFind<>();
@@ -40,15 +41,24 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 		store.storeRecord(recId, rec);
 	}
 
+	public boolean isParallelizable() {
+		return parallelizable;
+	}
+
 	@Override
 	public Collection<ID> resolve(RECORD rec, ID recId) throws StoreException {
-		List<ID> matches = StreamSupport.stream(store.spliterator(), true)
+		List<ID> matches = StreamSupport.stream(store.spliterator(), parallelizable)
 				.filter(candidate -> !recId.equals(candidate.getKey()) && sim.areSimilar(rec, candidate.getValue()))
 				.map(Entry::getKey).collect(Collectors.toList());
 		for (ID match : matches) {
 			uf.union(recId, match);
 		}
 		return uf.getComponent(recId);
+	}
+
+	public BruteForceEntityResolver<RECORD, ID> setParallelizable(boolean parallelizable) {
+		this.parallelizable = parallelizable;
+		return this;
 	}
 
 }

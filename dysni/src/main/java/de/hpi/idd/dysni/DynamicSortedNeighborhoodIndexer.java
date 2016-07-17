@@ -106,6 +106,15 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	}
 
 	/**
+	 * Whether similarity function will be executed in parallel or not
+	 *
+	 * @return true, if similarity function will be executed in parallel
+	 */
+	public boolean isParallelizable() {
+		return parallelizable;
+	}
+
+	/**
 	 * Find duplicates by retrieving candidates from each index and comparing
 	 * the record to each of these candidates using the similarity measure.
 	 * Similar records are connected in the Union Find data structure.
