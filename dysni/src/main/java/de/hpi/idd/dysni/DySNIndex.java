@@ -62,4 +62,8 @@ class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 	public void insert(RECORD record, ID value) {
 		tree.insert(keyHandler.computeKey(record), value);
 	}
+	
+	public int size() {
+		return tree.nodes();
+	}
 }

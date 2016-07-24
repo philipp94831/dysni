@@ -553,6 +553,15 @@ public class Node<K extends Comparable<K>, V> {
 		return elements.size() + (left == null ? 0 : left.size()) + (right == null ? 0 : right.size());
 	}
 
+	/**
+	 * Get the number of nodes of the tree rooted at this node.
+	 *
+	 * @return number of nodes contained in the tree rooted at node
+	 */
+	int nodes() {
+		return 1 + (left == null ? 0 : left.nodes()) + (right == null ? 0 : right.nodes());
+	}
+
 	@Override
 	public String toString() {
 		return key.toString();

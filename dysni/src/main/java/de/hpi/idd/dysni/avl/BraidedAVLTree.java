@@ -205,4 +205,13 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	public int size() {
 		return top == null ? 0 : top.size();
 	}
+
+	/**
+	 * Get the number of nodes of the tree.
+	 *
+	 * @return number of nodes contained in the tree
+	 */
+	public int nodes() {
+		return top == null ? 0 : top.nodes();
+	}
 }

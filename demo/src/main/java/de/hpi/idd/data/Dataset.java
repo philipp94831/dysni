@@ -27,7 +27,7 @@ public enum Dataset {
 	CORA(CoraConfig.config(), "cora_v3.csv", "cora_ground_truth.csv", new CoraUtility(), true),
 	MOVIES(MoviesConfig.config(), "movies_dataset.csv", "movies_ground_truth.csv", new MovieSimilarityMeasure(), true),
 	NCVOTERS(NCVotersConfig.config(), "ncvoters_1000000.csv", "ncvoters_ground_truth_1000000.csv",
-			new NCVotersSimilarity(), true),
+			new NCVotersSimilarity(), false),
 	PEOPLE(PeopleConfig.config(), "febrl_300k_relevant.csv", "gold_standard_febrl_300k.csv",
 			new SimilarityFunctionForPeopleDataset(), true);
 

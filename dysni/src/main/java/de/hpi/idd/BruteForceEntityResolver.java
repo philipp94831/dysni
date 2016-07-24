@@ -53,7 +53,9 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 		for (ID match : matches) {
 			uf.union(recId, match);
 		}
-		return uf.getComponent(recId);
+		Collection<ID> component = uf.getComponent(recId);
+		component.remove(recId);
+		return component;
 	}
 
 	public BruteForceEntityResolver<RECORD, ID> setParallelizable(boolean parallelizable) {

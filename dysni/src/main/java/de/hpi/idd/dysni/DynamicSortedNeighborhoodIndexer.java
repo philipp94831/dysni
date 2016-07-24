@@ -3,6 +3,7 @@ package de.hpi.idd.dysni;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,6 +46,11 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	private final RecordStore<ID, RECORD> store;
 	/** Union find data structure to ensure transitivity of similarity */
 	private final UnionFind<ID> uf = new UnionFind<>();
+	private int comparisons = 0;
+	
+	public int getComparisons() {
+		return comparisons;
+	}
 
 	/**
 	 * Construct a new DySNIndexer with the specified store and similarity
@@ -126,6 +132,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 			candidates.addAll(index.findCandidates(rec));
 		}
 		candidates.remove(recId);
+		comparisons += candidates.size();
 		Set<ID> matches = streamCandidates(candidates).filter(candidate -> {
 			try {
 				RECORD candidateRec = store.getRecord(candidate);
@@ -137,7 +144,9 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 		for (ID match : matches) {
 			uf.union(recId, match);
 		}
-		return uf.getComponent(recId);
+		Collection<ID> component = uf.getComponent(recId);
+		component.remove(recId);
+		return component;
 	}
 
 	/**
@@ -168,5 +177,9 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 		} else {
 			return candidates.stream();
 		}
+	}
+	
+	public List<Integer> indexSizes() {
+		return indexes.stream().map(DySNIndex::size).collect(Collectors.toList());
 	}
 }

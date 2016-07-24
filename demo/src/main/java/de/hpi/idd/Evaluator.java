@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -52,9 +53,8 @@ class Evaluator {
 			}
 		}
 		int t = 0;
-		for (String root : duplicates.getRoots()) {
-			List<String> elems = new ArrayList<>(duplicates.getComponent(root));
-			elems.add(root);
+		for (Set<String> component : duplicates) {
+			List<String> elems = new ArrayList<>(component);
 			for (int i = 0; i < elems.size(); i++) {
 				for (int j = i + 1; j < elems.size(); j++) {
 					t++;

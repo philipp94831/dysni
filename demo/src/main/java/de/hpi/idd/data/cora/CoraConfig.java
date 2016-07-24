@@ -13,7 +13,7 @@ import de.hpi.idd.sim.LevenshteinSimilarity;
 import de.hpi.idd.sim.SimilarityMeasure;
 
 public class CoraConfig {
-	
+
 	private static final SimilarityMeasure<String> LEVENSHTEIN = new LevenshteinSimilarity();
 
 	public static Collection<DySNIndexConfiguration<Map<String, Object>, ?, String>> config() {
@@ -21,15 +21,15 @@ public class CoraConfig {
 
 			@Override
 			public String computeKey(Map<String, Object> obj) {
-				String title = ((String) obj.get("Authors")).trim().toLowerCase();
-				return StringUtils.substring(title, 0, 3);
+				String authors = ((String) obj.get("Authors")).toLowerCase();
+				return StringUtils.substring(authors, 0, 3);
 			}
 		}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.4))),
 				new DySNIndexConfiguration<>(new KeyHandler<Map<String, Object>, String>() {
 
 					@Override
 					public String computeKey(Map<String, Object> obj) {
-						String title = ((String) obj.get("title")).trim().toLowerCase();
+						String title = ((String) obj.get("title")).toLowerCase().replaceAll("^\\s*the", "");
 						return StringUtils.substring(title, 0, 3);
 					}
 				}, new AdaptiveKeySimilarityWindowBuilder<>(LEVENSHTEIN.asClassifier(0.4))));

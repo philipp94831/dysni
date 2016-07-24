@@ -1,12 +1,18 @@
 package de.hpi.idd.util;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import com.google.common.collect.Sets;
 
 /**
  * Based on the implementation by
@@ -22,18 +28,18 @@ import java.util.stream.Collectors;
  * @param <T>
  *            type of the elements
  */
-public class UnionFind<T> {
+public class UnionFind<T> implements Iterable<Set<T>> {
 
 	/**
 	 * This class represents a node in the Union Find tree having a parent,
 	 * multiple children and containing an element of type {@code T}
 	 *
 	 */
-	private class Node {
+	private static class Node<U> {
 
-		private final Collection<Node> children = new HashSet<>();
-		private final T element;
-		private Node parent;
+		private final Collection<Node<U>> children = new HashSet<>();
+		private final U element;
+		private Node<U> parent;
 		private byte rank;
 
 		/**
@@ -42,7 +48,7 @@ public class UnionFind<T> {
 		 * @param element
 		 *            element associated with this node
 		 */
-		public Node(T element) {
+		public Node(U element) {
 			this.element = element;
 		}
 
@@ -52,8 +58,24 @@ public class UnionFind<T> {
 		 * @param child
 		 *            new child node
 		 */
-		private void addChild(Node child) {
+		private void addChild(Node<U> child) {
 			children.add(child);
+		}
+
+		public Node<U> find() {
+			Node<U> node = this;
+			Node<U> parent;
+			while ((parent = node.getParent()) != null) {
+				// path compression by halving
+				Node<U> pp = parent.getParent();
+				if (pp != null) {
+					node.setParent(pp);
+					node = pp;
+				} else {
+					return parent;
+				}
+			}
+			return node;
 		}
 
 		/**
@@ -61,8 +83,20 @@ public class UnionFind<T> {
 		 *
 		 * @return collection of child nodes
 		 */
-		public Collection<Node> getChildren() {
+		public Collection<Node<U>> getChildren() {
 			return children;
+		}
+
+		public Set<U> getComponent() {
+			Set<U> component = new HashSet<>();
+			Stack<Node<U>> todo = new Stack<>();
+			todo.add(this);
+			while (!todo.isEmpty()) {
+				Node<U> elem = todo.pop();
+				component.add(elem.getElement());
+				todo.addAll(elem.getChildren());
+			}
+			return component;
 		}
 
 		/**
@@ -70,7 +104,7 @@ public class UnionFind<T> {
 		 *
 		 * @return element contained by this node
 		 */
-		public T getElement() {
+		public U getElement() {
 			return element;
 		}
 
@@ -79,7 +113,7 @@ public class UnionFind<T> {
 		 *
 		 * @return parent node of this node
 		 */
-		public Node getParent() {
+		public Node<U> getParent() {
 			return parent;
 		}
 
@@ -109,7 +143,7 @@ public class UnionFind<T> {
 		 * @param child
 		 *            the child to be removed
 		 */
-		public void removeChild(Node child) {
+		public void removeChild(Node<U> child) {
 			children.remove(child);
 		}
 
@@ -120,21 +154,19 @@ public class UnionFind<T> {
 		 * @param parent
 		 *            the new parent node
 		 */
-		public void setParent(Node parent) {
+		public void setParent(Node<U> parent) {
 			if (this.parent != null) {
 				this.parent.removeChild(this);
-			} else {
-				roots.remove(this);
 			}
 			this.parent = parent;
 			parent.addChild(this);
 		}
 	}
 
-	/** Element-node mapping to retrieve the node */
-	private final Map<T, Node> nodes = new HashMap<>();
 	/** Nodes rooting a tree */
-	private final Set<Node> roots = new HashSet<>();
+	private int count = 0;
+	/** Element-node mapping to retrieve the node */
+	private final Map<T, Node<T>> nodes = new HashMap<>();
 
 	/**
 	 * Returns true if the the two sites are in the same component.
@@ -147,8 +179,8 @@ public class UnionFind<T> {
 	 *         the same component; <tt>false</tt> otherwise
 	 */
 	public boolean connected(T t, T u) {
-		Node nodeT = find(t);
-		Node nodeU = find(u);
+		Node<T> nodeT = find(t);
+		Node<T> nodeU = find(u);
 		return !(nodeT == null || nodeU == null) && nodeT.equals(nodeU);
 	}
 
@@ -158,7 +190,7 @@ public class UnionFind<T> {
 	 * @return the number of components
 	 */
 	public int count() {
-		return roots.size();
+		return count;
 	}
 
 	/**
@@ -170,23 +202,15 @@ public class UnionFind<T> {
 	 * @return the component identifier for the component containing site
 	 *         <tt>t</tt>
 	 */
-	private Node find(T t) {
+	private Node<T> find(T t) {
 		if (t == null) {
 			throw new NullPointerException("Element must not be null");
 		}
-		Node node = nodes.get(t);
+		Node<T> node = nodes.get(t);
 		if (node == null) {
 			return null;
 		}
-		while (node.getParent() != null) {
-			// path compression by halving
-			Node pp = node.getParent().getParent();
-			if (pp != null) {
-				node.setParent(pp);
-			}
-			node = node.getParent();
-		}
-		return node;
+		return node.find();
 	}
 
 	/**
@@ -198,29 +222,11 @@ public class UnionFind<T> {
 	 *         excluding <tt>t</tt>
 	 */
 	public Collection<T> getComponent(T t) {
-		Collection<T> component = new HashSet<>();
-		Stack<Node> todo = new Stack<>();
-		Node node = find(t);
+		Node<T> node = find(t);
 		if (node == null) {
-			return component;
+			return new HashSet<>();
 		}
-		todo.add(node);
-		while (!todo.isEmpty()) {
-			Node elem = todo.pop();
-			component.add(elem.getElement());
-			todo.addAll(elem.getChildren());
-		}
-		component.remove(t);
-		return component;
-	}
-
-	/**
-	 * Get the nodes rooting the trees of the Union Find
-	 *
-	 * @return nodes rooting a tree
-	 */
-	public Set<T> getRoots() {
-		return roots.stream().map(Node::getElement).collect(Collectors.toSet());
+		return node.getComponent();
 	}
 
 	/**
@@ -230,13 +236,22 @@ public class UnionFind<T> {
 	 * @param t
 	 *            element to be inserted
 	 */
-	private void insert(T t) {
+	private Node<T> insert(T t) {
 		if (t == null) {
 			throw new NullPointerException("Element must not be null");
 		}
-		Node node = new Node(t);
-		roots.add(node);
+		Node<T> node = new Node<>(t);
+		count++;
 		nodes.put(t, node);
+		return node;
+	}
+
+	@Override
+	public Iterator<Set<T>> iterator() {
+		return nodes.values().stream()
+				.map(n -> Pair.of(n.find(), n.getElement())).collect(Collectors.groupingBy(Pair::getLeft, Collectors
+						.reducing(Collections.<T> emptySet(), p -> Collections.singleton(p.getRight()), Sets::union)))
+				.values().iterator();
 	}
 
 	/**
@@ -249,18 +264,21 @@ public class UnionFind<T> {
 	 *            the element representing the other site
 	 */
 	public void union(T t, T u) {
-		if (!nodes.containsKey(t)) {
-			insert(t);
+		Node<T> nodeT = nodes.get(t);
+		if (nodeT == null) {
+			nodeT = insert(t);
 		}
-		if (!nodes.containsKey(u)) {
-			insert(u);
+		Node<T> nodeU = nodes.get(u);
+		if (nodeU == null) {
+			nodeU = insert(u);
 		}
-		Node rootT = find(t);
-		Node rootU = find(u);
+		Node<T> rootT = nodeT.find();
+		Node<T> rootU = nodeU.find();
 		if (rootT.equals(rootU)) {
 			return;
 		}
 		// make root of smaller rank point to root of larger rank
+		count--;
 		if (rootT.getRank() < rootU.getRank()) {
 			rootT.setParent(rootU);
 		} else if (rootT.getRank() > rootU.getRank()) {
