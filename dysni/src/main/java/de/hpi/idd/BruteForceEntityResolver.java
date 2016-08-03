@@ -37,8 +37,9 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 	}
 
 	@Override
-	public void insert(RECORD record, ID recordId) throws StoreException {
+	public Collection<ID> insert(RECORD record, ID recordId) throws StoreException {
 		store.storeRecord(recordId, record);
+		return resolve(record, recordId);
 	}
 
 	public boolean isParallelizable() {

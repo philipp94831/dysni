@@ -2,7 +2,6 @@ package de.hpi.idd.dysni;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -142,11 +141,11 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 * all indexes.
 	 */
 	@Override
-	public void insert(RECORD record, ID recordId) throws StoreException {
+	public Collection<ID> insert(RECORD record, ID recordId) throws StoreException {
 		store.storeRecord(recordId, record);
-		for (DySNIndex<RECORD, ?, ID> index : indexes) {
-			index.insert(record, recordId);
-		}
+		Set<ID> candidates = indexes.stream().flatMap(index -> index.insert(record, recordId).stream())
+				.collect(Collectors.toSet());
+		return resolve(record, recordId, candidates);
 	}
 
 	/**
@@ -182,6 +181,10 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	@Override
 	public Collection<ID> resolve(RECORD record, ID recordId) {
 		Set<ID> candidates = findCandidates(record);
+		return resolve(record, recordId, candidates);
+	}
+
+	private Collection<ID> resolve(RECORD record, ID recordId, Set<ID> candidates) {
 		candidates.remove(recordId);
 		comparisons += candidates.size();
 		Set<ID> matches = matchCandidates(record, candidates);

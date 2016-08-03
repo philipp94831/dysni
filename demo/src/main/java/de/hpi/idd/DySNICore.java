@@ -2,6 +2,7 @@ package de.hpi.idd;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -54,15 +55,14 @@ public class DySNICore implements Core {
 	}
 
 	@Override
-	public boolean insertRecord(Map<String, Object> record, Map<String, String> parameters) {
+	public List<String> insertRecord(Map<String, Object> record, Map<String, String> parameters) {
 		String id = (String) record.get(Dataset.ID);
 		try {
-			er.insert(record, id);
-			return true;
+			return new ArrayList<>(er.insert(record, id));
 		} catch (StoreException e) {
 			LOGGER.severe("Error inserting record " + id + ": " + e);
 		}
-		return false;
+		return Collections.emptyList();
 	}
 
 }

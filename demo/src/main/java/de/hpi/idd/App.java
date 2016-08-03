@@ -53,8 +53,7 @@ public class App {
 			for (CSVRecord record : parser) {
 				Map<String, Object> rec = du.parseRecord(record.toMap());
 				String id = (String) rec.get(Dataset.ID);
-				er.insert(rec, id);
-				Collection<String> duplicates = er.resolve(rec, id);
+				Collection<String> duplicates = er.insert(rec, id);
 				for (String duplicate : duplicates) {
 					duplicatesToCheck.put(id, duplicate, true);
 				}

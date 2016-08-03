@@ -25,7 +25,7 @@ public interface EntityResolver<RECORD, ID> extends Closeable {
 	 *            the unique identifier of the record
 	 * @throws Exception
 	 */
-	void insert(RECORD record, ID recordId) throws StoreException;
+	Collection<ID> insert(RECORD record, ID recordId) throws StoreException;
 
 	/**
 	 * Find duplicates for the specified record

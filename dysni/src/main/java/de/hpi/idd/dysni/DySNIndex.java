@@ -3,6 +3,7 @@ package de.hpi.idd.dysni;
 import java.util.Collection;
 
 import de.hpi.idd.dysni.avl.BraidedAVLTree;
+import de.hpi.idd.dysni.avl.Node;
 import de.hpi.idd.dysni.window.WindowBuilder;
 
 /**
@@ -48,7 +49,7 @@ class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 	 * @return the ids of possible duplicate records
 	 */
 	public Collection<ID> findCandidates(RECORD record) {
-		return windowBuilder.buildWindow(record, tree.find(keyHandler.computeKey(record)));
+		return findCandidates(record, tree.find(keyHandler.computeKey(record)));
 	}
 
 	/**
@@ -59,10 +60,15 @@ class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 	 * @param value
 	 *            the id it can be identified by
 	 */
-	public void insert(RECORD record, ID value) {
-		tree.insert(keyHandler.computeKey(record), value);
+	public Collection<ID> insert(RECORD record, ID value) {
+		Node<KEY, ID> node = tree.insert(keyHandler.computeKey(record), value);
+		return findCandidates(record, node);
 	}
 	
+	private Collection<ID> findCandidates(RECORD record, Node<KEY, ID> node) {
+		return windowBuilder.buildWindow(record, node);
+	}
+
 	public int size() {
 		return tree.nodes();
 	}

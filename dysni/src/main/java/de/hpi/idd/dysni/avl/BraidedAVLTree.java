@@ -169,15 +169,20 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	 *            the element's sorting key (silently ignored if null)
 	 * @param element
 	 *            element to insert (silently ignored if null)
+	 * @return 
 	 */
-	public void insert(K key, V element) {
+	public Node<K, V> insert(K key, V element) {
 		if (key != null || element != null) {
 			if (top == null) {
 				top = new Node<>(key, element);
+				return top;
 			} else {
 				top.insert(key, element);
+				//TODO: directly return correct node
+				return find(key);
 			}
 		}
+		return null;
 	}
 
 	/**

@@ -14,7 +14,7 @@ public class AVLTreeTest {
 	private final BraidedAVLTree<String, String> tree = new BraidedAVLTree<>();
 
 	private void insert(String s) {
-		tree.insert(s, s.toLowerCase());
+		assertEquals(s, tree.insert(s, s.toLowerCase()).getKey());
 	}
 
 	@Test
