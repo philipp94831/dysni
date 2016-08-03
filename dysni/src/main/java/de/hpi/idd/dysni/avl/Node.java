@@ -177,7 +177,7 @@ public class Node<K extends Comparable<K>, V> {
 	 *
 	 * @return left sub-tree
 	 */
-	public Node<K, V> getLeft() {
+	Node<K, V> getLeft() {
 		return left;
 	}
 
@@ -204,7 +204,7 @@ public class Node<K extends Comparable<K>, V> {
 	 *
 	 * @return right sub-tree
 	 */
-	public Node<K, V> getRight() {
+	Node<K, V> getRight() {
 		return right;
 	}
 

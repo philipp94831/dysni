@@ -30,6 +30,7 @@ import de.hpi.idd.util.UnionFind;
  */
 public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResolver<RECORD, ID> {
 
+	private int comparisons = 0;
 	/**
 	 * the different indexes, each with a specific key function and window
 	 * builder
@@ -46,11 +47,6 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	private final RecordStore<ID, RECORD> store;
 	/** Union find data structure to ensure transitivity of similarity */
 	private final UnionFind<ID> uf = new UnionFind<>();
-	private int comparisons = 0;
-	
-	public int getComparisons() {
-		return comparisons;
-	}
 
 	/**
 	 * Construct a new DySNIndexer with the specified store and similarity
@@ -94,9 +90,51 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 		return this;
 	}
 
+	/**
+	 * Check a record and a candidate for similarity. This method may produce a
+	 * {@link RuntimeException} if the candidate cannot be retrieved from the
+	 * store. Since Java 8 streams do not support exceptions, this case cannot
+	 * be caught.
+	 *
+	 * @param record
+	 *            the record for which similarity should be resolved
+	 * @param candidate
+	 *            a potential duplicate represented by its unique id
+	 * @return true if the record and the candidate are determined similar by
+	 *         the similarity measure
+	 */
+	private boolean areSimilar(RECORD record, ID candidate) {
+		try {
+			RECORD candidateRec = store.getRecord(candidate);
+			return sim.areSimilar(record, candidateRec);
+		} catch (StoreException e) {
+			throw new RuntimeException("Error retrieving element from store", e);
+		}
+	}
+
 	@Override
 	public void close() throws StoreException {
 		store.close();
+	}
+
+	/**
+	 * Retrieve candidates for possible similarity to a given record from each
+	 * index.
+	 *
+	 * @param record
+	 *            the record for which potential duplicates should be resolved
+	 * @return ids of potential duplicates
+	 */
+	private Set<ID> findCandidates(RECORD record) {
+		return indexes.stream().flatMap(index -> index.findCandidates(record).stream()).collect(Collectors.toSet());
+	}
+
+	public int getComparisons() {
+		return comparisons;
+	}
+
+	public List<Integer> indexSizes() {
+		return indexes.stream().map(DySNIndex::size).collect(Collectors.toList());
 	}
 
 	/**
@@ -104,10 +142,10 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 * all indexes.
 	 */
 	@Override
-	public void insert(RECORD rec, ID recId) throws StoreException {
-		store.storeRecord(recId, rec);
+	public void insert(RECORD record, ID recordId) throws StoreException {
+		store.storeRecord(recordId, record);
 		for (DySNIndex<RECORD, ?, ID> index : indexes) {
-			index.insert(rec, recId);
+			index.insert(record, recordId);
 		}
 	}
 
@@ -121,31 +159,37 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	}
 
 	/**
+	 * Check candidates for similarity to a given record. This is usually the
+	 * most expensive part of DySNI. To improve performance, it is recommended
+	 * to check whether parallelizing the calls to the similarity measure is
+	 * helpful.
+	 *
+	 * @param record
+	 *            the record for which similar records should be resolved
+	 * @param candidates
+	 *            potential duplicates represented by their unique id
+	 * @return ids of similar records
+	 */
+	private Set<ID> matchCandidates(RECORD record, Set<ID> candidates) {
+		return stream(candidates).filter(candidate -> areSimilar(record, candidate)).collect(Collectors.toSet());
+	}
+
+	/**
 	 * Find duplicates by retrieving candidates from each index and comparing
 	 * the record to each of these candidates using the similarity measure.
 	 * Similar records are connected in the Union Find data structure.
 	 */
 	@Override
-	public Collection<ID> resolve(RECORD rec, ID recId) {
-		Set<ID> candidates = new HashSet<>();
-		for (DySNIndex<RECORD, ?, ID> index : indexes) {
-			candidates.addAll(index.findCandidates(rec));
-		}
-		candidates.remove(recId);
+	public Collection<ID> resolve(RECORD record, ID recordId) {
+		Set<ID> candidates = findCandidates(record);
+		candidates.remove(recordId);
 		comparisons += candidates.size();
-		Set<ID> matches = streamCandidates(candidates).filter(candidate -> {
-			try {
-				RECORD candidateRec = store.getRecord(candidate);
-				return sim.areSimilar(rec, candidateRec);
-			} catch (StoreException e) {
-				throw new RuntimeException("Error retrieving element from store", e);
-			}
-		}).collect(Collectors.toSet());
+		Set<ID> matches = matchCandidates(record, candidates);
 		for (ID match : matches) {
-			uf.union(recId, match);
+			uf.union(recordId, match);
 		}
-		Collection<ID> component = uf.getComponent(recId);
-		component.remove(recId);
+		Collection<ID> component = uf.getComponent(recordId);
+		component.remove(recordId);
 		return component;
 	}
 
@@ -171,15 +215,11 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 *            candidates to stream
 	 * @return stream of candidates, parallel if {@link #parallelizable} true
 	 */
-	private Stream<ID> streamCandidates(Set<ID> candidates) {
+	private <T> Stream<T> stream(Set<T> candidates) {
 		if (parallelizable) {
 			return candidates.parallelStream();
 		} else {
 			return candidates.stream();
 		}
-	}
-	
-	public List<Integer> indexSizes() {
-		return indexes.stream().map(DySNIndex::size).collect(Collectors.toList());
 	}
 }

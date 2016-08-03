@@ -19,24 +19,24 @@ public interface EntityResolver<RECORD, ID> extends Closeable {
 	/**
 	 * Add a record to the entity resolver
 	 *
-	 * @param rec
+	 * @param record
 	 *            the record to be added
-	 * @param recId
+	 * @param recordId
 	 *            the unique identifier of the record
 	 * @throws Exception
 	 */
-	void insert(RECORD rec, ID recId) throws StoreException;
+	void insert(RECORD record, ID recordId) throws StoreException;
 
 	/**
 	 * Find duplicates for the specified record
 	 *
-	 * @param rec
+	 * @param record
 	 *            the record to be resolved
-	 * @param recId
+	 * @param recordId
 	 *            the unique identifier of the record
-	 * @return collection of ids of duplicate records
+	 * @return ids of duplicate records
 	 * @throws Exception
 	 */
-	Collection<ID> resolve(RECORD rec, ID recId) throws StoreException;
+	Collection<ID> resolve(RECORD record, ID recordId) throws StoreException;
 
 }

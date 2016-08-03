@@ -37,8 +37,8 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 	}
 
 	@Override
-	public void insert(RECORD rec, ID recId) throws StoreException {
-		store.storeRecord(recId, rec);
+	public void insert(RECORD record, ID recordId) throws StoreException {
+		store.storeRecord(recordId, record);
 	}
 
 	public boolean isParallelizable() {
@@ -46,15 +46,15 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 	}
 
 	@Override
-	public Collection<ID> resolve(RECORD rec, ID recId) throws StoreException {
+	public Collection<ID> resolve(RECORD record, ID recordId) throws StoreException {
 		List<ID> matches = StreamSupport.stream(store.spliterator(), parallelizable)
-				.filter(candidate -> !recId.equals(candidate.getKey()) && sim.areSimilar(rec, candidate.getValue()))
+				.filter(candidate -> !recordId.equals(candidate.getKey()) && sim.areSimilar(record, candidate.getValue()))
 				.map(Entry::getKey).collect(Collectors.toList());
 		for (ID match : matches) {
-			uf.union(recId, match);
+			uf.union(recordId, match);
 		}
-		Collection<ID> component = uf.getComponent(recId);
-		component.remove(recId);
+		Collection<ID> component = uf.getComponent(recordId);
+		component.remove(recordId);
 		return component;
 	}
 
