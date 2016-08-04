@@ -32,8 +32,8 @@ public class Node<K extends Comparable<K>, V> {
 	}
 
 	/** Elements contained in the current node. */
-	private Collection<V> elements;
-	private K key;
+	private final Collection<V> elements;
+	private final K key;
 	/** Left sub-tree. */
 	private Node<K, V> left;
 	/** Next node */
@@ -46,6 +46,8 @@ public class Node<K extends Comparable<K>, V> {
 	private Node<K, V> right;
 	/** Skew factor. */
 	private Skew skew;
+	/** The tree the node belongs to. Needed to keep track of root of tree */
+	private final BraidedAVLTree<K, V> tree;
 
 	/**
 	 * Build a node for a specified element.
@@ -54,14 +56,19 @@ public class Node<K extends Comparable<K>, V> {
 	 *            key
 	 * @param element
 	 *            element
+	 * @param tree
+	 *            the tree the node belongs to
 	 */
-	Node(K key, V element) {
-		if (key == null || element == null) {
-			throw new NullPointerException("Key and element must not be null");
+	Node(BraidedAVLTree<K, V> tree, K key, V element) {
+		this.tree = tree;
+		if (key == null) {
+			throw new NullPointerException("Key must not be null");
 		}
 		elements = new ArrayList<>();
 		this.key = key;
-		elements.add(element);
+		if (element != null) {
+			elements.add(element);
+		}
 		left = null;
 		right = null;
 		parent = null;
@@ -88,54 +95,84 @@ public class Node<K extends Comparable<K>, V> {
 	 * @param element
 	 *            element to delete
 	 *
-	 * @return true if the deleted element was the root of the tree, false
-	 *         otherwise
 	 */
-	boolean delete(V element) {
+	void delete(V element) {
 		elements.remove(element);
 		if (elements.isEmpty()) {
 			if (parent == null && left == null && right == null) {
 				// this was the last node, the tree is now empty
-				elements = null;
-				return true;
+				tree.root = null;
 			} else {
-				Node<K, V> node;
+				final Node<K, V> start;
 				Node<K, V> child;
 				boolean leftShrunk;
 				if (left == null && right == null) {
-					node = this;
-					elements = null;
-					prev.setNext(next);
-					leftShrunk = node == node.parent.left;
+					start = parent;
+					leftShrunk = start.isLeft(this);
 					child = null;
 				} else {
-					node = left != null ? prev : next;
-					elements = node.elements;
-					key = node.key;
-					if (left != null) {
-						setPrev(node.prev);
+					final Node<K, V> node;
+					if (left == null) {
+						node = next;
+						child = node.right;
 					} else {
-						setNext(node.next);
+						node = prev;
+						child = node.left;
 					}
-					leftShrunk = node == node.parent.left;
-					child = node.left != null ? node.left : node.right;
+					if (node != left) {
+						node.setLeft(left);
+					}
+					if (node != right) {
+						node.setRight(right);
+					}
+					start = node.parent;
+					leftShrunk = start.isLeft(node);
+					exchange(node);
 				}
-				node = node.parent;
-				if (leftShrunk) {
-					node.setLeft(child);
+				if (prev != null) {
+					prev.setNext(next);
 				} else {
-					node.setRight(child);
+					next.setPrev(prev);
 				}
+				if (leftShrunk) {
+					start.setLeft(child);
+				} else {
+					start.setRight(child);
+				}
+				Node<K, V> node = start;
+				Node<K, V> nextParent = node.parent;
 				while (leftShrunk ? node.rebalanceLeftShrunk() : node.rebalanceRightShrunk()) {
-					if (node.parent == null) {
-						return false;
+					if (nextParent == null) {
+						return;
 					}
-					leftShrunk = node == node.parent.left;
-					node = node.parent;
+					leftShrunk = nextParent.isLeft(start);
+					node = nextParent;
+					nextParent = node.parent;
 				}
 			}
 		}
-		return false;
+	}
+
+	/**
+	 * Place a node at the position where this node currently is. May update the
+	 * trees root.
+	 *
+	 * @param node
+	 *            the new node to be placed
+	 */
+	private void exchange(Node<K, V> node) {
+		if (parent != null) {
+			if (parent.isLeft(this)) {
+				parent.setLeft(node);
+			} else if (parent.isRight(this)) {
+				parent.setRight(node);
+			} else {
+				throw new IllegalStateException("Node is neither left nor right node of parent");
+			}
+		} else {
+			node.parent = null;
+			tree.root = node;
+		}
 	}
 
 	/**
@@ -233,29 +270,96 @@ public class Node<K extends Comparable<K>, V> {
 	 *            element to insert
 	 * @return true if the parent tree should be re-Skew.BALANCED
 	 */
-	boolean insert(K key, V element) {
+	Node<K, V> insert(K key, V element) {
+		final Node<K, V> newNode;
 		if (key.compareTo(this.key) < 0) {
 			// the inserted element is smaller than the node
 			if (left == null) {
-				setLeft(new Node<>(key, element));
+				newNode = new Node<>(tree, key, element);
+				setLeft(newNode);
 				left.setPrev(prev);
 				setPrev(left);
-				return rebalanceLeftGrown();
+				Node<K, V> node = this;
+				Node<K, V> nextParent = parent;
+				boolean isLeft = true;
+				boolean needsRebalance = true;
+				while (needsRebalance) {
+					needsRebalance = isLeft ? node.rebalanceLeftGrown() : node.rebalanceRightGrown();
+					if (nextParent == null) {
+						break;
+					}
+					isLeft = nextParent.isLeft(node);
+					node = nextParent;
+					nextParent = node.parent;
+				}
+				return newNode;
 			}
-			return left.insert(key, element) && rebalanceLeftGrown();
+			return left.insert(key, element);
 		}
 		if (key.compareTo(this.key) == 0) {
 			elements.add(element);
-			return false;
+			return this;
 		}
 		// the inserted element is greater than the node
 		if (right == null) {
-			setRight(new Node<>(key, element));
+			newNode = new Node<>(tree, key, element);
+			setRight(newNode);
 			right.setNext(next);
 			setNext(right);
-			return rebalanceRightGrown();
+			Node<K, V> node = this;
+			Node<K, V> nextParent = parent;
+			boolean isLeft = false;
+			boolean needsRebalance = true;
+			while (needsRebalance) {
+				needsRebalance = isLeft ? node.rebalanceLeftGrown() : node.rebalanceRightGrown();
+				if (nextParent == null) {
+					break;
+				}
+				isLeft = nextParent.isLeft(node);
+				node = nextParent;
+				nextParent = node.parent;
+			}
+			return newNode;
 		}
-		return right.insert(key, element) && rebalanceRightGrown();
+		return right.insert(key, element);
+	}
+
+	/**
+	 * Check whether a node is the left child of this node.
+	 *
+	 * @param node
+	 *            The potential left child.
+	 * @return true if the node is this node's left child, false otherwise.
+	 */
+	private boolean isLeft(Node<K, V> node) {
+		return left == node;
+	}
+
+	/**
+	 * Check whether a node is the right child of this node.
+	 *
+	 * @param node
+	 *            The potential right child.
+	 * @return true if the node is this node's right child, false otherwise.
+	 */
+	private boolean isRight(Node<K, V> node) {
+		return right == node;
+	}
+
+	/**
+	 * Get the number of nodes of the tree rooted at this node.
+	 *
+	 * @return number of nodes contained in the tree rooted at node
+	 */
+	int nodes() {
+		return 1 + (left == null ? 0 : left.nodes()) + (right == null ? 0 : right.nodes());
+	}
+
+	/**
+	 * Print the tree to the console.
+	 */
+	public void print() {
+		TreePrinter.printNode(this);
 	}
 
 	/**
@@ -264,37 +368,38 @@ public class Node<K extends Comparable<K>, V> {
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
 	private boolean rebalanceLeftGrown() {
+		Node<K, V> node = this;
 		switch (skew) {
 		case LEFT_HIGH:
 			if (left.skew == Skew.LEFT_HIGH) {
-				rotateCW();
-				skew = Skew.BALANCED;
-				right.skew = Skew.BALANCED;
+				node = rotateCW();
+				node.skew = Skew.BALANCED;
+				node.right.skew = Skew.BALANCED;
 			} else {
 				Skew s = left.right.skew;
 				left.rotateCCW();
-				rotateCW();
+				node = rotateCW();
 				switch (s) {
 				case LEFT_HIGH:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.RIGHT_HIGH;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.RIGHT_HIGH;
 					break;
 				case RIGHT_HIGH:
-					left.skew = Skew.LEFT_HIGH;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.LEFT_HIGH;
+					node.right.skew = Skew.BALANCED;
 					break;
 				default:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.BALANCED;
 				}
-				skew = Skew.BALANCED;
+				node.skew = Skew.BALANCED;
 			}
 			return false;
 		case RIGHT_HIGH:
-			skew = Skew.BALANCED;
+			node.skew = Skew.BALANCED;
 			return false;
 		default:
-			skew = Skew.LEFT_HIGH;
+			node.skew = Skew.LEFT_HIGH;
 			return true;
 		}
 	}
@@ -305,43 +410,44 @@ public class Node<K extends Comparable<K>, V> {
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
 	private boolean rebalanceLeftShrunk() {
+		Node<K, V> node = this;
 		switch (skew) {
 		case LEFT_HIGH:
-			skew = Skew.BALANCED;
+			node.skew = Skew.BALANCED;
 			return true;
 		case RIGHT_HIGH:
 			if (right.skew == Skew.RIGHT_HIGH) {
-				rotateCCW();
-				skew = Skew.BALANCED;
-				left.skew = Skew.BALANCED;
+				node = rotateCCW();
+				node.skew = Skew.BALANCED;
+				node.left.skew = Skew.BALANCED;
 				return true;
 			} else if (right.skew == Skew.BALANCED) {
-				rotateCCW();
-				skew = Skew.LEFT_HIGH;
-				left.skew = Skew.RIGHT_HIGH;
+				node = rotateCCW();
+				node.skew = Skew.LEFT_HIGH;
+				node.left.skew = Skew.RIGHT_HIGH;
 				return false;
 			} else {
 				Skew s = right.left.skew;
 				right.rotateCW();
-				rotateCCW();
+				node = rotateCCW();
 				switch (s) {
 				case LEFT_HIGH:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.RIGHT_HIGH;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.RIGHT_HIGH;
 					break;
 				case RIGHT_HIGH:
-					left.skew = Skew.LEFT_HIGH;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.LEFT_HIGH;
+					node.right.skew = Skew.BALANCED;
 					break;
 				default:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.BALANCED;
 				}
-				skew = Skew.BALANCED;
+				node.skew = Skew.BALANCED;
 				return true;
 			}
 		default:
-			skew = Skew.RIGHT_HIGH;
+			node.skew = Skew.RIGHT_HIGH;
 			return false;
 		}
 	}
@@ -352,37 +458,38 @@ public class Node<K extends Comparable<K>, V> {
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
 	private boolean rebalanceRightGrown() {
+		Node<K, V> node = this;
 		switch (skew) {
 		case LEFT_HIGH:
-			skew = Skew.BALANCED;
+			node.skew = Skew.BALANCED;
 			return false;
 		case RIGHT_HIGH:
 			if (right.skew == Skew.RIGHT_HIGH) {
-				rotateCCW();
-				skew = Skew.BALANCED;
-				left.skew = Skew.BALANCED;
+				node = rotateCCW();
+				node.skew = Skew.BALANCED;
+				node.left.skew = Skew.BALANCED;
 			} else {
 				Skew s = right.left.skew;
 				right.rotateCW();
-				rotateCCW();
+				node = rotateCCW();
 				switch (s) {
 				case LEFT_HIGH:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.RIGHT_HIGH;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.RIGHT_HIGH;
 					break;
 				case RIGHT_HIGH:
-					left.skew = Skew.LEFT_HIGH;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.LEFT_HIGH;
+					node.right.skew = Skew.BALANCED;
 					break;
 				default:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.BALANCED;
 				}
-				skew = Skew.BALANCED;
+				node.skew = Skew.BALANCED;
 			}
 			return false;
 		default:
-			skew = Skew.RIGHT_HIGH;
+			node.skew = Skew.RIGHT_HIGH;
 			return true;
 		}
 	}
@@ -393,43 +500,44 @@ public class Node<K extends Comparable<K>, V> {
 	 * @return true if the parent tree should be reSkew.BALANCED too
 	 */
 	private boolean rebalanceRightShrunk() {
+		Node<K, V> node = this;
 		switch (skew) {
 		case RIGHT_HIGH:
-			skew = Skew.BALANCED;
+			node.skew = Skew.BALANCED;
 			return true;
 		case LEFT_HIGH:
 			if (left.skew == Skew.LEFT_HIGH) {
-				rotateCW();
-				skew = Skew.BALANCED;
-				right.skew = Skew.BALANCED;
+				node = rotateCW();
+				node.skew = Skew.BALANCED;
+				node.right.skew = Skew.BALANCED;
 				return true;
 			} else if (left.skew == Skew.BALANCED) {
-				rotateCW();
-				skew = Skew.RIGHT_HIGH;
-				right.skew = Skew.LEFT_HIGH;
+				node = rotateCW();
+				node.skew = Skew.RIGHT_HIGH;
+				node.right.skew = Skew.LEFT_HIGH;
 				return false;
 			} else {
 				Skew s = left.right.skew;
 				left.rotateCCW();
-				rotateCW();
+				node = rotateCW();
 				switch (s) {
 				case LEFT_HIGH:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.RIGHT_HIGH;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.RIGHT_HIGH;
 					break;
 				case RIGHT_HIGH:
-					left.skew = Skew.LEFT_HIGH;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.LEFT_HIGH;
+					node.right.skew = Skew.BALANCED;
 					break;
 				default:
-					left.skew = Skew.BALANCED;
-					right.skew = Skew.BALANCED;
+					node.left.skew = Skew.BALANCED;
+					node.right.skew = Skew.BALANCED;
 				}
-				skew = Skew.BALANCED;
+				node.skew = Skew.BALANCED;
 				return true;
 			}
 		default:
-			skew = Skew.LEFT_HIGH;
+			node.skew = Skew.LEFT_HIGH;
 			return false;
 		}
 	}
@@ -440,27 +548,15 @@ public class Node<K extends Comparable<K>, V> {
 	 * The skew factor are not updated by this method, they <em>must</em> be
 	 * updated by the caller
 	 * </p>
+	 *
+	 * @return Node that is now located at this position in the tree.
 	 */
-	private void rotateCCW() {
-		final Collection<V> tmpElt = elements;
-		final K tmpSkv = key;
-		final Node<K, V> tmpNext = next == right ? this : next;
-		final Node<K, V> tmpPrev = prev;
-		final Node<K, V> tmpRightNext = right.next;
-		final Node<K, V> tmpRightPrev = right.prev == this ? right : right.prev;
-		elements = right.elements;
-		key = right.key;
-		setNext(tmpRightNext);
-		setPrev(tmpRightPrev);
-		right.elements = tmpElt;
-		right.key = tmpSkv;
-		right.setPrev(tmpPrev);
-		right.setNext(tmpNext);
-		final Node<K, V> tmpNode = right;
-		setRight(tmpNode.right);
-		tmpNode.setRight(tmpNode.left);
-		tmpNode.setLeft(left);
-		setLeft(tmpNode);
+	private Node<K, V> rotateCCW() {
+		final Node<K, V> tmpRight = right;
+		exchange(tmpRight);
+		setRight(tmpRight.left);
+		tmpRight.setLeft(this);
+		return tmpRight;
 	}
 
 	/**
@@ -469,27 +565,15 @@ public class Node<K extends Comparable<K>, V> {
 	 * The skew factor are not updated by this method, they <em>must</em> be
 	 * updated by the caller
 	 * </p>
+	 *
+	 * @return Node that is now located at this position in the tree.
 	 */
-	private void rotateCW() {
-		final Collection<V> tmpElt = elements;
-		final K tmpSkv = key;
-		final Node<K, V> tmpNext = next;
-		final Node<K, V> tmpPrev = prev == left ? this : prev;
-		final Node<K, V> tmpLeftNext = left.next == this ? left : left.next;
-		final Node<K, V> tmpLeftPrev = left.prev;
-		elements = left.elements;
-		key = left.key;
-		setPrev(tmpLeftPrev);
-		setNext(tmpLeftNext);
-		left.elements = tmpElt;
-		left.key = tmpSkv;
-		left.setNext(tmpNext);
-		left.setPrev(tmpPrev);
-		final Node<K, V> tmpNode = left;
-		setLeft(tmpNode.left);
-		tmpNode.setLeft(tmpNode.right);
-		tmpNode.setRight(right);
-		setRight(tmpNode);
+	private Node<K, V> rotateCW() {
+		final Node<K, V> tmpLeft = left;
+		exchange(tmpLeft);
+		setLeft(tmpLeft.right);
+		tmpLeft.setRight(this);
+		return tmpLeft;
 	}
 
 	/**
@@ -551,15 +635,6 @@ public class Node<K extends Comparable<K>, V> {
 	 */
 	int size() {
 		return elements.size() + (left == null ? 0 : left.size()) + (right == null ? 0 : right.size());
-	}
-
-	/**
-	 * Get the number of nodes of the tree rooted at this node.
-	 *
-	 * @return number of nodes contained in the tree rooted at node
-	 */
-	int nodes() {
-		return 1 + (left == null ? 0 : left.nodes()) + (right == null ? 0 : right.nodes());
 	}
 
 	@Override

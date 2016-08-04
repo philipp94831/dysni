@@ -48,8 +48,8 @@ public class BruteForceEntityResolver<RECORD, ID> implements EntityResolver<RECO
 
 	@Override
 	public Collection<ID> resolve(RECORD record, ID recordId) throws StoreException {
-		List<ID> matches = StreamSupport.stream(store.spliterator(), parallelizable)
-				.filter(candidate -> !recordId.equals(candidate.getKey()) && sim.areSimilar(record, candidate.getValue()))
+		List<ID> matches = StreamSupport.stream(store.spliterator(), parallelizable).filter(
+				candidate -> !recordId.equals(candidate.getKey()) && sim.areSimilar(record, candidate.getValue()))
 				.map(Entry::getKey).collect(Collectors.toList());
 		for (ID match : matches) {
 			uf.union(recordId, match);

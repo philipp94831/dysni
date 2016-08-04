@@ -43,6 +43,7 @@ public enum Dataset {
 			return MOVIES;
 		case "ncvoters":
 			return NCVOTERS;
+		case "febrl":
 		case "people":
 			return PEOPLE;
 		default:

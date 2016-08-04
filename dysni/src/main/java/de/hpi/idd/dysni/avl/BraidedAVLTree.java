@@ -73,7 +73,7 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	}
 
 	/** Top level node. */
-	private Node<K, V> top;
+	Node<K, V> root;
 
 	/**
 	 * Delete an element from the tree.
@@ -96,9 +96,7 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 				return false;
 			}
 			if (node.contains(element)) {
-				if (node.delete(element)) {
-					top = null;
-				}
+				node.delete(element);
 				return true;
 			}
 			return false;
@@ -114,7 +112,7 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	 * @return node with the specified key, null if no node is found
 	 */
 	public Node<K, V> find(K key) {
-		for (Node<K, V> node = top; node != null;) {
+		for (Node<K, V> node = root; node != null;) {
 			if (node.getKey().compareTo(key) < 0) {
 				if (node.getRight() == null) {
 					return null;
@@ -142,11 +140,11 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	 * @see Node#getNext
 	 */
 	public Node<K, V> getLargest() {
-		return top == null ? null : top.getLargest();
+		return root == null ? null : root.getLargest();
 	}
 
 	Node<K, V> getRoot() {
-		return top;
+		return root;
 	}
 
 	/**
@@ -159,27 +157,25 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	 * @see Node#getNext
 	 */
 	public Node<K, V> getSmallest() {
-		return top == null ? null : top.getSmallest();
+		return root == null ? null : root.getSmallest();
 	}
 
 	/**
 	 * Insert an element in the tree.
 	 *
 	 * @param key
-	 *            the element's sorting key (silently ignored if null)
+	 *            the element's sorting key
 	 * @param element
-	 *            element to insert (silently ignored if null)
-	 * @return 
+	 *            element to insert
+	 * @return Node where the element was inserted
 	 */
 	public Node<K, V> insert(K key, V element) {
-		if (key != null || element != null) {
-			if (top == null) {
-				top = new Node<>(key, element);
-				return top;
+		if (key != null) {
+			if (root == null) {
+				root = new Node<>(this, key, element);
+				return root;
 			} else {
-				top.insert(key, element);
-				//TODO: directly return correct node
-				return find(key);
+				return root.insert(key, element);
 			}
 		}
 		return null;
@@ -191,7 +187,7 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	 * @return true if the tree is empty
 	 */
 	public boolean isEmpty() {
-		return top == null;
+		return root == null;
 	}
 
 	/**
@@ -203,20 +199,27 @@ public class BraidedAVLTree<K extends Comparable<K>, V> implements Iterable<Node
 	}
 
 	/**
-	 * Get the number of elements of the tree.
-	 *
-	 * @return number of elements contained in the tree
-	 */
-	public int size() {
-		return top == null ? 0 : top.size();
-	}
-
-	/**
 	 * Get the number of nodes of the tree.
 	 *
 	 * @return number of nodes contained in the tree
 	 */
 	public int nodes() {
-		return top == null ? 0 : top.nodes();
+		return root == null ? 0 : root.nodes();
+	}
+
+	/**
+	 * Print the tree to the console.
+	 */
+	public void print() {
+		TreePrinter.print(this);
+	}
+
+	/**
+	 * Get the number of elements of the tree.
+	 *
+	 * @return number of elements contained in the tree
+	 */
+	public int size() {
+		return root == null ? 0 : root.size();
 	}
 }

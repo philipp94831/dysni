@@ -2,6 +2,7 @@ package de.hpi.idd.dysni;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,9 +84,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 */
 	public DynamicSortedNeighborhoodIndexer<RECORD, ID> addIndexes(
 			Collection<DySNIndexConfiguration<RECORD, ?, ID>> configs) {
-		for (DySNIndexConfiguration<RECORD, ?, ID> config : configs) {
-			addIndex(config);
-		}
+		configs.forEach(this::addIndex);
 		return this;
 	}
 
@@ -142,7 +141,9 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 */
 	@Override
 	public Collection<ID> insert(RECORD record, ID recordId) throws StoreException {
-		store.storeRecord(recordId, record);
+		if (recordId != null) {
+			store.storeRecord(recordId, record);
+		}
 		Set<ID> candidates = indexes.stream().flatMap(index -> index.insert(record, recordId).stream())
 				.collect(Collectors.toSet());
 		return resolve(record, recordId, candidates);
@@ -170,6 +171,7 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 	 * @return ids of similar records
 	 */
 	private Set<ID> matchCandidates(RECORD record, Set<ID> candidates) {
+		comparisons += candidates.size();
 		return stream(candidates).filter(candidate -> areSimilar(record, candidate)).collect(Collectors.toSet());
 	}
 
@@ -184,14 +186,33 @@ public class DynamicSortedNeighborhoodIndexer<RECORD, ID> implements EntityResol
 		return resolve(record, recordId, candidates);
 	}
 
+	/**
+	 * Resolve similarity for a record and the given candidates.
+	 *
+	 * @param record
+	 *            the record for which similar records should be resolved
+	 * @param recordId
+	 *            the unique identifier of the record
+	 * @param candidates
+	 *            potential duplicates represented by their unique id
+	 * @return ids of duplicate records
+	 */
 	private Collection<ID> resolve(RECORD record, ID recordId, Set<ID> candidates) {
 		candidates.remove(recordId);
-		comparisons += candidates.size();
 		Set<ID> matches = matchCandidates(record, candidates);
-		for (ID match : matches) {
-			uf.union(recordId, match);
+		final ID rep;
+		if (recordId != null) {
+			rep = recordId;
+		} else {
+			if (matches.isEmpty()) {
+				return Collections.emptyList();
+			}
+			rep = matches.iterator().next();
 		}
-		Collection<ID> component = uf.getComponent(recordId);
+		for (ID match : matches) {
+			uf.union(rep, match);
+		}
+		Collection<ID> component = uf.getComponent(rep);
 		component.remove(recordId);
 		return component;
 	}

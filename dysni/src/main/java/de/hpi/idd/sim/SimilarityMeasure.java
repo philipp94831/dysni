@@ -55,5 +55,5 @@ public interface SimilarityMeasure<T> {
 	 *            second object
 	 * @return similarity of the objects
 	 */
-	abstract double calculateSimilarity(T e1, T e2);
+	double calculateSimilarity(T e1, T e2);
 }

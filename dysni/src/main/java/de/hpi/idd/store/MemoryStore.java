@@ -25,6 +25,9 @@ public class MemoryStore<K, V> implements RecordStore<K, V> {
 
 	@Override
 	public void storeRecord(K id, V record) {
+		if (id == null) {
+			throw new NullPointerException("Cannot store record with no id");
+		}
 		store.put(id, record);
 	}
 }

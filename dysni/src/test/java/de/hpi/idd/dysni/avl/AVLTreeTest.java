@@ -15,6 +15,7 @@ public class AVLTreeTest {
 
 	private void insert(String s) {
 		assertEquals(s, tree.insert(s, s.toLowerCase()).getKey());
+		// BTreePrinter.printNode(tree.getRoot());
 	}
 
 	@Test
@@ -198,5 +199,13 @@ public class AVLTreeTest {
 		assertNull(a.getPrevious());
 		assertNull(a.getLeft());
 		assertNull(a.getRight());
+	}
+
+	@Test
+	public void testRootRotation() {
+		insert("A");
+		insert("B");
+		insert("C");
+		assertEquals("B", tree.getRoot().getKey());
 	}
 }

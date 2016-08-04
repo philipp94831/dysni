@@ -53,6 +53,20 @@ class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 	}
 
 	/**
+	 * Find possible duplicates by building a window starting from the given
+	 * node.
+	 *
+	 * @param record
+	 *            the record for which duplicates should be found
+	 * @param node
+	 *            the node to start search from
+	 * @return the ids of possible duplicate records
+	 */
+	private Collection<ID> findCandidates(RECORD record, Node<KEY, ID> node) {
+		return windowBuilder.buildWindow(record, node);
+	}
+
+	/**
 	 * Insert a new record into the index using its id
 	 *
 	 * @param record
@@ -63,10 +77,6 @@ class DySNIndex<RECORD, KEY extends Comparable<KEY>, ID> {
 	public Collection<ID> insert(RECORD record, ID value) {
 		Node<KEY, ID> node = tree.insert(keyHandler.computeKey(record), value);
 		return findCandidates(record, node);
-	}
-	
-	private Collection<ID> findCandidates(RECORD record, Node<KEY, ID> node) {
-		return windowBuilder.buildWindow(record, node);
 	}
 
 	public int size() {
