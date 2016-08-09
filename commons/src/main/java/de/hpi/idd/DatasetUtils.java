@@ -47,11 +47,11 @@ abstract public class DatasetUtils {
 	
 	/**
 	 * 
-	 * Provided with all the attributes' similarities, it decides whether it is a match or not.
+	 * Provided with all the attributes' similarities, it returns an overall similarity between [0, 1].
 	 * 
 	 * @param similarities: {<"FirstName", 0.75>, <"LastName", 0.85>, <"Year", 0.8>}
-	 * @return If it is a match or not: e.g. True
+	 * @return An overall similarity value in [0, 1]
 	 */
-	abstract public Boolean isMatch(Map<String, Double> similarities);
+	abstract public Double calculateAttributeSimilarity(Map<String, Double> similarities);
 	
 }

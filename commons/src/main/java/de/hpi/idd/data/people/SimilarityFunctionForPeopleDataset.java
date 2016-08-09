@@ -102,7 +102,6 @@ public class SimilarityFunctionForPeopleDataset extends DatasetUtils {
         return 0.0;
     }
 
-    @Override
     public Boolean isMatch(Map<String, Double> similarities) {
         Double totalWeight = 0.0;
         Double sum = 0.0;
@@ -170,4 +169,10 @@ public class SimilarityFunctionForPeopleDataset extends DatasetUtils {
             }
         }
     }
+
+	@Override
+	public Double calculateAttributeSimilarity(Map<String, Double> similarities) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

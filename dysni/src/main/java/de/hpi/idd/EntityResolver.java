@@ -1,9 +1,9 @@
 package de.hpi.idd;
 
+import de.hpi.idd.store.StoreException;
+
 import java.io.Closeable;
 import java.util.Collection;
-
-import de.hpi.idd.store.StoreException;
 
 /**
  * Interface for entity resolvers to determine similar or equal entities.
@@ -23,7 +23,7 @@ public interface EntityResolver<RECORD, ID> extends Closeable {
 	 *            the record to be added
 	 * @param recordId
 	 *            the unique identifier of the record
-	 * @throws Exception
+	 * @throws StoreException
 	 */
 	Collection<ID> insert(RECORD record, ID recordId) throws StoreException;
 
@@ -35,7 +35,7 @@ public interface EntityResolver<RECORD, ID> extends Closeable {
 	 * @param recordId
 	 *            the unique identifier of the record
 	 * @return ids of duplicate records
-	 * @throws Exception
+	 * @throws StoreException
 	 */
 	Collection<ID> resolve(RECORD record, ID recordId) throws StoreException;
 

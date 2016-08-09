@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.util.*;
 
 import com.opencsv.CSVWriter;
-
 import de.hpi.idd.DatasetUtils;
-
 import org.simmetrics.StringMetric;
 import org.simmetrics.metrics.StringMetrics;
 
@@ -122,6 +120,7 @@ public class CoraUtility extends DatasetUtils {
     /**
      * Works now. Use it.
      */
+    @Override
     public Double calculateAttributeSimilarity(Map<String, Double> similarities) {
         try {
             Double sim = 0.0;
@@ -241,12 +240,6 @@ public class CoraUtility extends DatasetUtils {
         //
 
     }
-
-	@Override
-	public Boolean isMatch(Map<String, Double> similarities) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 

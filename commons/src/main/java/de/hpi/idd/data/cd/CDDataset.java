@@ -253,7 +253,7 @@ public class CDDataset extends DatasetUtils {
 
 	public double similarity(CDRecord firstRecord, CDRecord secondRecord) {
 		Map<String, Double> similarityMap = getSimilarityOfRecords(firstRecord, secondRecord);
-		return aggregateSimilarities(similarityMap);
+		return calculateAttributeSimilarity(similarityMap);
 	}
 
 	private static String trimNumbers(String s) {
@@ -337,12 +337,7 @@ public class CDDataset extends DatasetUtils {
 	}
 
 	@Override
-	public Boolean isMatch(Map<String, Double> similarities) {
-		double result = aggregateSimilarities(similarities);
-		return THRESHOLD <= result;
-	}
-
-	private double aggregateSimilarities(Map<String, Double> similarities) {
+	public Double calculateAttributeSimilarity(Map<String, Double> similarities) {
 		double result = 0.0;
 		for (Entry<String, Double> entry : similarities.entrySet()) {
 			result += Attribute.getForName(entry.getKey()).weight() * entry.getValue();
