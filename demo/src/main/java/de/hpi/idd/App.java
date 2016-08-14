@@ -1,8 +1,8 @@
 package de.hpi.idd;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
@@ -23,7 +23,7 @@ public class App {
 		BRUTE_FORCE, DYSNI
 	}
 
-	private static final Dataset DATASET = Dataset.PEOPLE;
+	private static final Dataset DATASET = Dataset.CD;
 	private static final ERType ER_TYPE = ERType.DYSNI;
 	private static final CSVFormat FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 
@@ -46,6 +46,7 @@ public class App {
 	public static void main(String[] args) {
 		DatasetUtils du = DATASET.getDataset();
 		SymmetricTable<String, Boolean> duplicatesToCheck = new SymmetricTable<>();
+		Map<Integer, Long> incrementalTimes = new HashMap<>();
 		try (CSVParser parser = FORMAT.parse(new InputStreamReader(DATASET.getFile()));
 				EntityResolver<Map<String, Object>, String> er = getEntityResolver(DATASET, new MemoryStore<>())) {
 			int i = 0;
@@ -53,7 +54,10 @@ public class App {
 			for (CSVRecord record : parser) {
 				Map<String, Object> rec = du.parseRecord(record.toMap());
 				String id = (String) rec.get(Dataset.ID);
+				long incStart = System.nanoTime();
 				Collection<String> duplicates = er.insert(rec, id);
+				long incEnd = System.nanoTime();
+				incrementalTimes.put(i, incEnd - incStart);
 				for (String duplicate : duplicates) {
 					duplicatesToCheck.put(id, duplicate, true);
 				}
@@ -67,6 +71,20 @@ public class App {
 		} catch (IOException e) {
 			throw new RuntimeException("Error parsing CSV", e);
 		}
+
+		try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(DATASET.toString() + "_incremental.txt"), "utf-8"))) {
+			for (Integer key: incrementalTimes.keySet()) {
+				writer.write(key + ", " + incrementalTimes.get(key) + "\n");
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
 		Evaluator evaluator = new Evaluator(DATASET.getGroundThruth());
 		evaluator.evaluate(duplicatesToCheck);
 	}
