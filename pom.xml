@@ -3,13 +3,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.hpi.idd</groupId>
-  <artifactId>idd</artifactId>
+  <artifactId>dysni</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
-    <module>commons</module>
-    <module>dysni</module>
-    <module>demo</module>
+    <module>core</module>
+    <module>example</module>
   </modules>
   <build>
     <plugins>
